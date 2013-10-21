@@ -43,6 +43,11 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.chkProblem = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.btnFolder = new System.Windows.Forms.Button();
+            this.btnClearList = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.btnRemoveUnusedFile = new System.Windows.Forms.Button();
+            this.listFiles = new System.Windows.Forms.CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)(this.picHeader)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picItem)).BeginInit();
             this.SuspendLayout();
@@ -76,35 +81,40 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 214);
+            this.label3.Location = new System.Drawing.Point(203, 212);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(62, 12);
             this.label3.TabIndex = 4;
             this.label3.Text = "見出し画像";
+            this.label3.Visible = false;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // picHeader
             // 
             this.picHeader.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.picHeader.Location = new System.Drawing.Point(12, 239);
+            this.picHeader.Location = new System.Drawing.Point(205, 236);
             this.picHeader.Name = "picHeader";
-            this.picHeader.Size = new System.Drawing.Size(128, 128);
+            this.picHeader.Size = new System.Drawing.Size(98, 91);
             this.picHeader.TabIndex = 5;
             this.picHeader.TabStop = false;
+            this.picHeader.Visible = false;
+            this.picHeader.Click += new System.EventHandler(this.picHeader_Click);
             // 
             // btnHeaderPic
             // 
-            this.btnHeaderPic.Location = new System.Drawing.Point(12, 385);
+            this.btnHeaderPic.Location = new System.Drawing.Point(309, 240);
             this.btnHeaderPic.Name = "btnHeaderPic";
-            this.btnHeaderPic.Size = new System.Drawing.Size(128, 42);
+            this.btnHeaderPic.Size = new System.Drawing.Size(76, 42);
             this.btnHeaderPic.TabIndex = 6;
             this.btnHeaderPic.Text = "画像登録";
             this.btnHeaderPic.UseVisualStyleBackColor = true;
+            this.btnHeaderPic.Visible = false;
             this.btnHeaderPic.Click += new System.EventHandler(this.btnHeaderPic_Click);
             // 
             // picItem
             // 
             this.picItem.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picItem.Location = new System.Drawing.Point(172, 278);
+            this.picItem.Location = new System.Drawing.Point(15, 240);
             this.picItem.Name = "picItem";
             this.picItem.Size = new System.Drawing.Size(64, 64);
             this.picItem.TabIndex = 7;
@@ -113,7 +123,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(170, 250);
+            this.label4.Location = new System.Drawing.Point(13, 212);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(77, 12);
             this.label4.TabIndex = 8;
@@ -121,7 +131,7 @@
             // 
             // btnItemOld
             // 
-            this.btnItemOld.Location = new System.Drawing.Point(242, 278);
+            this.btnItemOld.Location = new System.Drawing.Point(85, 240);
             this.btnItemOld.Name = "btnItemOld";
             this.btnItemOld.Size = new System.Drawing.Size(95, 29);
             this.btnItemOld.TabIndex = 9;
@@ -131,7 +141,7 @@
             // 
             // btnItemNew
             // 
-            this.btnItemNew.Location = new System.Drawing.Point(242, 313);
+            this.btnItemNew.Location = new System.Drawing.Point(85, 275);
             this.btnItemNew.Name = "btnItemNew";
             this.btnItemNew.Size = new System.Drawing.Size(95, 29);
             this.btnItemNew.TabIndex = 10;
@@ -141,9 +151,9 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(146, 387);
+            this.btnOK.Location = new System.Drawing.Point(9, 496);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(101, 42);
+            this.btnOK.Size = new System.Drawing.Size(208, 42);
             this.btnOK.TabIndex = 16;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -152,9 +162,9 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(253, 386);
+            this.btnCancel.Location = new System.Drawing.Point(223, 496);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(94, 44);
+            this.btnCancel.Size = new System.Drawing.Size(151, 44);
             this.btnCancel.TabIndex = 17;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -179,11 +189,64 @@
             this.label7.TabIndex = 24;
             this.label7.Text = "※RSS://http://XXXXという書き方でRSSを購読できます";
             // 
+            // btnFolder
+            // 
+            this.btnFolder.Location = new System.Drawing.Point(103, 443);
+            this.btnFolder.Name = "btnFolder";
+            this.btnFolder.Size = new System.Drawing.Size(90, 45);
+            this.btnFolder.TabIndex = 26;
+            this.btnFolder.Text = "フォルダ追加";
+            this.btnFolder.UseVisualStyleBackColor = true;
+            this.btnFolder.Click += new System.EventHandler(this.btnFolder_Click);
+            // 
+            // btnClearList
+            // 
+            this.btnClearList.Location = new System.Drawing.Point(199, 443);
+            this.btnClearList.Name = "btnClearList";
+            this.btnClearList.Size = new System.Drawing.Size(90, 45);
+            this.btnClearList.TabIndex = 27;
+            this.btnClearList.Text = "リストクリア";
+            this.btnClearList.UseVisualStyleBackColor = true;
+            this.btnClearList.Click += new System.EventHandler(this.btnCleraList_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(9, 443);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(90, 45);
+            this.button1.TabIndex = 28;
+            this.button1.Text = "ファイル追加";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // btnRemoveUnusedFile
+            // 
+            this.btnRemoveUnusedFile.Location = new System.Drawing.Point(295, 443);
+            this.btnRemoveUnusedFile.Name = "btnRemoveUnusedFile";
+            this.btnRemoveUnusedFile.Size = new System.Drawing.Size(90, 45);
+            this.btnRemoveUnusedFile.TabIndex = 29;
+            this.btnRemoveUnusedFile.Text = "未指定ファイルのクリア";
+            this.btnRemoveUnusedFile.UseVisualStyleBackColor = true;
+            this.btnRemoveUnusedFile.Click += new System.EventHandler(this.btnRemoveUnusedFiles_Click);
+            // 
+            // listFiles
+            // 
+            this.listFiles.FormattingEnabled = true;
+            this.listFiles.Location = new System.Drawing.Point(15, 338);
+            this.listFiles.Name = "listFiles";
+            this.listFiles.Size = new System.Drawing.Size(361, 88);
+            this.listFiles.TabIndex = 30;
+            // 
             // FormAddItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 445);
+            this.ClientSize = new System.Drawing.Size(388, 549);
+            this.Controls.Add(this.listFiles);
+            this.Controls.Add(this.btnRemoveUnusedFile);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnClearList);
+            this.Controls.Add(this.btnFolder);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.chkProblem);
             this.Controls.Add(this.btnCancel);
@@ -227,5 +290,10 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox chkProblem;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button btnFolder;
+        private System.Windows.Forms.Button btnClearList;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnRemoveUnusedFile;
+        private System.Windows.Forms.CheckedListBox listFiles;
     }
 }

@@ -340,6 +340,9 @@ namespace GodaiLibrary
         private static void sendFilesSub(Network network, String strDirectory, String strSubPath)
         {
             DirectoryInfo dirinfo = new DirectoryInfo(strDirectory);
+            if (!dirinfo.Exists)
+                return;
+
             foreach (var file in dirinfo.GetFiles())
             {
                 sendFile(network, file.Name, file.FullName, strSubPath);

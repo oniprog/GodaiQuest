@@ -111,8 +111,8 @@ namespace GodaiQuest
             {
                 String strHalfPath = Path.Combine(strAddPath, fileinfo.Name);
                 this.mFileSet.Add(new FilePair(fileinfo.FullName, strHalfPath));
-//                this.listFiles.Items.Add(strHalfPath);
-//                this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
+                this.listFiles.Items.Add(strHalfPath);
+                this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
             }
             foreach (var dir in dirinfo.GetDirectories() ) {
                 addFolder(dir.FullName, Path.Combine(strAddPath, dir.Name));
@@ -121,7 +121,7 @@ namespace GodaiQuest
 
         private void btnCleraList_Click(object sender, EventArgs e)
         {
-//            this.listFiles.Items.Clear();
+            this.listFiles.Items.Clear();
             this.mFileSet.Clear();
         }
 
@@ -135,8 +135,8 @@ namespace GodaiQuest
             foreach (var filename in dlg.FileNames)
             {
                 this.mFileSet.Add(new FilePair(Path.GetFullPath(filename), Path.GetFileName(filename)));
-//                this.listFiles.Items.Add(Path.GetFileName(filename));
-//                this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
+                this.listFiles.Items.Add(Path.GetFileName(filename));
+                this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
             }
         }
 
@@ -147,9 +147,9 @@ namespace GodaiQuest
             {
                 if (File.Exists(file))
                 {
-//                    this.listFiles.Items.Add(Path.GetFileName(file));
+                    this.listFiles.Items.Add(Path.GetFileName(file));
                     this.mFileSet.Add(new FilePair(Path.GetFullPath(file), Path.GetFileName(file)));
-//                    this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
+                    this.listFiles.SetItemChecked(this.listFiles.Items.Count - 1, true);
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace GodaiQuest
 
         private void btnRemoveUnusedFiles_Click(object sender, EventArgs e)
         {
-#if false
+#if true
             for (int it = 0; it < this.listFiles.Items.Count; ++it)
             {
                 bool bChecked = this.listFiles.GetItemChecked(it);
@@ -184,6 +184,16 @@ namespace GodaiQuest
                 }
             }
 #endif
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void picHeader_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

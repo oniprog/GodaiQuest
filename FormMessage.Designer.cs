@@ -43,6 +43,7 @@
             this.txtSystemMessage.Multiline = true;
             this.txtSystemMessage.Name = "txtSystemMessage";
             this.txtSystemMessage.ReadOnly = true;
+            this.txtSystemMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtSystemMessage.Size = new System.Drawing.Size(527, 417);
             this.txtSystemMessage.TabIndex = 0;
             // 

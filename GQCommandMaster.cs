@@ -419,7 +419,7 @@ namespace GodaiQuest
                     return false;
                 }
 
-#if false
+#if true
                 //            Network.sendFiles(this.mNetwork, strDataFolder);
                 // ファイルを全部転送する
                 foreach (var fileinfo in setFile)

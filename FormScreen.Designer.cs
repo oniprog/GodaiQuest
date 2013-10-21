@@ -42,7 +42,6 @@
             this.btnGetout = new System.Windows.Forms.Button();
             this.txtTalk = new System.Windows.Forms.TextBox();
             this.btnTalk = new System.Windows.Forms.Button();
-            this.btnTalkCLear = new System.Windows.Forms.Button();
             this.picHeader = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.labExpTotal = new System.Windows.Forms.Label();
@@ -50,6 +49,7 @@
             this.btnAshiatoLog = new System.Windows.Forms.Button();
             this.btnWarp = new System.Windows.Forms.Button();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.btnClear = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picScreen)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picHeader)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -60,9 +60,9 @@
             this.picScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.picScreen.Location = new System.Drawing.Point(152, 12);
+            this.picScreen.Location = new System.Drawing.Point(241, 19);
             this.picScreen.Name = "picScreen";
-            this.picScreen.Size = new System.Drawing.Size(640, 640);
+            this.picScreen.Size = new System.Drawing.Size(597, 612);
             this.picScreen.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picScreen.TabIndex = 0;
             this.picScreen.TabStop = false;
@@ -80,7 +80,7 @@
             // btnEdit
             // 
             this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEdit.Location = new System.Drawing.Point(805, 478);
+            this.btnEdit.Location = new System.Drawing.Point(852, 510);
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(129, 37);
             this.btnEdit.TabIndex = 2;
@@ -99,7 +99,7 @@
             // btnEnd
             // 
             this.btnEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEnd.Location = new System.Drawing.Point(805, 596);
+            this.btnEnd.Location = new System.Drawing.Point(853, 647);
             this.btnEnd.Name = "btnEnd";
             this.btnEnd.Size = new System.Drawing.Size(129, 37);
             this.btnEnd.TabIndex = 3;
@@ -110,7 +110,7 @@
             // btnChangeAccount
             // 
             this.btnChangeAccount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnChangeAccount.Location = new System.Drawing.Point(805, 532);
+            this.btnChangeAccount.Location = new System.Drawing.Point(852, 564);
             this.btnChangeAccount.Name = "btnChangeAccount";
             this.btnChangeAccount.Size = new System.Drawing.Size(129, 37);
             this.btnChangeAccount.TabIndex = 4;
@@ -127,10 +127,12 @@
             // 
             this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.richTextBox1.Location = new System.Drawing.Point(2, 148);
+            this.richTextBox1.BackColor = System.Drawing.Color.Silver;
+            this.richTextBox1.ForeColor = System.Drawing.Color.Black;
+            this.richTextBox1.Location = new System.Drawing.Point(12, 21);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(143, 170);
+            this.richTextBox1.Size = new System.Drawing.Size(223, 514);
             this.richTextBox1.TabIndex = 6;
             this.richTextBox1.Text = "";
             this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -143,7 +145,7 @@
             // btnGetout
             // 
             this.btnGetout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGetout.Location = new System.Drawing.Point(805, 21);
+            this.btnGetout.Location = new System.Drawing.Point(852, 21);
             this.btnGetout.Name = "btnGetout";
             this.btnGetout.Size = new System.Drawing.Size(123, 38);
             this.btnGetout.TabIndex = 7;
@@ -156,52 +158,42 @@
             this.txtTalk.AcceptsReturn = true;
             this.txtTalk.AcceptsTab = true;
             this.txtTalk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txtTalk.Location = new System.Drawing.Point(2, 509);
+            this.txtTalk.Location = new System.Drawing.Point(12, 541);
             this.txtTalk.Multiline = true;
             this.txtTalk.Name = "txtTalk";
-            this.txtTalk.Size = new System.Drawing.Size(143, 103);
+            this.txtTalk.Size = new System.Drawing.Size(223, 103);
             this.txtTalk.TabIndex = 8;
             // 
             // btnTalk
             // 
             this.btnTalk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnTalk.Location = new System.Drawing.Point(2, 618);
+            this.btnTalk.Location = new System.Drawing.Point(12, 650);
             this.btnTalk.Name = "btnTalk";
-            this.btnTalk.Size = new System.Drawing.Size(90, 34);
+            this.btnTalk.Size = new System.Drawing.Size(140, 34);
             this.btnTalk.TabIndex = 9;
             this.btnTalk.Text = "発言";
             this.btnTalk.UseVisualStyleBackColor = true;
             this.btnTalk.Click += new System.EventHandler(this.btnTalk_Click);
             // 
-            // btnTalkCLear
-            // 
-            this.btnTalkCLear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnTalkCLear.Location = new System.Drawing.Point(98, 618);
-            this.btnTalkCLear.Name = "btnTalkCLear";
-            this.btnTalkCLear.Size = new System.Drawing.Size(47, 34);
-            this.btnTalkCLear.TabIndex = 10;
-            this.btnTalkCLear.Text = "クリア";
-            this.btnTalkCLear.UseVisualStyleBackColor = true;
-            this.btnTalkCLear.Click += new System.EventHandler(this.btnTalkCLear_Click);
-            // 
             // picHeader
             // 
+            this.picHeader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.picHeader.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.picHeader.Location = new System.Drawing.Point(6, 12);
+            this.picHeader.Location = new System.Drawing.Point(852, 204);
             this.picHeader.Name = "picHeader";
-            this.picHeader.Size = new System.Drawing.Size(133, 128);
+            this.picHeader.Size = new System.Drawing.Size(129, 128);
             this.picHeader.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picHeader.TabIndex = 11;
             this.picHeader.TabStop = false;
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.labExpTotal);
             this.groupBox1.Controls.Add(this.labExp);
-            this.groupBox1.Location = new System.Drawing.Point(6, 333);
+            this.groupBox1.Location = new System.Drawing.Point(852, 338);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(138, 166);
+            this.groupBox1.Size = new System.Drawing.Size(129, 166);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             // 
@@ -228,7 +220,7 @@
             // btnAshiatoLog
             // 
             this.btnAshiatoLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAshiatoLog.Location = new System.Drawing.Point(805, 148);
+            this.btnAshiatoLog.Location = new System.Drawing.Point(853, 119);
             this.btnAshiatoLog.Name = "btnAshiatoLog";
             this.btnAshiatoLog.Size = new System.Drawing.Size(122, 37);
             this.btnAshiatoLog.TabIndex = 13;
@@ -239,7 +231,7 @@
             // btnWarp
             // 
             this.btnWarp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnWarp.Location = new System.Drawing.Point(805, 75);
+            this.btnWarp.Location = new System.Drawing.Point(852, 75);
             this.btnWarp.Name = "btnWarp";
             this.btnWarp.Size = new System.Drawing.Size(123, 38);
             this.btnWarp.TabIndex = 14;
@@ -253,16 +245,27 @@
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Visible = true;
             // 
+            // btnClear
+            // 
+            this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnClear.Location = new System.Drawing.Point(158, 650);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(77, 34);
+            this.btnClear.TabIndex = 15;
+            this.btnClear.Text = "クリア";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnTalkCLear_Click);
+            // 
             // FormScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(946, 667);
+            this.ClientSize = new System.Drawing.Size(993, 699);
+            this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnWarp);
             this.Controls.Add(this.btnAshiatoLog);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.picHeader);
-            this.Controls.Add(this.btnTalkCLear);
             this.Controls.Add(this.btnTalk);
             this.Controls.Add(this.txtTalk);
             this.Controls.Add(this.btnGetout);
@@ -300,7 +303,6 @@
         private System.Windows.Forms.Button btnGetout;
         private System.Windows.Forms.TextBox txtTalk;
         private System.Windows.Forms.Button btnTalk;
-        private System.Windows.Forms.Button btnTalkCLear;
         private System.Windows.Forms.PictureBox picHeader;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label labExp;
@@ -308,5 +310,6 @@
         private System.Windows.Forms.Button btnAshiatoLog;
         private System.Windows.Forms.Button btnWarp;
         private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private System.Windows.Forms.Button btnClear;
     }
 }

@@ -32,10 +32,10 @@ namespace GodaiQuest
 
         private void FormOpenItem_Load(object sender, EventArgs e)
         {
-            //makeListView();
+            makeListView();
 
             // アップロードボタンはオーナーのみの特権
-            //this.btnUpload.Visible = this.mOwner;
+            this.btnUpload.Visible = this.mOwner;
 
             // 退治、状態チェンジもオーナーの特権
             this.btnChangeState.Visible = this.mOwner;
@@ -47,6 +47,12 @@ namespace GodaiQuest
 
         private void loadArticle()
         {
+			// アイテム概要を得る
+            ItemInfo itemInfo = new ItemInfo();
+            this.mGQCom.getItemInfo(out itemInfo);
+            var item = itemInfo.getAItem(this.mItemID);
+            this.richTextBox3.Text = item.getHeaderString();            
+            
             // アーティクルをセットする
             richTextBox1.Text = this.mGQCom.getAritcleString(this.mItemID);
 
@@ -71,7 +77,7 @@ namespace GodaiQuest
 
         }
 
-#if false
+#if true
         private void makeListView()
         {
             this.listView1.Items.Clear();
@@ -95,7 +101,7 @@ namespace GodaiQuest
             System.Diagnostics.Process.Start("EXPLORER.exe", this.mFolder);
         }
 
-#if false
+#if true
         private void listView1_MouseClick(object sender, MouseEventArgs e)
         {
         }
@@ -184,6 +190,11 @@ namespace GodaiQuest
         }
 
         private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.LinkText);
+        }
+
+        private void richTextBox3_LinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
         }

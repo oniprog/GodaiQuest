@@ -790,7 +790,7 @@ namespace GodaiQuestServer
             }
         }
 
-#if false
+#if false 
         // アイテム情報を得る
         public EServerResult getItemImageInfo(out ItemImageInfo itemimageinfo)
         {

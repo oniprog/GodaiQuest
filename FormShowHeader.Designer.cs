@@ -46,9 +46,12 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(12, 220);
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.Location = new System.Drawing.Point(12, 171);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(363, 142);
+            this.richTextBox1.Size = new System.Drawing.Size(363, 191);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -60,12 +63,13 @@
             this.picHeader.Size = new System.Drawing.Size(128, 128);
             this.picHeader.TabIndex = 1;
             this.picHeader.TabStop = false;
+            this.picHeader.Visible = false;
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(196, 386);
+            this.btnOpen.Location = new System.Drawing.Point(12, 93);
             this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(99, 38);
+            this.btnOpen.Size = new System.Drawing.Size(174, 72);
             this.btnOpen.TabIndex = 2;
             this.btnOpen.Text = "ダウンロードとメッセージ書き込み";
             this.btnOpen.UseVisualStyleBackColor = true;
@@ -73,6 +77,7 @@
             // 
             // btnCancel
             // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(301, 386);
             this.btnCancel.Name = "btnCancel";
@@ -90,13 +95,15 @@
             this.btnRefPic.TabIndex = 4;
             this.btnRefPic.Text = "参照";
             this.btnRefPic.UseVisualStyleBackColor = true;
+            this.btnRefPic.Visible = false;
             this.btnRefPic.Click += new System.EventHandler(this.btnRefPic_Click);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(13, 386);
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Location = new System.Drawing.Point(161, 386);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(92, 38);
+            this.btnSave.Size = new System.Drawing.Size(126, 38);
             this.btnSave.TabIndex = 5;
             this.btnSave.Text = "変更を保存する";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -106,11 +113,13 @@
             // 
             this.txtAshiato.AcceptsReturn = true;
             this.txtAshiato.AcceptsTab = true;
+            this.txtAshiato.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAshiato.Location = new System.Drawing.Point(192, 31);
             this.txtAshiato.Multiline = true;
             this.txtAshiato.Name = "txtAshiato";
             this.txtAshiato.ReadOnly = true;
-            this.txtAshiato.Size = new System.Drawing.Size(182, 179);
+            this.txtAshiato.Size = new System.Drawing.Size(182, 134);
             this.txtAshiato.TabIndex = 6;
             // 
             // label1
@@ -125,7 +134,7 @@
             // picItemImage
             // 
             this.picItemImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.picItemImage.Location = new System.Drawing.Point(13, 146);
+            this.picItemImage.Location = new System.Drawing.Point(12, 12);
             this.picItemImage.Name = "picItemImage";
             this.picItemImage.Size = new System.Drawing.Size(64, 64);
             this.picItemImage.TabIndex = 8;
@@ -133,7 +142,7 @@
             // 
             // btnChangeItemImage
             // 
-            this.btnChangeItemImage.Location = new System.Drawing.Point(83, 146);
+            this.btnChangeItemImage.Location = new System.Drawing.Point(82, 12);
             this.btnChangeItemImage.Name = "btnChangeItemImage";
             this.btnChangeItemImage.Size = new System.Drawing.Size(105, 64);
             this.btnChangeItemImage.TabIndex = 9;
@@ -143,6 +152,7 @@
             // 
             // label7
             // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(10, 371);
             this.label7.Name = "label7";

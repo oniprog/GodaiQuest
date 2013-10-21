@@ -619,7 +619,7 @@ namespace GodaiQuestServer
             this.mNetwork.flush();
 
             // ファイル群を受信する
-#if false
+#if true
             String strFolder = getItemFolder(item.getItemID());
             if ( Directory.Exists(strFolder))
                 Directory.Delete(strFolder, true);

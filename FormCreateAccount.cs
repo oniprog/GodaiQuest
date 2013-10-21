@@ -64,7 +64,7 @@ namespace GodaiQuest
                 MessageBox.Show("キャラクターの絵を指定してください");
                 return;
             }
-            if (this.txtDownloadFolder.Text.Length == 0)
+            if (this.mCreateAccount && this.txtDownloadFolder.Text.Length == 0)
             {
                 MessageBox.Show("ダウンロード先フォルダを指定してください");
                 return;
@@ -76,13 +76,16 @@ namespace GodaiQuest
             }
 
             //
-            Directory.CreateDirectory(this.txtDownloadFolder.Text);
-            if (!Directory.Exists(this.txtDownloadFolder.Text))
+            if (this.txtDownloadFolder.Text.Length > 0)
             {
-                MessageBox.Show("ダウンロードフォルダが作れませんでした");
-                return;
+                Directory.CreateDirectory(this.txtDownloadFolder.Text);
+                if (!Directory.Exists(this.txtDownloadFolder.Text))
+                {
+                    MessageBox.Show("ダウンロードフォルダが作れませんでした");
+                    return;
+                }
             }
-
+			
             try
             {
                 if (this.mCreateAccount)
@@ -107,7 +110,7 @@ namespace GodaiQuest
                     this.mUser.setCharacterImage(this.picPlayer.Image);
                     if (this.mGQCom.setAUser(this.mUser))
                     {
-                        if (!this.mGQCom.setUserFolder(this.mUser.getUserID(), txtDownloadFolder.Text))
+                        if (txtDownloadFolder.Text.Length > 0 && !this.mGQCom.setUserFolder(this.mUser.getUserID(), txtDownloadFolder.Text))
                         {
                             MessageBox.Show("ユーザフォルダの設定変更に失敗しました");
                         }
