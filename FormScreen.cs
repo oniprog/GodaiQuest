@@ -92,7 +92,7 @@ namespace GodaiQuest
                 // ピックアップしてない情報を読む
                 this.loadUnpickedupInfo();
 
-                this.picScreen.Image = new Bitmap(32 * 20, 32 * 20);
+                this.picScreen.Image = new Bitmap(BLOCK_SIZE * HALF_WIDTH*2, BLOCK_SIZE * HALF_WIDTH*2);
 
                 loadDungeon(this.mLocation, true);
 
@@ -277,7 +277,8 @@ namespace GodaiQuest
             this.mMonsterLocation = dicNew;
         }
 
-        private static int HALF_WIDTH = 10;
+        private static int HALF_WIDTH = 5;
+        private static int BLOCK_SIZE = 64;
 
         private void drawScreen()
         {
@@ -361,20 +362,20 @@ namespace GodaiQuest
 
                         var image = this.mDungeonBlockImage.getImageAt(nImage);
 
-                        int idrawx = (ix - cx + HALF_WIDTH) * 32 + rect.Left;
-                        int idrawy = (iy - cy + HALF_WIDTH) * 32 + rect.Top;
+                        int idrawx = (ix - cx + HALF_WIDTH) * BLOCK_SIZE + rect.Left;
+                        int idrawy = (iy - cy + HALF_WIDTH) * BLOCK_SIZE + rect.Top;
 
                         // 地形イメージを表示
                         if (image != null)
                         {
-                            gra.DrawImage(image, idrawx, idrawy, 32, 32);
+                            gra.DrawImage(image, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
                         }
 
                         // ユーザのイメージを表示
                         if (ix == this.mLocation.getIX() && iy == this.mLocation.getIY())
                         {
                             var user = this.mUserInfo.getAUser(this.mGQCom.getUserID());
-                            gra.DrawImage(user.getCharacterImage(), idrawx, idrawy, 32, 32);
+                            gra.DrawImage(user.getCharacterImage(), idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
                         }
 
                         foreach (var loc in listLocation)
@@ -384,7 +385,7 @@ namespace GodaiQuest
                                 // ユーザのイメージを表示
                                 var user = this.mUserInfo.getAUser(loc.getUserID());
                                 Image imageOther = user.getCharacterImage();
-                                gra.DrawImage(imageOther, idrawx, idrawy, 32, 32);
+                                gra.DrawImage(imageOther, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
 
                             }
                         }
@@ -405,13 +406,13 @@ namespace GodaiQuest
                                     continue;
 
                                 var imageMonster = this.mDungeonBlockImage.getImageAt((uint)item.getItemImageID());
-                                gra.DrawImage(imageMonster, idrawx, idrawy, 32, 32);
+                                gra.DrawImage(imageMonster, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
                             }
                         }
 
                         // 選択色
                         if (ix == this.mSelectedCell.X && iy == this.mSelectedCell.Y)
-                            gra.FillRectangle(new SolidBrush(Color.FromArgb(64, 0x20, 0x20, 0x80)), idrawx, idrawy, 32, 32);
+                            gra.FillRectangle(new SolidBrush(Color.FromArgb(64, 0x20, 0x20, 0x80)), idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
 
 
                         // 未読の枠を書く
@@ -444,13 +445,13 @@ namespace GodaiQuest
                     {
                         if (ix < 0 || ix >= this.mDungeon.getSizeX()) continue;
 
-                        int idrawx = (ix - cx + HALF_WIDTH) * 32 + rect.Left;
-                        int idrawy = (iy - cy + HALF_WIDTH) * 32 + rect.Top;
+                        int idrawx = (ix - cx + HALF_WIDTH) * BLOCK_SIZE + rect.Left;
+                        int idrawy = (iy - cy + HALF_WIDTH) * BLOCK_SIZE + rect.Top;
 
                         if (ix == this.mLocation.getIX() && iy == this.mLocation.getIY())
                         {
                             var user = this.mUserInfo.getAUser(this.mGQCom.getUserID());
-                            gra.DrawImage(user.getCharacterImage(), idrawx, idrawy, 32, 32);
+                            gra.DrawImage(user.getCharacterImage(), idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
 
                             // メッセージを表示
                             if (dicMessage.ContainsKey(user.getUserID()))
@@ -460,7 +461,7 @@ namespace GodaiQuest
                                 int idy = idrawy;
                                 foreach (var mesline in listMes)
                                 {
-                                    gra.DrawString(mesline, font, Brushes.Black, idrawx + 36, idy);
+                                    gra.DrawString(mesline, font, Brushes.Black, idrawx + BLOCK_SIZE+4, idy);
                                     idy += (int)gra.MeasureString(mesline, font).Height;
                                 }
                             }
@@ -510,7 +511,7 @@ namespace GodaiQuest
         private Point getDungeonCoordInPicture(int x, int y)
         {
             int nMinSize = Math.Min(this.picScreen.Width, this.picScreen.Height);
-            int nSize = nMinSize / 20;
+            int nSize = nMinSize / (HALF_WIDTH*2);
             int newix = ((x-(this.picScreen.Width-nMinSize)/2) / nSize) + this.mLocation.getIX() - HALF_WIDTH;
             int newiy = ((y-(this.picScreen.Height-nMinSize)/2) / nSize) + this.mLocation.getIY() - HALF_WIDTH;
             return new Point(newix, newiy);
