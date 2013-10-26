@@ -422,16 +422,16 @@ namespace GodaiQuest
                             {
                                 if (!this.mRDReadItemInfo.isReadItem(obj.getItemID()))
                                 {
-                                    gra.DrawRectangle(Pens.Red, idrawx, idrawy, 31, 31);
-                                    gra.DrawRectangle(Pens.Red, idrawx + 2, idrawy + 2, 27, 27);
+                                    gra.DrawRectangle(Pens.Red, idrawx, idrawy, BLOCK_SIZE-1, BLOCK_SIZE-1);
+                                    gra.DrawRectangle(Pens.Red, idrawx + 2, idrawy + 2, BLOCK_SIZE-3, BLOCK_SIZE-3);
                                 }
                             }
                             else
                             {
                                 if (this.mUnpickedupInfo.containItemID(obj.getItemID()))
                                 {
-                                    gra.DrawRectangle(Pens.Red, idrawx, idrawy, 31, 31);
-                                    gra.DrawRectangle(Pens.Red, idrawx + 2, idrawy + 2, 27, 27);
+                                    gra.DrawRectangle(Pens.Red, idrawx, idrawy, BLOCK_SIZE-1, BLOCK_SIZE-1);
+                                    gra.DrawRectangle(Pens.Red, idrawx + 2, idrawy + 2, BLOCK_SIZE-3, BLOCK_SIZE-3);
                                 }
                             }
                         }
