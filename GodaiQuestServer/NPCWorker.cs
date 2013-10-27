@@ -64,6 +64,8 @@ namespace GodaiQuestServer
         {
             dungeon = new ulong[nSizeX * nSizeY];
 
+            Random rand = new  Random();
+
             // タイルを得る
             TileInfo tileinfo;
             this.mParent.getTileList(out tileinfo);
@@ -77,17 +79,24 @@ namespace GodaiQuestServer
             foreach (var tile in tileinfo)
             {
                 var obj = objectinfo.getObject((int)tile.getObjectID());
-                if (!obj.canWalk() && tileWall == null )
+                if (!obj.canWalk() )
                 {
-                    tileWall = tile;
+                    if (tileWall == null || rand.NextDouble() < 0.1) {
+                        tileWall = tile;
+                    }
                 }
-                else if (obj.getObjectCommand() == EObjectCommand.IntoDungeon && tileIn == null )
-                {
-                    tileIn = tile;
+                else if (obj.getObjectCommand() == EObjectCommand.IntoDungeon ) {
+
+                    if ( tileIn == null || rand.NextDouble() < 0.1 ) {
+                        tileIn = tile;
+                    }
                 }
-                else if (obj.getObjectCommand() == EObjectCommand.GoOutDungeon && tileOut == null)
-                {
-                    tileOut = tile;
+                else if (obj.getObjectCommand() == EObjectCommand.GoOutDungeon ) {
+
+                    if (tileOut == null || rand.NextDouble() < 0.1)
+                    {
+                        tileOut = tile;
+                    }
                 }
             }
 
