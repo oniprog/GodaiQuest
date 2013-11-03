@@ -22,6 +22,25 @@ namespace GodaiLibrary.GodaiQuest
             this.mContents = strContent_;
             this.mCreateTime = createTime_;
         }
+        public ItemArticle(godaiquest.ItemArticle itemarticle)
+        {
+            mItemID = itemarticle.item_id;
+            mArticleID = itemarticle.article_id;
+            mUserID = itemarticle.user_id;
+            mContents = itemarticle.contents;
+            mCreateTime = DateTime.FromBinary(itemarticle.cretae_time);
+        }
+
+        public godaiquest.ItemArticle getSerialize()
+        {
+            var ret = new godaiquest.ItemArticle();
+            ret.item_id = mItemID;
+            ret.article_id = mArticleID;
+            ret.user_id = mUserID;
+            ret.contents = mContents;
+            ret.cretae_time = mCreateTime.ToBinary();
+            return ret;
+        }
 
         public int getItemID()
         {
@@ -58,6 +77,29 @@ namespace GodaiLibrary.GodaiQuest
         public ItemArticleInfo(int nItemID_)
         {
             this.mItemID = nItemID_;
+        }
+        public ItemArticleInfo(godaiquest.ItemArticleInfo info)
+        {
+            mItemID = info.item_id;
+			foreach (var tmp in info.item_article_dic)
+			{
+                mDicItemArticle.Add(tmp.index, new ItemArticle(tmp.item_article));
+			}
+        }
+
+        public godaiquest.ItemArticleInfo getSerialize()
+        {
+            var ret = new godaiquest.ItemArticleInfo();
+            ret.item_id = mItemID;
+
+			foreach ( var tmp in mDicItemArticle)
+			{
+				var item_article = new godaiquest.ItemArticleDic();
+				item_article.index = tmp.Key;
+				item_article.item_article = tmp.Value.getSerialize();
+                ret.item_article_dic.Add(item_article);
+			}
+            return ret;
         }
 
         public int getItemID()

@@ -28,6 +28,25 @@ namespace GodaiLibrary.GodaiQuest
             this.mDungeonUserID = nDungeonUserID_;
             this.mDungeonNumber = nDungeonNumber_;
         }
+        public ALocation(godaiquest.ALocation alocation)
+        {
+            mUserID = alocation.user_id;
+            mIX = alocation.ix;
+            mIY = alocation.iy;
+            mDungeonUserID = alocation.dungeon_user_id;
+            mDungeonNumber = alocation.dungeon_number;
+        }
+
+        public godaiquest.ALocation getSerialize()
+        {
+            var ret = new godaiquest.ALocation();
+            ret.user_id = mUserID;
+            ret.ix = mIX;
+            ret.iy = mIY;
+            ret.dungeon_user_id = mDungeonUserID;
+            ret.dungeon_number = mDungeonNumber;
+            return ret;
+        }
 
         public int getUserID()
         {
@@ -64,6 +83,27 @@ namespace GodaiLibrary.GodaiQuest
     public class LocationInfo : IEnumerable<ALocation> {
 
         private Dictionary<int, ALocation> mDicLocation = new Dictionary<int, ALocation>();
+
+        public LocationInfo() { }
+        public LocationInfo(godaiquest.LocationInfo location_info)
+        {
+			foreach (var tmp in location_info.alocation_dic)
+			{
+                mDicLocation.Add(tmp.index, new ALocation(tmp.alocation));
+            }
+        }
+        public godaiquest.LocationInfo getSerialize()
+        {
+            var ret = new godaiquest.LocationInfo();
+			foreach ( var tmp in mDicLocation)
+			{
+				var alocation = new godaiquest.ALocationDic();
+				alocation.index = tmp.Key;
+				alocation.alocation = tmp.Value.getSerialize();
+                ret.alocation_dic.Add(alocation);
+			}
+            return ret;
+        }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return GetEnumerator();

@@ -387,5 +387,69 @@ namespace GodaiLibrary
                 MessageBox.Show(ex.Message);
             }
         }
+
+		// シリアライズする
+        public void Serialize<T>(T obj)
+        {
+            //ProtoBuf.Serializer.Serialize( this.mStream, obj);
+            ProtoBuf.Serializer.SerializeWithLengthPrefix( this.mStream, obj, ProtoBuf.PrefixStyle.Base128, 0);
+        }
+
+		// デシリアライズする
+        public T Deserialize<T>()
+        {
+            return ProtoBuf.Serializer.DeserializeWithLengthPrefix<T>(this.mStream, ProtoBuf.PrefixStyle.Base128, 0 );
+            //return ProtoBuf.Serializer.Deserialize<T>(this.mStream);
+        }
+
+        // http://www.atmarkit.co.jp/fdotnet/dotnettips/603byteimage/byteimage.html
+        // バイト配列をImageオブジェクトに変換
+        public static Image ByteArrayToImage(byte[] b)
+        {
+            if (b.Length == 0)
+                return null;
+
+            ImageConverter imgconv = new ImageConverter();
+            Image img = (Image)imgconv.ConvertFrom(b);
+            return img;
+        }
+
+        // Imageオブジェクトをバイト配列に変換
+        public static byte[] ImageToByteArray(Image img)
+        {
+            if (img == null)
+                return new byte[0];
+
+            ImageConverter imgconv = new ImageConverter();
+            byte[] b = (byte[])imgconv.ConvertTo(img, typeof(byte[]));
+            return b;
+        }
+
+        public static byte[] ConvertUlongToByte(ulong[] data)
+        {
+            byte[] ret = new byte[data.Length * 8];
+            for (int it = 0; it < data.Length; ++it)
+            {
+                var tmp = BitConverter.GetBytes(data[it]);
+                ret[it * 8 + 0] = tmp[0];
+                ret[it * 8 + 1] = tmp[1];
+                ret[it * 8 + 2] = tmp[2];
+                ret[it * 8 + 3] = tmp[3];
+                ret[it * 8 + 4] = tmp[4];
+                ret[it * 8 + 5] = tmp[5];
+                ret[it * 8 + 6] = tmp[6];
+                ret[it * 8 + 7] = tmp[7];
+            }
+            return ret;
+        }
+        public static ulong[] ConvertByteToUlong(byte[] data)
+        {
+            ulong[] ret = new ulong[data.Length/8];
+            for (int it = 0; it < data.Length; it += 8)
+            {
+                ret[it / 8] = BitConverter.ToUInt64(data, it);
+            }
+            return ret;
+        }
     }
 }

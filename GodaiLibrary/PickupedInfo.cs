@@ -18,6 +18,20 @@ namespace GodaiLibrary.GodaiQuest
             this.mItemID = nItemID;
             this.mDateTime = datetime_;
         }
+        public APickuped(godaiquest.APickuped pickuped)
+        {
+            mUserID = pickuped.user_id;
+            mItemID = pickuped.item_id;
+            mDateTime = DateTime.FromBinary(pickuped.date_time);
+        }
+        public godaiquest.APickuped getSerialize()
+        {
+            var ret = new godaiquest.APickuped();
+            ret.user_id = mUserID;
+            ret.item_id = mItemID;
+            ret.date_time = mDateTime.ToBinary();
+            return ret;
+        }
 
         public int getUserID()
         {
@@ -37,6 +51,24 @@ namespace GodaiLibrary.GodaiQuest
     public class PickupedInfo : IEnumerable<APickuped>
     {
         private List<APickuped> mPickupedList = new List<APickuped>();
+
+        public PickupedInfo() { }
+        public PickupedInfo(godaiquest.PickupedInfo apickup)
+        {
+            foreach (var tmp in apickup.apickuped) 
+			{
+                mPickupedList.Add(new APickuped(tmp));
+			}
+        }
+        public godaiquest.PickupedInfo getSerialize()
+        {
+            var ret = new godaiquest.PickupedInfo();
+			foreach (var tmp in mPickupedList)
+			{
+                ret.apickuped.Add(tmp.getSerialize());
+			}
+            return ret;
+        }
 
         public void addPickupedInfo( APickuped pickup ) {
             this.mPickupedList.Add(pickup);

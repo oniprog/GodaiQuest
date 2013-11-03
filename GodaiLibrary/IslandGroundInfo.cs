@@ -28,6 +28,26 @@ namespace GodaiLibrary.GodaiQuest
             this.mUserID = nUserID_;
         }
 
+        public IslandGround(godaiquest.IslandGround ground)
+        {
+            mUserID = ground.user_id;
+            mIx1 = ground.ix1;
+            mIy1 = ground.iy1;
+            mIx2 = ground.ix2;
+            mIy2 = ground.iy2;
+        }
+
+        public godaiquest.IslandGround getSerialize()
+        {
+            var ret = new godaiquest.IslandGround();
+            ret.user_id = mUserID;
+            ret.ix1 = mIx1;
+            ret.ix2 = mIx2;
+            ret.iy1 = mIy1;
+            ret.iy2 = mIy2;
+            return ret;
+        }
+
         public int getUserID()
         {
             return this.mUserID;
@@ -61,6 +81,24 @@ namespace GodaiLibrary.GodaiQuest
     public class IslandGroundInfo : IEnumerable<IslandGround>
     {
         private List<IslandGround> mIslandGroundList = new List<IslandGround>();
+
+        public IslandGroundInfo() { }
+        public IslandGroundInfo(godaiquest.IslandGroundInfo info)
+        {
+			foreach (var tmp in info.ground_list)
+			{
+                mIslandGroundList.Add(new IslandGround(tmp));
+            }
+        }
+        public godaiquest.IslandGroundInfo getSerialize()
+        {
+            var ret = new godaiquest.IslandGroundInfo();
+			foreach (var tmp in mIslandGroundList)
+			{
+                ret.ground_list.Add(tmp.getSerialize());
+			}
+            return ret;
+        }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

@@ -14,6 +14,24 @@ namespace GodaiLibrary.GodaiQuest
         private int mSizeY;
         private int mDungeonNumber;
 
+        public DungeonInfo() { }
+        public DungeonInfo(godaiquest.DungeonInfo info)
+        {
+            mDungeon = Network.ConvertByteToUlong(info.dungeon);
+            mSizeX = info.size_x;
+            mSizeY = info.size_y;
+            mDungeonNumber = info.dungeon_number;
+        }
+        public godaiquest.DungeonInfo getSerialize()
+        {
+            var ret = new godaiquest.DungeonInfo();
+            ret.dungeon = Network.ConvertUlongToByte(mDungeon);
+            ret.size_x = mSizeX;
+            ret.size_y = mSizeY;
+            ret.dungeon_number = mDungeonNumber;
+            return ret;
+        }
+
         public void setInit(int nDugeonNumber, ulong[] dungeon, int nSizeX, int nSizeY)
         {
             this.mDungeonNumber = nDugeonNumber;
@@ -115,6 +133,29 @@ namespace GodaiLibrary.GodaiQuest
             this.mOwner = nOwner;
             this.mCreated = dateCreate;
         }
+        public ImagePair(godaiquest.ImagePair imagepair)
+        {
+            mNumber = imagepair.number;
+            mCanItemImage = imagepair.can_item_image;
+            mName = imagepair.name;
+            mImage = Network.ByteArrayToImage(imagepair.image);
+            mNewImage = imagepair.new_image;
+            mOwner = imagepair.owner;
+            mCreated = DateTime.FromBinary(imagepair.created);
+        }
+
+        public godaiquest.ImagePair getSerialize()
+        {
+            var ret = new godaiquest.ImagePair();
+            ret.number = mNumber;
+            ret.can_item_image = mCanItemImage;
+            ret.name = mName;
+            ret.image = Network.ImageToByteArray(mImage);
+            ret.new_image = mNewImage;
+            ret.owner = mOwner;
+            ret.created = mCreated.ToBinary();
+            return ret;
+        }
 
         public void setNumber(int nNumber)
         {
@@ -175,6 +216,32 @@ namespace GodaiLibrary.GodaiQuest
     {
         private uint mMaxImageNum;
         private Dictionary<uint, ImagePair> mImageDic = new Dictionary<uint, ImagePair>();
+
+        public DungeonBlockImageInfo() { }
+
+        public DungeonBlockImageInfo(godaiquest.DungeonBlockImageInfo info)
+        {
+            mMaxImageNum = (uint)info.max_image_num;
+            foreach (var pair0 in info.image_dic) 
+			{
+				ImagePair newpair = new ImagePair( pair0.imagepair );
+                mImageDic.Add(pair0.index, newpair);
+			}
+        }
+
+        public godaiquest.DungeonBlockImageInfo getSerialize()
+        {
+            var ret = new godaiquest.DungeonBlockImageInfo();
+            ret.max_image_num = mMaxImageNum;
+			foreach (var dic in mImageDic )
+			{
+                var imagepairdic = new godaiquest.ImagePairDic();
+                imagepairdic.index = dic.Key;
+                imagepairdic.imagepair = dic.Value.getSerialize();
+                ret.image_dic.Add(imagepairdic);
+			}
+            return ret;
+        }
 
         // 
         // bNewは新規作成したデータに対してtrueとすること
@@ -242,6 +309,25 @@ namespace GodaiLibrary.GodaiQuest
         public TilePalette(int nUserID)
         {
             this.mUserID = nUserID;
+        }
+        public TilePalette(godaiquest.TilePalette tile_palette)
+        {
+            mUserID = tile_palette.user_id;
+			foreach (var tile_id in tile_palette.image_set )
+			{
+                mImageSet.Add(tile_id.tile_id);
+            }
+        }
+        public godaiquest.TilePalette getSerialize()
+        {
+            var ret = new godaiquest.TilePalette();
+			foreach (var tile_id in mImageSet)
+			{
+                var new_tile_id = new godaiquest.TilePaletteImageSet();
+                new_tile_id.tile_id = tile_id;
+                ret.image_set.Add(new_tile_id);
+			}
+            return ret;
         }
 
         public TilePalette copy()

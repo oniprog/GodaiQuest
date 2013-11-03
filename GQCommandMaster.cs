@@ -10,14 +10,18 @@ using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using GodaiLibrary.GodaiQuest;
+using ProtoBuf.Serializers;
+using ProtoBuf;
 
 namespace GodaiQuest
 {
     public class GQCommandMaster
     {
-        public static int CLIENT_VERSION = 2012120216;
+        //public static int CLIENT_VERSION = 2012120216;
+        public static int CLIENT_VERSION = 2013110318;
 
-        public static int SERVER_PORT = 21014;  // サーバ用のポート
+        //public static int SERVER_PORT = 21014;  // サーバ用のポート
+        public static int SERVER_PORT = 21015;  // サーバ用のポート
         private GodaiLibrary.Network mNetwork;
         private GodaiLibrary.GodaiQuest.EServerResult   mError;
 
@@ -50,15 +54,24 @@ namespace GodaiQuest
         {
             return this.mUserID;
         }
-
+		
         ///  ユーザーの追加
         public bool addUser(String strMail, String strPassword, String strName, Image imageCharacter, String strUserFolder)
         {
             lock (this.mLock)
             {
                 this.mNetwork.sendDWORD((int)GodaiLibrary.GodaiQuest.EServerCommand.AddUser);
-
                 this.mNetwork.sendDWORD(1); // Version
+
+#if true
+				godaiquest.AddUser user = new godaiquest.AddUser();
+				user.mail_address = strMail;
+                user.password = GodaiLibrary.Crypto.calcPasswordHash(strPassword);
+                user.user_name = strName;
+                user.user_folder = strUserFolder;
+                user.computer_name = getComputerName();
+				this.mNetwork.Serialize( user );
+#else
                 this.mNetwork.sendString(strMail);
                 this.mNetwork.sendString(strName);
                 this.mNetwork.sendString(GodaiLibrary.Crypto.calcPasswordHash(strPassword));
@@ -66,7 +79,7 @@ namespace GodaiQuest
                 this.mNetwork.sendString(getComputerName());
 
                 this.mNetwork.sendImage(imageCharacter);
-
+#endif
                 this.mNetwork.flush();
 
                 GodaiLibrary.GodaiQuest.EServerResult eResult = (GodaiLibrary.GodaiQuest.EServerResult)this.mNetwork.receiveDWORD();
@@ -85,11 +98,19 @@ namespace GodaiQuest
             lock (this.mLock)
             {
                 this.mNetwork.sendDWORD((int)GodaiLibrary.GodaiQuest.EServerCommand.TryLogon);
-
                 this.mNetwork.sendDWORD(1); // Version
+
+#if true
+                godaiquest.Login login = new godaiquest.Login();
+                login.mail_address = strMail;
+				login.password = GodaiLibrary.Crypto.calcPasswordHash(strPassword); 
+				login.client_version = (uint)CLIENT_VERSION;
+                this.mNetwork.Serialize(login);
+#else
                 this.mNetwork.sendString(strMail);
                 this.mNetwork.sendString(GodaiLibrary.Crypto.calcPasswordHash(strPassword));
                 this.mNetwork.sendDWORD(CLIENT_VERSION);    // クライアントバージョン
+#endif
 
                 this.mNetwork.flush();
 
@@ -112,10 +133,16 @@ namespace GodaiQuest
                 dungeon = null;
 
                 this.mNetwork.sendDWORD((int)GodaiLibrary.GodaiQuest.EServerCommand.GetDungeon);
-
                 this.mNetwork.sendDWORD(1); // Version
+#if true
+				var get_dungeon = new godaiquest.GetDungeon();
+				get_dungeon.id = nID;
+				get_dungeon.dungeon_number = nDungeonNumber;
+                this.mNetwork.Serialize(get_dungeon);
+#else
                 this.mNetwork.sendDWORD(nID);
                 this.mNetwork.sendDWORD(nDungeonNumber);
+#endif
 
                 this.mNetwork.flush();
 
@@ -142,6 +169,19 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.SetDungeon);
 
                 this.mNetwork.sendDWORD(1); // Version
+#if true
+
+                var set_dungeon = new godaiquest.SetDungeon();
+
+                set_dungeon.user_id = nUserID;
+                set_dungeon.dungeon_number = dungeon.getDungeonNumber();
+				
+                set_dungeon.dungeon_info = dungeon.getSerialize();
+                set_dungeon.images = images.getSerialize();
+                set_dungeon.object_info = objectinfo.getSerialize();
+                set_dungeon.tile_info = tileinfo.getSerialize();
+                this.mNetwork.Serialize(set_dungeon);
+#else
                 this.mNetwork.sendDWORD(nUserID);
                 this.mNetwork.sendDWORD(dungeon.getDungeonNumber());
 
@@ -162,6 +202,7 @@ namespace GodaiQuest
                 MemoryStream memoryTile = new MemoryStream();
                 formatter.Serialize(memoryTile, tileinfo);
                 this.mNetwork.sendBinary(memoryTile.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -192,10 +233,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                images = new DungeonBlockImageInfo(this.mNetwork.Deserialize<godaiquest.DungeonBlockImageInfo>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 images = (DungeonBlockImageInfo)formatter.Deserialize(new MemoryStream(data));
-
+#endif
                 return true;
             }
         }
@@ -209,10 +253,14 @@ namespace GodaiQuest
 
                 this.mNetwork.sendDWORD(1); // Version
 
+#if true
+                this.mNetwork.Serialize(images.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, images);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
                 this.mNetwork.flush();
 
                 var eResult = (EServerResult)this.mNetwork.receiveDWORD();
@@ -235,7 +283,6 @@ namespace GodaiQuest
 
                 this.mNetwork.sendDWORD(1); // Version
                 this.mNetwork.sendDWORD(nUserID);
-
                 this.mNetwork.flush();
 
                 palette = null;
@@ -247,9 +294,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                palette = new TilePalette(this.mNetwork.Deserialize<godaiquest.TilePalette>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 palette = (TilePalette)formatter.Deserialize(new MemoryStream(data));
+#endif
 
                 return true;
             }
@@ -261,8 +312,13 @@ namespace GodaiQuest
             lock (this.mLock)
             {
                 this.mNetwork.sendDWORD((int)EServerCommand.SetTilePalette);
-
                 this.mNetwork.sendDWORD(1);
+#if true
+                var set_block_image_palette = new godaiquest.SetBlockImagePalette();
+                set_block_image_palette.user_id = nUserID;
+                set_block_image_palette.tile_palette = palette.getSerialize();
+                this.mNetwork.Serialize(set_block_image_palette);
+#else
                 this.mNetwork.sendDWORD(nUserID);
 
                 MemoryStream memory = new MemoryStream();
@@ -271,6 +327,7 @@ namespace GodaiQuest
                 byte[] data = memory.ToArray();
 
                 this.mNetwork.sendBinary(data);
+#endif
                 this.mNetwork.flush();
 
                 var result = (EServerResult)this.mNetwork.receiveDWORD();
@@ -290,7 +347,6 @@ namespace GodaiQuest
                 info = null;
 
                 this.mNetwork.sendDWORD((int)EServerCommand.GetObjectAttrInfo);
-
                 this.mNetwork.sendDWORD(1);
                 this.mNetwork.flush();
 
@@ -301,10 +357,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                info = new ObjectAttrInfo(this.mNetwork.Deserialize<godaiquest.ObjectAttrInfo>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 info = (ObjectAttrInfo)formatter.Deserialize(new MemoryStream(data));
-
+#endif
                 return true;
             }
         }
@@ -318,10 +377,14 @@ namespace GodaiQuest
 
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(info.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, info);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -355,9 +418,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                tilelist = new TileInfo(this.mNetwork.Deserialize<godaiquest.TileInfo>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 tilelist = (TileInfo)formatter.Deserialize(new MemoryStream(data));
+#endif
 
                 return true;
             }
@@ -382,9 +449,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                userinfo = new UserInfo(this.mNetwork.Deserialize<godaiquest.UserInfo>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 userinfo = (UserInfo)formatter.Deserialize(new MemoryStream(data));
+#endif
 
                 return true;
             }
@@ -401,14 +472,22 @@ namespace GodaiQuest
 
                 this.mNetwork.flush();
 
+#if true
+                this.mNetwork.Serialize(item.getSerialize());
+#else
                 MemoryStream memoryItem = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memoryItem, item);
                 this.mNetwork.sendBinary(memoryItem.ToArray());
+#endif
 
+#if true
+                this.mNetwork.Serialize(itemimage.getSerialize());
+#else
                 MemoryStream memoryItemImage = new MemoryStream();
                 formatter.Serialize(memoryItemImage, itemimage);
                 this.mNetwork.sendBinary(memoryItemImage.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -419,18 +498,19 @@ namespace GodaiQuest
                     return false;
                 }
 
-#if true
-                //            Network.sendFiles(this.mNetwork, strDataFolder);
                 // ファイルを全部転送する
                 foreach (var fileinfo in setFile)
                 {
                     Network.sendFile(this.mNetwork, Path.GetFileName(fileinfo.FullPath), fileinfo.FullPath, Path.GetDirectoryName(fileinfo.HalfPath));
                 }
                 this.mNetwork.sendByte(0);
-#endif
 
+#if true
+                item = new AItem(this.mNetwork.Deserialize<godaiquest.AItem>());
+#else
                 byte[] dataItem = this.mNetwork.receiveBinary();
                 item = (AItem)formatter.Deserialize(new MemoryStream(dataItem));
+#endif
 
                 return true;
             }
@@ -473,9 +553,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                iteminfo = new ItemInfo(this.mNetwork.Deserialize<godaiquest.ItemInfo>());
+#else
                 byte[] dataItemInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 iteminfo = (ItemInfo)formatter.Deserialize(new MemoryStream(dataItemInfo));
+#endif
                 return true;
             }
         }
@@ -487,11 +571,14 @@ namespace GodaiQuest
             {
                 this.mNetwork.sendDWORD((int)EServerCommand.SetAUser);
                 this.mNetwork.sendDWORD(1);
-
+#if true
+                this.mNetwork.Serialize(user.getSerialize());		
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, user);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -513,12 +600,14 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.ChangeAItem);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(item.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, item);
-
                 this.mNetwork.sendBinary(memory.ToArray());
-
+#endif
                 this.mNetwork.flush();
 
                 var result = (EServerResult)this.mNetwork.receiveDWORD();
@@ -570,10 +659,14 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.Polling);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(locSelf.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, locSelf);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -588,8 +681,12 @@ namespace GodaiQuest
                 }
 
                 // ユーザ位置情報を得る
+#if true
+				locInfo = new LocationInfo( this.mNetwork.Deserialize<godaiquest.LocationInfo>());
+#else
                 byte[] dataLocationInfo = this.mNetwork.receiveBinary();
                 locInfo = (LocationInfo)formatter.Deserialize(new MemoryStream(dataLocationInfo));
+#endif
 
                 // ログインユーザ情報を得る
                 {
@@ -602,9 +699,12 @@ namespace GodaiQuest
                 }
 
                 // シグナルを得る
+#if true
+				signalqueue = new SignalQueue( this.mNetwork.Deserialize<godaiquest.SignalQueue>());
+#else
                 byte[] dataSignal = this.mNetwork.receiveBinary();
                 signalqueue = (SignalQueue)formatter.Deserialize(new MemoryStream(dataSignal));
-
+#endif
                 return true;
             }
         }
@@ -627,9 +727,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                groundinfo = new IslandGroundInfo(this.mNetwork.Deserialize<godaiquest.IslandGroundInfo>());
+#else
                 byte[] dataGroundInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 groundinfo = (IslandGroundInfo)formatter.Deserialize(new MemoryStream(dataGroundInfo));
+#endif
 
                 return true;
             }
@@ -643,10 +747,14 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.ChangeObjectAttr);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(obj.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, obj);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
                 this.mNetwork.flush();
 
                 var result = (EServerResult)this.mNetwork.receiveDWORD();
@@ -667,10 +775,14 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.ChangeDungeonBlockImagePair);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+				this.mNetwork.Serialize(imagepair.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, imagepair);
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
                 this.mNetwork.flush();
 
                 var result = (EServerResult)this.mNetwork.receiveDWORD();
@@ -700,9 +812,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                locinfo = new LocationInfo(this.mNetwork.Deserialize<godaiquest.LocationInfo>());
+#else
                 byte[] dataLocationInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 locinfo = (LocationInfo)formatter.Deserialize(new MemoryStream(dataLocationInfo));
+#endif
 
                 return true;
             }
@@ -725,9 +841,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+				mesinfo = new MessageInfo( this.mNetwork.Deserialize<godaiquest.MessageInfo>());
+#else
                 byte[] dataMesInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 mesinfo = (MessageInfo)formatter.Deserialize(new MemoryStream(dataMesInfo));
+#endif
 
                 return true;
             }
@@ -741,11 +861,15 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.SetAMessage);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(mes.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, mes);
 
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
 
                 this.mNetwork.flush();
 
@@ -801,15 +925,23 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                int nLen = (int)this.mNetwork.receiveLength();
+                HashSet<int> setItemID = new HashSet<int>();
+                for (int it = 0; it < nLen; ++it)
+                {
+                    setItemID.Add(this.mNetwork.receiveDWORD());
+                }
+#else
                 byte[] dataItemID = this.mNetwork.receiveBinary();
-
                 BinaryFormatter formatter = new BinaryFormatter();
                 HashSet<int> setItemID = (HashSet<int>)formatter.Deserialize(new MemoryStream(dataItemID));
+#endif
 
-                foreach (var nItemID in setItemID)
-                {
-                    info.addItemID(nItemID);
-                }
+                    foreach (var nItemID in setItemID)
+                    {
+                        info.addItemID(nItemID);
+                    }
 
                 return true;
             }
@@ -833,9 +965,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                pickinfo = new PickupedInfo(this.mNetwork.Deserialize<godaiquest.PickupedInfo>());
+#else
                 byte[] dataAshiato = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 pickinfo = (PickupedInfo)formatter.Deserialize(new MemoryStream(dataAshiato));
+#endif
 
                 return true;
             }
@@ -858,9 +994,18 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                listLog = new List<string>();
+                var logtmp = this.mNetwork.Deserialize<godaiquest.Ashiatolog>();
+				foreach (var alog in logtmp.alog)
+				{
+                    listLog.Add(alog);
+				}
+#else
                 byte[] dataLog = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 listLog = (List<String>)formatter.Deserialize(new MemoryStream(dataLog));
+#endif
 
                 return true;
             }
@@ -896,11 +1041,15 @@ namespace GodaiQuest
                 this.mNetwork.sendDWORD((int)EServerCommand.SetItemArticle);
                 this.mNetwork.sendDWORD(1);
 
+#if true
+                this.mNetwork.Serialize(article.getSerialize());
+#else
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, article);
 
                 this.mNetwork.sendBinary(memory.ToArray());
+#endif
                 this.mNetwork.flush();
 
                 var result = (EServerResult)this.mNetwork.receiveDWORD();
@@ -1013,9 +1162,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                monsterinfo = new MonsterInfo(this.mNetwork.Deserialize<godaiquest.MonsterInfo>());
+#else
                 byte[] dataMonsterInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 monsterinfo = (MonsterInfo)formatter.Deserialize(new MemoryStream(dataMonsterInfo));
+#endif
 
                 return true;
             }
@@ -1057,9 +1210,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                readiteminfo = new RDReadItemInfo(this.mNetwork.Deserialize<godaiquest.RDReadItemInfo>());
+#else
                 byte[] dataReadItemInfo = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 readiteminfo = (RDReadItemInfo)formatter.Deserialize(new MemoryStream(dataReadItemInfo));
+#endif
 
                 return true;
             }

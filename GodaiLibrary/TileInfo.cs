@@ -20,7 +20,19 @@ namespace GodaiLibrary.GodaiQuest
         {
             this.mTileID = nTileID_;
         }
-        public Tile() {}
+        public Tile() { }
+
+        public Tile(godaiquest.Tile tile)
+        {
+            mTileID = tile.tile_id;
+        }
+
+        public godaiquest.Tile getSerialize()
+        {
+			var ret = new godaiquest.Tile();
+            ret.tile_id = mTileID;
+            return ret;
+        }
 
         public ulong getTileID()
         {
@@ -40,6 +52,28 @@ namespace GodaiLibrary.GodaiQuest
     public class TileInfo : IEnumerable<Tile>
     {
         private Dictionary<ulong, Tile> mDicTile = new Dictionary<ulong, Tile>();
+
+        public TileInfo() { }
+        public TileInfo(godaiquest.TileInfo info)
+        {
+			foreach (var tiledic in info.tile_dic)
+			{
+                mDicTile.Add(tiledic.index, new Tile(tiledic.tile));
+			}
+        }
+
+        public godaiquest.TileInfo getSerialize()
+        {
+            var ret = new godaiquest.TileInfo();
+			foreach (var tiledic in mDicTile)
+			{
+				var newtiledic = new godaiquest.TileDic();
+				newtiledic.index = tiledic.Key;
+				newtiledic.tile = tiledic.Value.getSerialize();
+                ret.tile_dic.Add(newtiledic);
+			}
+            return ret;
+        }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

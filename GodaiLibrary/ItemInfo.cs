@@ -21,6 +21,25 @@ namespace GodaiLibrary.GodaiQuest
 
         private bool mNew;
 
+        public AItem() { }
+        public AItem(godaiquest.AItem aitem)
+        {
+            mItemID = aitem.item_id;
+            mItemImageID = aitem.item_image_id;
+            mHeaderString = aitem.header_string;
+            mHeaderImage = Network.ByteArrayToImage(aitem.header_image);
+            mNew = aitem.bNew;
+        }
+        public godaiquest.AItem getSerialize()
+        {
+			var ret = new godaiquest.AItem();
+            ret.item_id = mItemID;
+            ret.item_image_id = mItemImageID;
+            ret.header_string = mHeaderString;
+            ret.header_image = Network.ImageToByteArray(mHeaderImage);
+            return ret;
+        }
+
         public int getItemID() {
             return this.mItemID;
         }
@@ -66,6 +85,28 @@ namespace GodaiLibrary.GodaiQuest
     public class ItemInfo: IEnumerable<AItem>
     {
         private Dictionary<int, AItem> mDicItems = new Dictionary<int, AItem>();
+
+        public ItemInfo() { }
+        public ItemInfo(godaiquest.ItemInfo iteminfo)
+        {
+			foreach (var tmp in iteminfo.aitem_dic)
+			{
+                mDicItems.Add(tmp.index, new AItem(tmp.aitem));
+			}
+        }
+
+        public godaiquest.ItemInfo getSerialize()
+        {
+            var ret = new godaiquest.ItemInfo();
+			foreach (var tmp in mDicItems)
+			{
+                var aitemdic = new godaiquest.AItemDic();
+                aitemdic.index = tmp.Key;
+                aitemdic.aitem = tmp.Value.getSerialize();
+                ret.aitem_dic.Add(aitemdic);
+			}
+            return ret;
+        }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {

@@ -33,6 +33,26 @@ namespace GodaiLibrary.GodaiQuest
             this.mCommandSub = nCommandSub_;
             this.mNew = bNew;
         }
+		public ObjectAttr(godaiquest.ObjectAttr objattr) {
+			this.mObjectID = objattr.object_id;
+			this.mCanWalk = objattr.can_walk;
+			this.mItemID = objattr.item_id;
+			this.mCommand = (EObjectCommand)objattr.command;
+			this.mCommandSub = objattr.command_sub;
+			this.mNew = objattr.bNew;
+        }
+
+        public godaiquest.ObjectAttr getSerialize()
+        {
+            var ret = new godaiquest.ObjectAttr();
+            ret.object_id = mObjectID;
+            ret.can_walk = mCanWalk;
+            ret.item_id = mItemID;
+            ret.command = (int)mCommand;
+            ret.command_sub = mCommandSub;
+            ret.bNew = mNew;
+            return ret;
+        }
 
         public int getObjectID()
         {
@@ -65,6 +85,32 @@ namespace GodaiLibrary.GodaiQuest
     {
         private Dictionary<int, ObjectAttr> mDicObject = new Dictionary<int, ObjectAttr>();
         private int mNewID;
+
+		public ObjectAttrInfo() {}
+		public ObjectAttrInfo( godaiquest.ObjectAttrInfo attrinfo ) {
+			mNewID = attrinfo.new_id;
+
+			foreach( var objattr in attrinfo.object_attr_dic ) {
+
+				ObjectAttr newobjattr = new ObjectAttr(objattr.object_attr);
+				mDicObject.Add( objattr.index, newobjattr );
+            }
+        }
+
+        public godaiquest.ObjectAttrInfo getSerialize()
+        {
+            var ret = new godaiquest.ObjectAttrInfo();
+            ret.new_id = mNewID;
+
+			foreach (var dicobj in mDicObject)
+			{
+                var objattrdic = new godaiquest.ObjectAttrDic();
+                objattrdic.index = dicobj.Key;
+                objattrdic.object_attr = dicobj.Value.getSerialize();
+                ret.object_attr_dic.Add(objattrdic);
+			}
+            return ret;
+        }
 
         public void addObject(ObjectAttr obj_)
         {
