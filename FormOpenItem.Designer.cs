@@ -44,9 +44,9 @@
             // btnOpenFolder
             // 
             this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFolder.Location = new System.Drawing.Point(237, 33);
+            this.btnOpenFolder.Location = new System.Drawing.Point(440, 34);
             this.btnOpenFolder.Name = "btnOpenFolder";
-            this.btnOpenFolder.Size = new System.Drawing.Size(174, 33);
+            this.btnOpenFolder.Size = new System.Drawing.Size(95, 33);
             this.btnOpenFolder.TabIndex = 0;
             this.btnOpenFolder.Text = "エクスプローラーでフォルダを開く";
             this.btnOpenFolder.UseVisualStyleBackColor = true;
@@ -55,7 +55,7 @@
             // btnClose
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(525, 571);
+            this.btnClose.Location = new System.Drawing.Point(560, 572);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 36);
             this.btnClose.TabIndex = 2;
@@ -66,9 +66,9 @@
             // btnUpload
             // 
             this.btnUpload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUpload.Location = new System.Drawing.Point(423, 34);
+            this.btnUpload.Location = new System.Drawing.Point(541, 35);
             this.btnUpload.Name = "btnUpload";
-            this.btnUpload.Size = new System.Drawing.Size(175, 32);
+            this.btnUpload.Size = new System.Drawing.Size(92, 32);
             this.btnUpload.TabIndex = 3;
             this.btnUpload.Text = "フォルダの中身をアップロードする";
             this.btnUpload.UseVisualStyleBackColor = true;
@@ -80,10 +80,10 @@
             this.richTextBox1.AcceptsTab = true;
             this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.Location = new System.Drawing.Point(240, 188);
+            this.richTextBox1.Location = new System.Drawing.Point(333, 188);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(361, 286);
+            this.richTextBox1.Size = new System.Drawing.Size(302, 286);
             this.richTextBox1.TabIndex = 4;
             this.richTextBox1.Text = "";
             this.richTextBox1.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox1_LinkClicked);
@@ -91,16 +91,16 @@
             // richTextBox2
             // 
             this.richTextBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox2.Location = new System.Drawing.Point(240, 480);
+            this.richTextBox2.Location = new System.Drawing.Point(333, 480);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(360, 76);
+            this.richTextBox2.Size = new System.Drawing.Size(302, 76);
             this.richTextBox2.TabIndex = 5;
             this.richTextBox2.Text = "";
             // 
             // btnWriteArticle
             // 
             this.btnWriteArticle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnWriteArticle.Location = new System.Drawing.Point(243, 570);
+            this.btnWriteArticle.Location = new System.Drawing.Point(336, 570);
             this.btnWriteArticle.Name = "btnWriteArticle";
             this.btnWriteArticle.Size = new System.Drawing.Size(119, 37);
             this.btnWriteArticle.TabIndex = 6;
@@ -111,7 +111,7 @@
             // btnDeleteArticle
             // 
             this.btnDeleteArticle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteArticle.Location = new System.Drawing.Point(389, 570);
+            this.btnDeleteArticle.Location = new System.Drawing.Point(461, 571);
             this.btnDeleteArticle.Name = "btnDeleteArticle";
             this.btnDeleteArticle.Size = new System.Drawing.Size(90, 39);
             this.btnDeleteArticle.TabIndex = 7;
@@ -125,7 +125,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnChangeState.Location = new System.Drawing.Point(12, 2);
             this.btnChangeState.Name = "btnChangeState";
-            this.btnChangeState.Size = new System.Drawing.Size(588, 25);
+            this.btnChangeState.Size = new System.Drawing.Size(623, 25);
             this.btnChangeState.TabIndex = 8;
             this.btnChangeState.Text = "button1";
             this.btnChangeState.UseVisualStyleBackColor = true;
@@ -135,9 +135,9 @@
             // listView1
             // 
             this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.Location = new System.Drawing.Point(240, 72);
+            this.listView1.Location = new System.Drawing.Point(333, 72);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(361, 110);
+            this.listView1.Size = new System.Drawing.Size(302, 110);
             this.listView1.TabIndex = 9;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
@@ -154,7 +154,7 @@
             this.richTextBox3.Location = new System.Drawing.Point(11, 33);
             this.richTextBox3.Name = "richTextBox3";
             this.richTextBox3.ReadOnly = true;
-            this.richTextBox3.Size = new System.Drawing.Size(223, 574);
+            this.richTextBox3.Size = new System.Drawing.Size(316, 574);
             this.richTextBox3.TabIndex = 10;
             this.richTextBox3.Text = "";
             this.richTextBox3.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox3_LinkClicked);
@@ -163,7 +163,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(610, 626);
+            this.ClientSize = new System.Drawing.Size(645, 626);
             this.Controls.Add(this.richTextBox3);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnChangeState);
@@ -175,7 +175,6 @@
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnOpenFolder);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormOpenItem";
             this.Text = "アイテム内容";

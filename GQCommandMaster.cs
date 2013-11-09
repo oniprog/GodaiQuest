@@ -20,8 +20,8 @@ namespace GodaiQuest
         //public static int CLIENT_VERSION = 2012120216;
         public static int CLIENT_VERSION = 2013110318;
 
-        //public static int SERVER_PORT = 21014;  // サーバ用のポート
-        public static int SERVER_PORT = 21015;  // サーバ用のポート
+        public static int SERVER_PORT = 21014;  // サーバ用のポート
+        //public static int SERVER_PORT = 21015;  // サーバ用のポート
         private GodaiLibrary.Network mNetwork;
         private GodaiLibrary.GodaiQuest.EServerResult   mError;
 

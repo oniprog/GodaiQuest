@@ -72,9 +72,11 @@
             // 
             // txtHeader
             // 
+            this.txtHeader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeader.Location = new System.Drawing.Point(12, 60);
             this.txtHeader.Name = "txtHeader";
-            this.txtHeader.Size = new System.Drawing.Size(362, 120);
+            this.txtHeader.Size = new System.Drawing.Size(447, 120);
             this.txtHeader.TabIndex = 3;
             this.txtHeader.Text = "";
             // 
@@ -231,17 +233,19 @@
             // 
             // listFiles
             // 
+            this.listFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listFiles.FormattingEnabled = true;
             this.listFiles.Location = new System.Drawing.Point(15, 338);
             this.listFiles.Name = "listFiles";
-            this.listFiles.Size = new System.Drawing.Size(361, 88);
+            this.listFiles.Size = new System.Drawing.Size(446, 88);
             this.listFiles.TabIndex = 30;
             // 
             // FormAddItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(388, 549);
+            this.ClientSize = new System.Drawing.Size(476, 551);
             this.Controls.Add(this.listFiles);
             this.Controls.Add(this.btnRemoveUnusedFile);
             this.Controls.Add(this.button1);
@@ -262,7 +266,6 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormAddItem";
             this.Text = "技術情報の追加";

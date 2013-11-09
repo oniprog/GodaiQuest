@@ -51,7 +51,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(12, 171);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(363, 191);
+            this.richTextBox1.Size = new System.Drawing.Size(484, 191);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -79,7 +79,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(301, 386);
+            this.btnCancel.Location = new System.Drawing.Point(422, 386);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 38);
             this.btnCancel.TabIndex = 3;
@@ -101,7 +101,7 @@
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(161, 386);
+            this.btnSave.Location = new System.Drawing.Point(282, 386);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(126, 38);
             this.btnSave.TabIndex = 5;
@@ -119,7 +119,7 @@
             this.txtAshiato.Multiline = true;
             this.txtAshiato.Name = "txtAshiato";
             this.txtAshiato.ReadOnly = true;
-            this.txtAshiato.Size = new System.Drawing.Size(182, 134);
+            this.txtAshiato.Size = new System.Drawing.Size(303, 134);
             this.txtAshiato.TabIndex = 6;
             // 
             // label1
@@ -164,7 +164,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(387, 431);
+            this.ClientSize = new System.Drawing.Size(508, 431);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.btnChangeItemImage);
             this.Controls.Add(this.picItemImage);
@@ -177,7 +177,6 @@
             this.Controls.Add(this.picHeader);
             this.Controls.Add(this.richTextBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormShowHeader";
             this.Text = "アイテムヘッダー";

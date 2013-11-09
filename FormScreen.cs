@@ -710,14 +710,14 @@ namespace GodaiQuest
                         {
                             if (bGoDown)
                             {
-                                if (obj.getObjectCommand() == EObjectCommand.GoUp)
+                                if (obj.getObjectCommand() == EObjectCommand.GoDown) // これが正しいみたい
                                 {
                                     bFind = true;
                                 }
                             }
                             else
                             {
-                                if (obj.getObjectCommand() == EObjectCommand.GoDown)
+                                if (obj.getObjectCommand() == EObjectCommand.GoUp)
                                 {
                                     bFind = true;
                                 }

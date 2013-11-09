@@ -14,8 +14,8 @@ namespace GodaiQuestServer
      */
     public class ServerWorker
     {
-        //public static int SERVER_PORT = 21014;  // サーバ用のポート
-        public static int SERVER_PORT = 21015;  // サーバ用のポート
+        public static int SERVER_PORT = 21014;  // サーバ用のポート
+        //public static int SERVER_PORT = 21015;  // サーバ用のポート
 
         private FormServer mForm;
         private bool mStopFlag = false;
