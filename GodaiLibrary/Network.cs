@@ -392,13 +392,13 @@ namespace GodaiLibrary
         public void Serialize<T>(T obj)
         {
             //ProtoBuf.Serializer.Serialize( this.mStream, obj);
-            ProtoBuf.Serializer.SerializeWithLengthPrefix( this.mStream, obj, ProtoBuf.PrefixStyle.Base128, 0);
+            ProtoBuf.Serializer.SerializeWithLengthPrefix( this.mStream, obj, ProtoBuf.PrefixStyle.Fixed32, 0);
         }
 
 		// デシリアライズする
         public T Deserialize<T>()
         {
-            return ProtoBuf.Serializer.DeserializeWithLengthPrefix<T>(this.mStream, ProtoBuf.PrefixStyle.Base128, 0 );
+            return ProtoBuf.Serializer.DeserializeWithLengthPrefix<T>(this.mStream, ProtoBuf.PrefixStyle.Fixed32, 0 );
             //return ProtoBuf.Serializer.Deserialize<T>(this.mStream);
         }
 
@@ -411,6 +411,11 @@ namespace GodaiLibrary
 
             ImageConverter imgconv = new ImageConverter();
             Image img = (Image)imgconv.ConvertFrom(b);
+#if false
+            MemoryStream ms = new MemoryStream(b);
+            Image img = Bitmap.FromStream(ms);
+            ms.Close();
+#endif
             return img;
         }
 
@@ -422,6 +427,12 @@ namespace GodaiLibrary
 
             ImageConverter imgconv = new ImageConverter();
             byte[] b = (byte[])imgconv.ConvertTo(img, typeof(byte[]));
+#if false
+            MemoryStream ms = new MemoryStream();
+            img.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            byte[] ret = ms.ToArray();
+            ms.Close();
+#endif
             return b;
         }
 

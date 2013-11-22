@@ -18,7 +18,7 @@ namespace GodaiQuest
     public class GQCommandMaster
     {
         //public static int CLIENT_VERSION = 2012120216;
-        public static int CLIENT_VERSION = 2013110318;
+        public static int CLIENT_VERSION = 2013111614;
 
         public static int SERVER_PORT = 21014;  // サーバ用のポート
         //public static int SERVER_PORT = 21015;  // サーバ用のポート
@@ -153,10 +153,13 @@ namespace GodaiQuest
                     return false;
                 }
 
+#if true
+                dungeon = new DungeonInfo(this.mNetwork.Deserialize<godaiquest.DungeonInfo>());
+#else
                 byte[] data = this.mNetwork.receiveBinary();
                 BinaryFormatter formatter = new BinaryFormatter();
                 dungeon = (GodaiLibrary.GodaiQuest.DungeonInfo)formatter.Deserialize(new MemoryStream(data));
-
+#endif
                 return true;
             }
         }

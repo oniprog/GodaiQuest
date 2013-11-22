@@ -20,7 +20,7 @@ namespace GodaiQuestServer
     public class UserWorker
     {
         //public int CLIENT_VERSION = 2012120216; 
-        public int CLIENT_VERSION = 2013110318;
+        public int CLIENT_VERSION = 2013111614;
 
         private TcpClient mTcpClient;
         private ServerWorker mParent;
@@ -402,12 +402,16 @@ namespace GodaiQuestServer
 
             if (result == GodaiLibrary.GodaiQuest.EServerResult.SUCCESS)
             {
+#if true
+            this.mNetwork.Serialize(dungeon.getSerialize());
+#else
                 // ダンジョンの内容をシリアライズして送ります
                 MemoryStream memory = new MemoryStream();
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(memory, dungeon);
                 this.mNetwork.sendBinary(memory.ToArray());
                 memory.Dispose();
+#endif
             }
         }
 
