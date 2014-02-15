@@ -70,6 +70,7 @@ namespace GodaiQuest
                 user.user_name = strName;
                 user.user_folder = strUserFolder;
                 user.computer_name = getComputerName();
+                user.user_image = GodaiLibrary.Network.ImageToByteArray(imageCharacter);
 				mNetwork.Serialize( user );
 #else
                 mNetwork.sendString(strMail);
