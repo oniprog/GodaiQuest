@@ -119,7 +119,7 @@ namespace GodaiQuest
                         {
                             Settings.Instance.Password = this.txtPassword.Text;
 
-                            if (!this.mGQCom.changePassword(GodaiLibrary.Crypto.calcPasswordHash(this.txtPassword.Text)))
+                            if (!this.mGQCom.changePassword(GodaiLibrary.Crypto.CalcPasswordHash(this.txtPassword.Text)))
                             {
                                 MessageBox.Show(this.mGQCom.getErrorReasonString());
                                 // でも終了する…

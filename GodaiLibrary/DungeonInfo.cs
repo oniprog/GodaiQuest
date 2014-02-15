@@ -34,80 +34,80 @@ namespace GodaiLibrary.GodaiQuest
 
         public void setInit(int nDugeonNumber, ulong[] dungeon, int nSizeX, int nSizeY)
         {
-            this.mDungeonNumber = nDugeonNumber;
-            this.mSizeX = nSizeX;
-            this.mSizeY = nSizeY;
-            this.mDungeon = dungeon;
+            mDungeonNumber = nDugeonNumber;
+            mSizeX = nSizeX;
+            mSizeY = nSizeY;
+            mDungeon = dungeon;
         }
 
         public ulong[] getDungeon()
         {
-            return this.mDungeon;
+            return mDungeon;
         }
         public int getSizeX()
         {
-            return this.mSizeX;
+            return mSizeX;
         }
         public int getSizeY()
         {
-            return this.mSizeY;
+            return mSizeY;
         }
         public int getDungeonNumber()
         {
-            return this.mDungeonNumber;
+            return mDungeonNumber;
         }
         private int index(int ix, int iy)
         {
-            return this.mSizeX * iy + ix;
+            return mSizeX * iy + ix;
         }
         public uint getDungeonImageAt(int ix, int iy)
         {
-            return (uint)(this.mDungeon[index(ix,iy)] >> 32);
+            return (uint)(mDungeon[index(ix,iy)] >> 32);
         }
         public void setDungeonImageAt(int ix, int iy, uint nImage)
         {
-            ulong nNum = this.mDungeon[index(ix,iy)] & 0xffffffff;
-            this.mDungeon[index(ix, iy)] = nNum | ((ulong)nImage << 32);
+            ulong nNum = mDungeon[index(ix,iy)] & 0xffffffff;
+            mDungeon[index(ix, iy)] = nNum | ((ulong)nImage << 32);
         }
         public uint getDungeonContentAt(int ix, int iy)
         {
-            return (uint)(this.mDungeon[index(ix, iy)]) & 0xffffffff;
+            return (uint)(mDungeon[index(ix, iy)]) & 0xffffffff;
         }
         
         public void setDungeonContentAt(int ix, int iy, uint nContent)
         {
-            ulong nNum = this.mDungeon[index(ix, iy)] & 0xffffffff00000000;
-            this.mDungeon[index(ix, iy)] = nNum | nContent;
+            ulong nNum = mDungeon[index(ix, iy)] & 0xffffffff00000000;
+            mDungeon[index(ix, iy)] = nNum | nContent;
         }
         public ulong getDungeonTileAt(int ix, int iy)
         {
-            return this.mDungeon[index(ix, iy)];
+            return mDungeon[index(ix, iy)];
         }
         public void setDungeonTileAt(int ix, int iy, ulong nTileID)
         {
-            this.mDungeon[index(ix, iy)] = nTileID;
+            mDungeon[index(ix, iy)] = nTileID;
         }
 
         public void resize(int nNewX, int nNewY)
         {
             ulong[] newdungeon = new ulong[nNewX * nNewY];
-            for (int iy = 0; iy < this.mSizeY; ++iy)
+            for (int iy = 0; iy < mSizeY; ++iy)
             {
                 if ( iy >= nNewY )
                     continue;
 
-                for (int ix = 0; ix < this.mSizeX; ++ix)
+                for (int ix = 0; ix < mSizeX; ++ix)
                 {
                     if ( ix >= nNewX )
                         continue;
 
-                    newdungeon[ix + iy * nNewX] = this.mDungeon[index(ix, iy)];
+                    newdungeon[ix + iy * nNewX] = mDungeon[index(ix, iy)];
                 }
             }
 
-            this.mSizeX = nNewX;
-            this.mSizeY = nNewY;
-            this.mDungeon = newdungeon;
+            mSizeX = nNewX;
+            mSizeY = nNewY;
+            mDungeon = newdungeon;
         }
     }
 
@@ -125,13 +125,13 @@ namespace GodaiLibrary.GodaiQuest
         public ImagePair() { }
         public ImagePair(int nNumber_, bool bCanItemImage, Image image_, String name_, int nOwner, DateTime dateCreate, bool bNewImage)
         {
-            this.mNumber = nNumber_;
-            this.mCanItemImage = bCanItemImage;
-            this.mName = name_;
-            this.mImage = image_;
-            this.mNewImage = bNewImage;
-            this.mOwner = nOwner;
-            this.mCreated = dateCreate;
+            mNumber = nNumber_;
+            mCanItemImage = bCanItemImage;
+            mName = name_;
+            mImage = image_;
+            mNewImage = bNewImage;
+            mOwner = nOwner;
+            mCreated = dateCreate;
         }
         public ImagePair(godaiquest.ImagePair imagepair)
         {
@@ -159,55 +159,55 @@ namespace GodaiLibrary.GodaiQuest
 
         public void setNumber(int nNumber)
         {
-            this.mNumber = nNumber;
+            mNumber = nNumber;
         }
         public bool canItemImage()
         {
-            return this.mCanItemImage;
+            return mCanItemImage;
         }
         public int getNumber()
         {
-            return this.mNumber;
+            return mNumber;
         }
         public void setImage(Image image)
         {
-            this.mImage = image;
+            mImage = image;
         }
         public Image getImage()
         {
-            return this.mImage;
+            return mImage;
         }
         public bool isNewImage()
         {
-            return this.mNewImage;
+            return mNewImage;
         }
         public void setNewImage(bool bNew)
         {
-            this.mNewImage = bNew;
+            mNewImage = bNew;
         }
         public String getName()
         {
-            return this.mName;
+            return mName;
         }
         public void setName(String name_)
         {
-            this.mName = name_;
+            mName = name_;
         }
         public DateTime getCreateTime()
         {
-            return this.mCreated;
+            return mCreated;
         }
         public void setCreateTime(DateTime time_)
         {
-            this.mCreated = time_;
+            mCreated = time_;
         }
         public int getOwner()
         {
-            return this.mOwner;
+            return mOwner;
         }
         public void setOwner(int nOwner)
         {
-            this.mOwner = nOwner;
+            mOwner = nOwner;
         }
     }
 
@@ -246,13 +246,13 @@ namespace GodaiLibrary.GodaiQuest
         // 
         // bNewは新規作成したデータに対してtrueとすること
         public void addImage( uint nNum, bool canItemImage_, Image image, String name_, int nOwner_, DateTime dateCreate_, bool bNew ) {
-            this.mImageDic.Add((uint)nNum, new ImagePair((int)nNum, canItemImage_, image, name_, nOwner_, dateCreate_, bNew));
-            if (this.mMaxImageNum < nNum) this.mMaxImageNum = nNum;
+            mImageDic.Add((uint)nNum, new ImagePair((int)nNum, canItemImage_, image, name_, nOwner_, dateCreate_, bNew));
+            if (mMaxImageNum < nNum) mMaxImageNum = nNum;
         }
 
         public IEnumerator<ImagePair> GetEnumerator()
         {
-            return this.mImageDic.Values.GetEnumerator();
+            return mImageDic.Values.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -263,7 +263,7 @@ namespace GodaiLibrary.GodaiQuest
         public ImagePair getImagePairAt(uint nIndex)
         {
             ImagePair imagepair;
-            this.mImageDic.TryGetValue(nIndex, out imagepair);
+            mImageDic.TryGetValue(nIndex, out imagepair);
             if (imagepair != null)
             {
                 return imagepair;
@@ -278,7 +278,7 @@ namespace GodaiLibrary.GodaiQuest
         public Image getImageAt(uint nIndex)
         {
             ImagePair imagepair;
-            this.mImageDic.TryGetValue(nIndex, out imagepair);
+            mImageDic.TryGetValue(nIndex, out imagepair);
             if (imagepair != null)
             {
                 return imagepair.getImage();
@@ -292,7 +292,7 @@ namespace GodaiLibrary.GodaiQuest
         ///  未使用の番号を返す
         public uint newImageNum()
         {
-            if (this.mImageDic.Count == 0)
+            if (mImageDic.Count == 0)
                 return 0;
             else
                 return ++mMaxImageNum;
@@ -308,7 +308,7 @@ namespace GodaiLibrary.GodaiQuest
 
         public TilePalette(int nUserID)
         {
-            this.mUserID = nUserID;
+            mUserID = nUserID;
         }
         public TilePalette(godaiquest.TilePalette tile_palette)
         {
@@ -332,8 +332,8 @@ namespace GodaiLibrary.GodaiQuest
 
         public TilePalette copy()
         {
-            TilePalette ret = new TilePalette(this.mUserID);
-            foreach (var nTileID in this.mImageSet) 
+            TilePalette ret = new TilePalette(mUserID);
+            foreach (var nTileID in mImageSet) 
             {
                 ret.addTileID(nTileID);
             }
@@ -347,12 +347,12 @@ namespace GodaiLibrary.GodaiQuest
 
         public IEnumerator<ulong> GetEnumerator()
         {
-            return this.mImageSet.GetEnumerator();
+            return mImageSet.GetEnumerator();
         }
 
         public int getUesrID()
         {
-            return this.mUserID;
+            return mUserID;
         }
 
         public void addTileID(ulong nNum)
@@ -367,7 +367,7 @@ namespace GodaiLibrary.GodaiQuest
 
         public bool containsTileID(ulong nImageID)
         {
-            return this.mImageSet.Contains(nImageID);
+            return mImageSet.Contains(nImageID);
         }
     }
 }
