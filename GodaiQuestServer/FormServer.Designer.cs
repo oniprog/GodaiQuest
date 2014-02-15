@@ -68,7 +68,7 @@
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(813, 493);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tab1";
+            this.tabPage1.Text = "ログ";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // txtLog
@@ -94,7 +94,7 @@
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(813, 493);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tab2";
+            this.tabPage2.Text = "全体メッセージ";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // btnSendServerMes
@@ -139,7 +139,7 @@
             this.tabUser.Padding = new System.Windows.Forms.Padding(3);
             this.tabUser.Size = new System.Drawing.Size(813, 493);
             this.tabUser.TabIndex = 2;
-            this.tabUser.Text = "User";
+            this.tabUser.Text = "ユーザ管理";
             this.tabUser.UseVisualStyleBackColor = true;
             this.tabUser.Click += new System.EventHandler(this.tabUser_Click);
             this.tabUser.Enter += new System.EventHandler(this.tabUser_Enter);
