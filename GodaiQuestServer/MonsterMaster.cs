@@ -55,7 +55,7 @@ namespace GodaiQuestServer
 
             while (true)
             {
-				Thread.Sleep(500);      
+				Thread.Sleep(5000);      
 
 				// モンスターの生成
 				MakeMonster();

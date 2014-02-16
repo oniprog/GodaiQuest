@@ -557,65 +557,87 @@ namespace GodaiQuest
             if (poiClick.X < 0 || poiClick.X >= this.mDungeon.getSizeX() || poiClick.Y < 0 || poiClick.Y >= this.mDungeon.getSizeY())
                 return;
 
-            var objectid = this.mDungeon.getDungeonContentAt(poiClick.X, poiClick.Y);
-            var obj = this.mObjectAttrInfo.getObject((int)objectid);
-            int nItemID = 0;
-            if (obj.getItemID() > 0 && !this.mMonsterInfo.isMonster(obj.getItemID()) && (!this.inRandomDungeon() || !this.mRDReadItemInfo.isReadItem(obj.getItemID())))
+			/// 外部モンスターの参照をまずチェック
+            bool bDone = false;
+			foreach (var posinfo in _realMonsterLocationInfo)
+			{
+				if( poiClick.X == posinfo.MonsterIx && poiClick.Y == posinfo.MonsterIy && inIsland() )
+				{
+					// 外部モンスターをピックアップした
+				    var srcAmon = _realMonsterSrcInfo[posinfo.MonsterSrcId];
+				    picHeader.Image = srcAmon.MonsterImage;
+				    richTextBox1.Text = srcAmon.Name + "\r\n=========\r\n" + srcAmon.Spell + "\r\n==========\r\nが苦手";
+				    bDone = true;
+				    break;
+				}
+			}
+            if (!bDone)
             {
-                // アイテムピックアップ
-                nItemID = obj.getItemID();
-            }
-            {
-                // しかし、モンスタ位置が優先。チェックする
-                foreach (var monster in this.mMonsterLocation)
+                var objectid = this.mDungeon.getDungeonContentAt(poiClick.X, poiClick.Y);
+                var obj = this.mObjectAttrInfo.getObject((int) objectid);
+                int nItemID = 0;
+                if (obj.getItemID() > 0 && !this.mMonsterInfo.isMonster(obj.getItemID()) &&
+                    (!this.inRandomDungeon() || !this.mRDReadItemInfo.isReadItem(obj.getItemID())))
                 {
-                    if (monster.Value.Location.X == poiClick.X && monster.Value.Location.Y == poiClick.Y)
+                    // アイテムピックアップ
+                    nItemID = obj.getItemID();
+                }
+                {
+                    // しかし、モンスタ位置が優先。チェックする
+                    foreach (var monster in this.mMonsterLocation)
                     {
-                        // モンスターをピックアップした
-                        obj = this.mObjectAttrInfo.getObject(monster.Key);
-                        nItemID = obj.getItemID();
-                        break;
+                        if (monster.Value.Location.X == poiClick.X && monster.Value.Location.Y == poiClick.Y)
+                        {
+                            // モンスターをピックアップした
+                            obj = this.mObjectAttrInfo.getObject(monster.Key);
+                            nItemID = obj.getItemID();
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (nItemID >0 ){
-                // アイテム有り
-                // 情報表示
-                var item = this.mItemInfo.getAItem(nItemID);
-                this.richTextBox1.Text = item.getHeaderString();
-                if (item.getHeaderImage() != null && item.getHeaderImage().Size.Width > 1 )
+                if (nItemID > 0)
                 {
-                    this.picHeader.Image = item.getHeaderImage();
+                    // アイテム有り
+                    // 情報表示
+                    var item = this.mItemInfo.getAItem(nItemID);
+                    this.richTextBox1.Text = item.getHeaderString();
+                    if (item.getHeaderImage() != null && item.getHeaderImage().Size.Width > 1)
+                    {
+                        this.picHeader.Image = item.getHeaderImage();
+                    }
+                    else
+                    {
+                        this.picHeader.Image = this.mDungeonBlockImage.getImageAt((uint) item.getItemImageID());
+                    }
                 }
-                else
+                else if (obj.getObjectCommand() == EObjectCommand.IntoDungeon && this.mLocation.getDungeonUserID() == 0)
                 {
-                    this.picHeader.Image = this.mDungeonBlockImage.getImageAt((uint)item.getItemImageID());
-                }
-            }
-            else if (obj.getObjectCommand() == EObjectCommand.IntoDungeon && this.mLocation.getDungeonUserID() == 0)
-            {
-                IslandGroundInfo groundinfo;
-                if ( !this.mGQCom.getIslandGroundInfo(out groundinfo) ) {
-                    MessageBox.Show(this.mGQCom.getErrorReasonString());
-                    return;
-                }
+                    IslandGroundInfo groundinfo;
+                    if (!this.mGQCom.getIslandGroundInfo(out groundinfo))
+                    {
+                        MessageBox.Show(this.mGQCom.getErrorReasonString());
+                        return;
+                    }
 
-                // ダンジョンの入口
-                this.picHeader.Image = this.mDungeonBlockImage.getImageAt(this.mDungeon.getDungeonImageAt(poiClick.X, poiClick.Y));
-                int nDungeonID = groundinfo.getUserIDByCoord(poiClick.X, poiClick.Y);
-                if (nDungeonID == 0)
-                {
+                    // ダンジョンの入口
+                    this.picHeader.Image =
+                        this.mDungeonBlockImage.getImageAt(this.mDungeon.getDungeonImageAt(poiClick.X, poiClick.Y));
+                    int nDungeonID = groundinfo.getUserIDByCoord(poiClick.X, poiClick.Y);
+                    if (nDungeonID == 0)
+                    {
 
-                    this.richTextBox1.Text = "謎のダンジョンです\r\n" + "挑戦者を待ち受けています";
-                }
-                else
-                {
-                    var auser = this.mUserInfo.getAUser(nDungeonID);
-                    UnpickedupInfo unpickinfo;
-                    this.mGQCom.getUnpickedupItemInfo(out unpickinfo, nDungeonID);
+                        this.richTextBox1.Text = "謎のダンジョンです\r\n" + "挑戦者を待ち受けています";
+                    }
+                    else
+                    {
+                        var auser = this.mUserInfo.getAUser(nDungeonID);
+                        UnpickedupInfo unpickinfo;
+                        this.mGQCom.getUnpickedupItemInfo(out unpickinfo, nDungeonID);
 
-                    this.richTextBox1.Text = auser.getName() + "さんのダンジョンです\r\n" + ("" + unpickinfo.count()) + "個の未読情報があります\r\n";
+                        this.richTextBox1.Text = auser.getName() + "さんのダンジョンです\r\n" + ("" + unpickinfo.count()) +
+                                                 "個の未読情報があります\r\n";
+                    }
                 }
             }
             this.mSelectedCell = poiClick;
