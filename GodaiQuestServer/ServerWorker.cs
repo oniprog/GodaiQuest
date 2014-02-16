@@ -25,6 +25,7 @@ namespace GodaiQuestServer
         private Dictionary<int, UserWorker> mDicUserWorker = new Dictionary<int, UserWorker>();
         private NPCWorker mNPCWorker;
         private RSSReaderWorker mRSSReaderWorker;
+        private MonsterMaster _monster;
 
         public void startThread(FormServer form)
         {
@@ -44,6 +45,12 @@ namespace GodaiQuestServer
             // サーバ用のスレッドを作り実行する
             Thread thread = new Thread(new ThreadStart(this.run));
             thread.Start();
+
+			// モンスターリストを生成する
+			_monster = new MonsterMaster(this);
+			Thread thread4 = new Thread(_monster.Run);
+            thread4.IsBackground = true;
+			thread4.Start();
 
             // NPC用のスレッドを作り実行する
             this.mNPCWorker = new NPCWorker(this);
@@ -69,7 +76,7 @@ namespace GodaiQuestServer
                 {
                     // ユーザ用ワーカを立ち上げる
                     TcpClient client = listener.AcceptTcpClient();
-                    UserWorker worker = new UserWorker(client, this);
+                    UserWorker worker = new UserWorker(client, this, _monster);
                     Thread thread = new Thread(new ThreadStart(worker.run));
                     thread.Start();
                 }

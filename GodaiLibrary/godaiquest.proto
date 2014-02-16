@@ -287,3 +287,30 @@ message RDReadItemInfo {
 	repeated RDReadItemDic read_item_dic = 2;
 }
 
+// 外部モンスター情報
+message ARealMonster {
+	optional int32 monster_id = 1;
+	optional string monster_name = 2;
+	optional bytes monster_image = 3;
+	optional int32 monster_expvalue = 4;
+	optional string monster_spell = 5;
+	optional int32 monster_src_id = 6; // 元モンスターのID
+}
+
+message RealMonsterInfo {
+	repeated ARealMonster real_monster = 1;
+}
+
+// 外部モンスターの位置情報
+message ARealMonsterLocation {
+	optional int32 monster_id = 1;
+	optional int32 monster_ix = 2;
+	optional int32 monster_iy = 3;
+	optional int32 dungeon_number = 4; // 未使用
+	optional int32 monster_src_id = 5; // 元モンスターのID
+}
+
+message RealMonsterLocationInfo {
+	repeated ARealMonsterLocation location_list = 1;
+}
+

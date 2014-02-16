@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSVLoader.cs" />
     <Compile Include="godaiquest.cs" />
     <Compile Include="RandaomDungeonInfo.cs" />
     <Compile Include="Crypto.cs" />
@@ -64,6 +65,8 @@
     <Compile Include="ObjectAttrInfo.cs" />
     <Compile Include="PickupedInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RealMonsterInfo.cs" />
+    <Compile Include="RealMonsterLocationInfo.cs" />
     <Compile Include="ServerCommand.cs" />
     <Compile Include="SignalQueue.cs" />
     <Compile Include="TileInfo.cs" />

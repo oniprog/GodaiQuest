@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using GodaiLibrary;
-using System.Net;
 using System.Net.Sockets;
 using System.Drawing;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using GodaiLibrary.GodaiQuest;
-using ProtoBuf.Serializers;
-using ProtoBuf;
 
 namespace GodaiQuest
 {
     public class GQCommandMaster
     {
         //public static int CLIENT_VERSION = 2012120216;
-        public static int CLIENT_VERSION = 2013111614;
+        public static int CLIENT_VERSION = 2014021618;
 
         public static int SERVER_PORT = 21014;  // サーバ用のポート
         //public static int SERVER_PORT = 21015;  // サーバ用のポート
@@ -654,7 +647,7 @@ namespace GodaiQuest
         }
 
         // ポーリング
-        public bool polling(out SignalQueue signalqueue, out LocationInfo locInfo, out Dictionary<int,int> listLoginUser, ALocation locSelf)
+        public bool polling(out SignalQueue signalqueue, out LocationInfo locInfo, out Dictionary<int,int> listLoginUser, out RealMonsterLocationInfo realMonsterLocationInfo, ALocation locSelf)
         {
             lock (mLock)
             {
@@ -663,15 +656,7 @@ namespace GodaiQuest
                 mNetwork.sendDWORD((int)EServerCommand.Polling);
                 mNetwork.sendDWORD(1);
 
-#if true
                 mNetwork.Serialize(locSelf.getSerialize());
-#else
-                MemoryStream memory = new MemoryStream();
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(memory, locSelf);
-                mNetwork.sendBinary(memory.ToArray());
-#endif
-
                 mNetwork.flush();
 
                 var result = (EServerResult)mNetwork.receiveDWORD();
@@ -679,18 +664,14 @@ namespace GodaiQuest
                 {
                     locInfo = new LocationInfo();
                     signalqueue = new SignalQueue();
+					realMonsterLocationInfo = new RealMonsterLocationInfo();
 
                     mError = result;
                     return false;
                 }
 
                 // ユーザ位置情報を得る
-#if true
 				locInfo = new LocationInfo( mNetwork.Deserialize<godaiquest.LocationInfo>());
-#else
-                byte[] dataLocationInfo = mNetwork.receiveBinary();
-                locInfo = (LocationInfo)formatter.Deserialize(new MemoryStream(dataLocationInfo));
-#endif
 
                 // ログインユーザ情報を得る
                 {
@@ -702,13 +683,12 @@ namespace GodaiQuest
                     }
                 }
 
+				// 外部モンスターの位置を得る
+                realMonsterLocationInfo = new RealMonsterLocationInfo(mNetwork.Deserialize<godaiquest.RealMonsterLocationInfo>());
+
                 // シグナルを得る
-#if true
 				signalqueue = new SignalQueue( mNetwork.Deserialize<godaiquest.SignalQueue>());
-#else
-                byte[] dataSignal = mNetwork.receiveBinary();
-                signalqueue = (SignalQueue)formatter.Deserialize(new MemoryStream(dataSignal));
-#endif
+
                 return true;
             }
         }
@@ -1308,6 +1288,27 @@ namespace GodaiQuest
 
                 String strFolder = mNetwork.receiveString();
                 return strFolder;
+            }
+        }
+
+		// モンスターの元情報を得る
+        public bool getRealMonsterSrcInfo(out RealMonsterInfo info ) 
+        {
+            lock (mLock)
+            {
+                mNetwork.sendDWORD((int)EServerCommand.GetRealMonsterSrcInfo);
+                mNetwork.sendDWORD(1);
+
+                var result = (EServerResult) mNetwork.receiveDWORD();
+                if (result != EServerResult.SUCCESS)
+                {
+					info = new RealMonsterInfo();
+                    mError = result;
+                    return false;
+                }
+
+                info = new RealMonsterInfo(mNetwork.Deserialize<godaiquest.RealMonsterInfo>());
+                return true;
             }
         }
 

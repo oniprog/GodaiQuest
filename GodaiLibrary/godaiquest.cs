@@ -1289,4 +1289,146 @@ namespace godaiquest
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ARealMonster")]
+  public partial class ARealMonster : global::ProtoBuf.IExtensible
+  {
+    public ARealMonster() {}
+    
+    private int _monster_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"monster_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_id
+    {
+      get { return _monster_id; }
+      set { _monster_id = value; }
+    }
+    private string _monster_name = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"monster_name", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string monster_name
+    {
+      get { return _monster_name; }
+      set { _monster_name = value; }
+    }
+    private byte[] _monster_image = null;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"monster_image", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] monster_image
+    {
+      get { return _monster_image; }
+      set { _monster_image = value; }
+    }
+    private int _monster_expvalue = default(int);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"monster_expvalue", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_expvalue
+    {
+      get { return _monster_expvalue; }
+      set { _monster_expvalue = value; }
+    }
+    private string _monster_spell = "";
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"monster_spell", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string monster_spell
+    {
+      get { return _monster_spell; }
+      set { _monster_spell = value; }
+    }
+    private int _monster_src_id = default(int);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"monster_src_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_src_id
+    {
+      get { return _monster_src_id; }
+      set { _monster_src_id = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RealMonsterInfo")]
+  public partial class RealMonsterInfo : global::ProtoBuf.IExtensible
+  {
+    public RealMonsterInfo() {}
+    
+    private readonly global::System.Collections.Generic.List<godaiquest.ARealMonster> _real_monster = new global::System.Collections.Generic.List<godaiquest.ARealMonster>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"real_monster", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.ARealMonster> real_monster
+    {
+      get { return _real_monster; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ARealMonsterLocation")]
+  public partial class ARealMonsterLocation : global::ProtoBuf.IExtensible
+  {
+    public ARealMonsterLocation() {}
+    
+    private int _monster_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"monster_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_id
+    {
+      get { return _monster_id; }
+      set { _monster_id = value; }
+    }
+    private int _monster_ix = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"monster_ix", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_ix
+    {
+      get { return _monster_ix; }
+      set { _monster_ix = value; }
+    }
+    private int _monster_iy = default(int);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"monster_iy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_iy
+    {
+      get { return _monster_iy; }
+      set { _monster_iy = value; }
+    }
+    private int _dungeon_number = default(int);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"dungeon_number", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int dungeon_number
+    {
+      get { return _dungeon_number; }
+      set { _dungeon_number = value; }
+    }
+    private int _monster_src_id = default(int);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"monster_src_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int monster_src_id
+    {
+      get { return _monster_src_id; }
+      set { _monster_src_id = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RealMonsterLocationInfo")]
+  public partial class RealMonsterLocationInfo : global::ProtoBuf.IExtensible
+  {
+    public RealMonsterLocationInfo() {}
+    
+    private readonly global::System.Collections.Generic.List<godaiquest.ARealMonsterLocation> _location_list = new global::System.Collections.Generic.List<godaiquest.ARealMonsterLocation>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"location_list", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.ARealMonsterLocation> location_list
+    {
+      get { return _location_list; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
 }

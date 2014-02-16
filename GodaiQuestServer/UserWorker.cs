@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
 using System.Net.Sockets;
-using System.Windows.Forms;
 using System.Drawing;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using GodaiLibrary.GodaiQuest;
 using GodaiLibrary;
@@ -20,7 +14,7 @@ namespace GodaiQuestServer
     public class UserWorker
     {
         //public int CLIENT_VERSION = 2012120216; 
-        public int CLIENT_VERSION = 2013111614;
+        public int CLIENT_VERSION = 2014021618;
 
         private TcpClient mTcpClient;
         private ServerWorker mParent;
@@ -28,13 +22,15 @@ namespace GodaiQuestServer
         private String mMail;
         private String mName;
         private int mUserID;
-
         private SignalQueue mSignalQueue = new SignalQueue();
 
-        public UserWorker(TcpClient tcpclient, ServerWorker parent)
+        private MonsterMaster _monster;
+
+        public UserWorker(TcpClient tcpclient, ServerWorker parent, MonsterMaster mon) 
         {
             this.mTcpClient = tcpclient;
             this.mParent = parent;
+            _monster = mon;
         }
 
         private GodaiLibrary.Network mNetwork;
@@ -233,6 +229,10 @@ namespace GodaiQuestServer
                         else if (eCommand == EServerCommand.SetUserFolder)
                         {
                             ComSetUserFolder();
+                        }
+                        else if (eCommand == EServerCommand.GetRealMonsterSrcInfo)
+                        {
+                            ComGetRealMonsterSrcInfo();
                         }
                         else
                         {
@@ -880,29 +880,14 @@ namespace GodaiQuestServer
             int nVersion = this.mNetwork.receiveDWORD();
 
             // ユーザの位置情報を得る
-#if true
             var locSelf = new ALocation(this.mNetwork.Deserialize<godaiquest.ALocation>());
-#else
-            byte[] dataLocation = this.mNetwork.receiveBinary();
-            BinaryFormatter formatter = new BinaryFormatter();
-            ALocation locSelf = (ALocation)formatter.Deserialize(new MemoryStream(dataLocation));
-#endif
-
             this.mParent.setALocation(this.mUserID, locSelf);
-
             this.mNetwork.sendDWORD((int)EServerResult.SUCCESS);
 
             // 位置情報を送信する
             LocationInfo locInfo;
             this.mParent.getLocationInfo(out locInfo);
-
-#if true
             this.mNetwork.Serialize(locInfo.getSerialize());
-#else
-            MemoryStream memory = new MemoryStream();
-            formatter.Serialize(memory, locInfo);
-            this.mNetwork.sendBinary(memory.ToArray());
-#endif
 
             // ログインユーザを送る
             var listLogin = this.mParent.getLoginUserList();
@@ -912,19 +897,17 @@ namespace GodaiQuestServer
                 this.mNetwork.sendDWORD(nUserID);
             }
 
+			// モンスタ情報を送る
+            var listMonsterPosition = _monster.GetRealMonsterLocationInfo();
+			this.mNetwork.Serialize(listMonsterPosition.getSerialize());
+
             // シグナル情報を送る
             MemoryStream memorySignal = new MemoryStream();
             lock (this.mSignalQueue)
             {
-#if true
                 this.mNetwork.Serialize(mSignalQueue.getSerialize());
-#else
-                formatter.Serialize(memorySignal, this.mSignalQueue);
-#endif
-
                 this.mSignalQueue.clear();
             }
-//            this.mNetwork.sendBinary(memorySignal.ToArray());
         }
 
         // コマンド：大陸領土情報の取得
@@ -1365,5 +1348,15 @@ namespace GodaiQuestServer
 
             this.mNetwork.sendString(strFolder == null ? "" : strFolder);
         }
+
+		// コマンド：モンスターの元の情報を得る
+        public void ComGetRealMonsterSrcInfo()
+        {
+            addLog("Command : Get RealMonsterSrcInfo");
+            int nVersion = mNetwork.receiveDWORD();
+			mNetwork.sendDWORD((int)EServerResult.SUCCESS);
+			mNetwork.Serialize(_monster.GetRealMonsterSrcInfo().getSerialize());
+        }
     }
+
 }

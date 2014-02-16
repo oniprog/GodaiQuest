@@ -27,6 +27,7 @@ namespace GodaiQuestServer
         private List<String> mLogList = new List<string>();
 
         // ログに文字列を追加する
+		// 別スレッドから呼ばれる想定
         public void addLog(String strLog)
         {
             DateTime now = DateTime.Now.ToLocalTime();

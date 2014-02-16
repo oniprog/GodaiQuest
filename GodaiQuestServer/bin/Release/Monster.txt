@@ -1,0 +1,6 @@
+// モンスター情報
+// モンスタ名, モンスタイメージ, 経験値, 呪文テキスト
+"SnowMonster1", "MonsterImage\\snow1.jpg", 10, "int main() { destroySnow(); }"
+"SnowMonster2", "MonsterImage\\snow1.jpg", 10, "template<class T> class A : public T {};"
+"SnowMonster3", "MonsterImage\\snow1.jpg", 10, "return a != b ? 1 : 0;"
+

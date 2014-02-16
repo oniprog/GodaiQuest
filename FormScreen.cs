@@ -44,6 +44,9 @@ namespace GodaiQuest
 
         private RDReadItemInfo mRDReadItemInfo; // ランダムダンジョンの捕まえ済み情報
 
+        private RealMonsterInfo _realMonsterSrcInfo;	// 外部モンスターの元情報
+        private RealMonsterLocationInfo _realMonsterLocationInfo;	// 外部モンスターの位置
+
         private Random rand = new Random();
 
         private void FormScreen_Load(object sender, EventArgs e)
@@ -91,6 +94,9 @@ namespace GodaiQuest
 
                 // ピックアップしてない情報を読む
                 this.loadUnpickedupInfo();
+
+				// 外部モンスター一覧表を読む
+                loadRealMonsterSrcInfo();
 
                 this.picScreen.Image = new Bitmap(BLOCK_SIZE * HALF_WIDTH*2, BLOCK_SIZE * HALF_WIDTH*2);
 
@@ -191,10 +197,22 @@ namespace GodaiQuest
             }
         }
 
+		// 外部モンスターの元情報の取得
+        private bool loadRealMonsterSrcInfo()
+        {
+            return this.mGQCom.getRealMonsterSrcInfo(out _realMonsterSrcInfo);
+        }
+
         // 特殊ダンジョンにいるかの判定
         private bool inRandomDungeon()
         {
             return this.mLocation.getDungeonUserID() == 0x40000000; 
+        }
+
+		// 大陸にいるかの判定
+        private bool inIsland()
+        {
+            return this.mLocation.getDungeonUserID() == 0;
         }
 
         // モンスタ位置の初期化
@@ -407,6 +425,21 @@ namespace GodaiQuest
 
                                 var imageMonster = this.mDungeonBlockImage.getImageAt((uint)item.getItemImageID());
                                 gra.DrawImage(imageMonster, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
+                            }
+                        }
+
+						// 外部モンスターの位置チェック
+                        if (_realMonsterLocationInfo != null)
+                        {
+                            foreach (var posinfo in _realMonsterLocationInfo)
+                            {
+                                if (ix == posinfo.MonsterIx && iy == posinfo.MonsterIy && inIsland())
+                                {
+                                    // 外部モンスターの描画
+                                    var nSrcMonsterId = posinfo.MonsterSrcId;
+                                    var imageRealMonster = _realMonsterSrcInfo[nSrcMonsterId].MonsterImage;
+                                    gra.DrawImage(imageRealMonster, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
+                                }
                             }
                         }
 
@@ -1059,7 +1092,7 @@ namespace GodaiQuest
                         try
                         {
                             // ポーリング
-                            this.mGQCom.polling(out this.mSignalqueue, out this.mLocationInfo, out this.mLoginUserList, this.mLocation);
+                            this.mGQCom.polling(out this.mSignalqueue, out this.mLocationInfo, out this.mLoginUserList, out this._realMonsterLocationInfo, this.mLocation);
                             this.mFinishPooling = true;
                         }
                         catch (Exception)

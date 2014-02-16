@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Drawing;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using GodaiLibrary.GodaiQuest;
-using GodaiLibrary;
 
 namespace GodaiQuestServer
 {
     public class MongoMaster
     {
-        private MongoServer mMongo;
+        private const int MAX_ISLAND_SIZE = 512;
+
+		// 大陸サイズを返す
+        public static int GetIslandSize()
+        {
+            return MAX_ISLAND_SIZE;
+        }
+
+		private MongoServer mMongo;
         private MongoDatabase mDB;
         private MongoCollection<DBUser> mUserCollection;
         private MongoCollection<DBGodaiSystem> mGodaiSystemCollection;
@@ -37,6 +43,7 @@ namespace GodaiQuestServer
         private MongoCollection<DBRDReadItem> mRDReadItemCollection;
         private MongoCollection<DBRSSLastUpdateTime> mRSSLastUpdateTimeCollection;
         private MongoCollection<DBUserFolder> mUserFolderCollection;
+
 
         public MongoMaster()
         {
@@ -101,9 +108,9 @@ namespace GodaiQuestServer
             this.getIslandGroundInfo(out groundinfo);
 
             int nSize = 8;  // 土地のサイズ
- 
-            int nIx = groundinfo.count() % (512 / nSize);
-            int nIy = groundinfo.count() / (512 / nSize);
+
+            int nIx = groundinfo.count() % (MAX_ISLAND_SIZE / nSize);
+            int nIy = groundinfo.count() / (MAX_ISLAND_SIZE / nSize);
             nIx *= nSize;
             nIy *= nSize;
             IslandGround ground = new IslandGround(user.UserID, nIx, nIy, nIx+nSize-1, nIy+nSize-1);
@@ -1294,10 +1301,10 @@ namespace GodaiQuestServer
         {
             if (nUserID == 0)
             {
-                ulong[] dungeonmap = new ulong[512 * 512];
+                ulong[] dungeonmap = new ulong[MAX_ISLAND_SIZE * MAX_ISLAND_SIZE];
 
                 DungeonInfo dungeon = new DungeonInfo();
-                dungeon.setInit(0, dungeonmap, 512, 512);
+                dungeon.setInit(0, dungeonmap, MAX_ISLAND_SIZE, MAX_ISLAND_SIZE);
 
                 return dungeon;
             }
