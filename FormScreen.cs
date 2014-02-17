@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using GodaiLibrary.GodaiQuest;
 
 namespace GodaiQuest
@@ -49,8 +50,13 @@ namespace GodaiQuest
 
         private Random rand = new Random();
 
+        private List<BombAnim> _listBombAnim = new List<BombAnim>(); 
+
         private void FormScreen_Load(object sender, EventArgs e)
         {
+			// 爆破アニメーションの読み込み
+			BombAnim.InitBombImage();
+            
             // ログイン処理
             Hide();
             try
@@ -468,8 +474,38 @@ namespace GodaiQuest
                                 }
                             }
                         }
+
+						// モンスターの爆発アニメーション
+                        lock (_listBombAnim)
+                        {
+                            var listDestroy = new List<BombAnim>();
+                            foreach (var bombanim in _listBombAnim)
+                            {
+                                if (bombanim.Ix == ix && bombanim.Iy == iy)
+                                {
+                                    Image img = bombanim.GetBombImage();
+
+                                    bombanim.IncTurn();
+                                    if (bombanim.Expired())
+                                    {
+                                        listDestroy.Add(bombanim);
+                                    }
+
+                                    if (img != null)
+                                    {
+                                        gra.DrawImage(img, idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
+                                    }
+                                }
+                            }
+							// 削除
+                            foreach (var bombanim in listDestroy)
+                            {
+                                _listBombAnim.Remove(bombanim);
+                            }
+                        }
                     }
                 }
+
                 for (int iy = cy - HALF_WIDTH; iy <= cy + HALF_WIDTH; ++iy)
                 {
                     if (iy < 0 || iy >= this.mDungeon.getSizeY()) continue;
@@ -566,7 +602,7 @@ namespace GodaiQuest
 					// 外部モンスターをピックアップした
 				    var srcAmon = _realMonsterSrcInfo[posinfo.MonsterSrcId];
 				    picHeader.Image = srcAmon.MonsterImage;
-				    richTextBox1.Text = srcAmon.Name + "\r\n=========\r\n" + srcAmon.Spell + "\r\n==========\r\nが苦手";
+				    richTextBox1.Text = srcAmon.Name + "\r\n=========\r\n" + srcAmon.Spell + "\r\n=========\r\nが苦手";
 				    bDone = true;
 				    break;
 				}
@@ -1132,21 +1168,27 @@ namespace GodaiQuest
                         // シグナルの処理
                         foreach (var signal in this.mSignalqueue)
                         {
-                            switch (signal)
+                            switch (signal.SigType)
                             {
-                                case Signal.RefreshDungeon: 
+                                case SignalType.RefreshDungeon: 
                                     this.loadDungeon(this.mLocation, true); 
                                     notifyIcon1.BalloonTipText = "ダンジョンが更新されました";
                                     notifyIcon1.ShowBalloonTip(800);
                                     break;
-                                case Signal.RefreshMessage: 
+                                case SignalType.RefreshMessage: 
                                     this.loadMessageInfo();
                                     notifyIcon1.BalloonTipText = "メッセージが更新されました";
                                     notifyIcon1.ShowBalloonTip(800);
                                     break;
-                                case Signal.RefreshExpValue: this.loadExpValue(); break;
-                                case Signal.SystemMessage: var form = new FormMessage("システムメッセージ", this.mSignalqueue.getSystemMessage()); form.Show(); break;
-                                case Signal.RefreshUser: this.loadUserInfo(); break;
+                                case SignalType.RefreshExpValue: this.loadExpValue(); break;
+                                case SignalType.SystemMessage: var form = new FormMessage("システムメッセージ", this.mSignalqueue.getSystemMessage()); form.Show(); break;
+                                case SignalType.RefreshUser: this.loadUserInfo(); break;
+                                case SignalType.DestroyMonster:
+                                    lock (_listBombAnim)
+                                    {
+                                        _listBombAnim.Add(new BombAnim(signal.Ix, signal.Iy));
+                                    }
+                                    break;
                             }
                         }
 
@@ -1229,6 +1271,11 @@ namespace GodaiQuest
                 }
             }
         }
+
+        private void richTextBox1_SelectionChanged(object sender, EventArgs e)
+        {
+            richTextBox1.Select(0, 0);
+        }
     }
 
     public class MonsterLocation
@@ -1236,4 +1283,56 @@ namespace GodaiQuest
         public Point Location;
         public Point MoveDir;
     }
+
+	// 爆発アニメーション用
+    public class BombAnim
+    {
+        private int _timeBegin;
+        private int _turn;
+		
+		public int Ix { get; set; }
+        public int Iy { get; set; }
+
+        public BombAnim(int ix, int iy)
+        {
+            _timeBegin = System.Environment.TickCount;
+            _turn = 0;
+            Ix = ix;
+            Iy = iy;
+        }
+
+        public bool Expired()
+        {
+            return System.Environment.TickCount - _timeBegin > 5000;
+        }
+        public int IncTurn()
+        {
+            return _turn++;
+        }
+
+        public Image GetBombImage()
+        {
+            if (_turn%2 == 0)
+                return _img1;
+            else
+                return _img2;
+        }
+
+        public static Image _img1, _img2;
+
+        public static void InitBombImage()
+        {
+            string strDir = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            try
+            {
+                _img1 = Image.FromFile(Path.Combine(strDir, "bomb1.png"));
+                _img2 = Image.FromFile(Path.Combine(strDir, "bomb2.png"));
+            }
+            catch (FileNotFoundException)
+            {
+                MessageBox.Show("bomb1.pngとbomb2.pngが読めませんでした．モンスターが爆発しません");
+            }
+        }
+    }
 }
+

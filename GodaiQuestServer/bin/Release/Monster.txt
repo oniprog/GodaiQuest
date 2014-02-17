@@ -1,6 +1,19 @@
 // モンスター情報
 // モンスタ名, モンスタイメージ, 経験値, 呪文テキスト
-"SnowMonster1", "MonsterImage\\snow1.jpg", 10, "int main() { destroySnow(); }"
-"SnowMonster2", "MonsterImage\\snow1.jpg", 10, "template<class T> class A : public T {};"
-"SnowMonster3", "MonsterImage\\snow1.jpg", 10, "return a != b ? 1 : 0;"
+"SnowMonster1", "MonsterImage\\snow1.jpg", 10, "int main(){}"
+"SnowMonster2", "MonsterImage\\snow1.jpg", 10, "template<class T>;"
+"SnowMonster3", "MonsterImage\\snow1.jpg", 10, "a ? 1 : 0;"
+"SnowMonster4", "MonsterImage\\snow2.jpg", 10, "Linux"
+"SnowMonster5", "MonsterImage\\snow2.jpg", 10, "Windows"
+"SnowMonster6", "MonsterImage\\snow2.jpg", 10, "FreeBSD"
+"SnowMonster7", "MonsterImage\\snow2.jpg", 10, "Android"
+"SnowMonster8", "MonsterImage\\snow2.jpg", 10, "iOS"
 
+"SnowPlant1", "MonsterImage\\snow_plant1.jpg", 10, "Mike"
+"SnowPlant2", "MonsterImage\\snow_plant1.jpg", 10, "Tora"
+"SnowPlant3", "MonsterImage\\snow_plant1.jpg", 10, "chibi"
+
+"Train1", "MonsterImage\\train1.jpg", 10, "Nagano"
+"Train2", "MonsterImage\\train1.jpg", 10, "Naoetsu"
+"Train3", "MonsterImage\\train1.jpg", 10, "Tokyo"
+"Train4", "MonsterImage\\train1.jpg", 10, "Sakudaira"

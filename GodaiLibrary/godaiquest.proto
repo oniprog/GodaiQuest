@@ -195,6 +195,9 @@ message LocationInfo {
 message Signal {
 	
 	optional int32 signal = 1;
+	optional int32 id = 2;
+	optional int32 ix = 3;
+	optional int32 iy = 4;
 }
 
 message SignalQueue {

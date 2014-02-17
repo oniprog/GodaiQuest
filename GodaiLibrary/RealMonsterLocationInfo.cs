@@ -103,5 +103,10 @@ namespace GodaiLibrary.GodaiQuest
         {
             return _listRealMonsterLocation.Count;
         }
+
+        public bool Remove(ARealMonsterLocation amon)
+        {
+            return _listRealMonsterLocation.Remove(amon);
+        }
     }
 }

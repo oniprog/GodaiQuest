@@ -113,7 +113,7 @@ namespace GodaiQuestServer
         }
 
         // シグナルを伝達する
-        public void makeSignal(Signal sig_)
+        public void makeSignalAllUser(Signal sig_)
         {
             lock (this.mDicUserWorker)
             {
@@ -422,7 +422,7 @@ namespace GodaiQuestServer
                 expvalue.incValue(nValue);
                 this.mMongo.setExpValue(nUserID, expvalue);
 
-                this.makeSignal(Signal.RefreshExpValue, nUserID);
+                this.makeSignal(new Signal(SignalType.RefreshExpValue), nUserID );
             }
         }
 
@@ -587,11 +587,11 @@ namespace GodaiQuestServer
                     String strLog1 = user.getName() + "があなたの書き込みを見ました";
                     this.addAshiatoLog(ownerid, strLog1);
 
-                    this.makeSignal(Signal.RefreshExpValue, ownerid);
+                    this.makeSignal(new Signal(SignalType.RefreshExpValue), ownerid);
                 }
 
                 // 通知をする
-                this.makeSignal(Signal.RefreshExpValue, nUserID);
+                this.makeSignal(new Signal(SignalType.RefreshExpValue), nUserID);
             }
 
             return EServerResult.SUCCESS;

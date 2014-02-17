@@ -868,6 +868,30 @@ namespace godaiquest
       get { return _signal; }
       set { _signal = value; }
     }
+    private int _id = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int id
+    {
+      get { return _id; }
+      set { _id = value; }
+    }
+    private int _ix = default(int);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"ix", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int ix
+    {
+      get { return _ix; }
+      set { _ix = value; }
+    }
+    private int _iy = default(int);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"iy", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int iy
+    {
+      get { return _iy; }
+      set { _iy = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

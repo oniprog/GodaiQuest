@@ -24,7 +24,8 @@ namespace GodaiQuestServer
         private int mUserID;
         private SignalQueue mSignalQueue = new SignalQueue();
 
-        private MonsterMaster _monster;
+        private MonsterMaster _monster;		// 外部モンスター
+        private ALocation _locationSelf;
 
         public UserWorker(TcpClient tcpclient, ServerWorker parent, MonsterMaster mon) 
         {
@@ -319,7 +320,7 @@ namespace GodaiQuestServer
             this.mNetwork.sendDWORD((int)result);
 
             // 通知する
-            this.mParent.makeSignal(Signal.RefreshUser);
+            this.mParent.makeSignalAllUser(new Signal(SignalType.RefreshUser));
         }
 
         /// コマンド：ログオンを試みる
@@ -484,7 +485,7 @@ namespace GodaiQuestServer
             }
 #endif
 
-            this.mParent.makeSignal(Signal.RefreshDungeon);
+            this.mParent.makeSignalAllUser(new Signal(SignalType.RefreshDungeon));
         }
 
         /// コマンド：ダンジョン壁イメージの取得
@@ -790,8 +791,8 @@ namespace GodaiQuestServer
             this.mParent.addAshiatoLog(nItemOwner, strLog1);
 
             // 通知をする
-            this.mParent.makeSignal(Signal.RefreshExpValue, this.mUserID);
-            this.mParent.makeSignal(Signal.RefreshExpValue, nItemOwner);
+            this.mParent.makeSignal(new Signal(SignalType.RefreshExpValue), this.mUserID);
+            this.mParent.makeSignal(new Signal(SignalType.RefreshExpValue), nItemOwner);
         }
 
         /// コマンド：ユーザの情報を変更する
@@ -881,6 +882,7 @@ namespace GodaiQuestServer
 
             // ユーザの位置情報を得る
             var locSelf = new ALocation(this.mNetwork.Deserialize<godaiquest.ALocation>());
+            _locationSelf = locSelf;
             this.mParent.setALocation(this.mUserID, locSelf);
             this.mNetwork.sendDWORD((int)EServerResult.SUCCESS);
 
@@ -1034,22 +1036,20 @@ namespace GodaiQuestServer
 
             int nVersion = this.mNetwork.receiveDWORD();
 
-#if true
             var mes = new AMessage(this.mNetwork.Deserialize<godaiquest.AMessage>());
-#else
-            byte[] dataMessage = this.mNetwork.receiveBinary();
-            BinaryFormatter formatter = new BinaryFormatter();
-            AMessage mes = (AMessage)formatter.Deserialize(new MemoryStream(dataMessage));
-#endif
-
             var result = this.mParent.setAMessage(mes);
 
             this.mNetwork.sendDWORD((int)result);
-            
             if (result != EServerResult.SUCCESS)
                 return;
 
-            this.mParent.makeSignal(Signal.RefreshMessage);
+            if (_locationSelf != null)
+            {
+				// モンスターへの呪文攻撃の判定
+                _monster.AttackMonster(mes.getMessage(), _locationSelf);
+            }
+
+            this.mParent.makeSignalAllUser(new Signal(SignalType.RefreshMessage));
         }
 
         // コマンド：経験値を得る

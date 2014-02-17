@@ -53,7 +53,7 @@ namespace GodaiQuestServer
                 this.mParent.clearRDReadItemInfo();
 
                 // ダンジョンの変更を通知する
-                this.mParent.makeSignal(Signal.RefreshDungeon);
+                this.mParent.makeSignalAllUser(new Signal(SignalType.RefreshDungeon));
 
                 this.mParent.addLog("New Random dungeon is created.");
             }

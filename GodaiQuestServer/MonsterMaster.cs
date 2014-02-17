@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using GodaiLibrary;
 using GodaiLibrary.GodaiQuest;
@@ -94,6 +96,58 @@ namespace GodaiQuestServer
             }
         }
 
+		// モンスターへの攻撃検出
+        public void AttackMonster(string strMes, GodaiLibrary.GodaiQuest.ALocation locSelf)
+        {
+            if (locSelf.getDungeonUserID() != 0)
+                return;	// 大陸以外では未サポート
+
+            var listDestroy = new List<ARealMonsterLocation>();
+
+            lock (_cs)
+            {
+                foreach (var amon in _listLiveMonsterLocation)
+                {
+                    int dx = Math.Abs(amon.MonsterIx - locSelf.getIX());
+                    int dy = Math.Abs(amon.MonsterIy - locSelf.getIY());
+                    if (Math.Max(dx, dy) > 5)
+                        continue;	// 遠すぎる
+
+                    int nSrcId = amon.MonsterSrcId;
+                    var monsrc = _listAvailableMonster[nSrcId];
+                    if (strMes.Contains(monsrc.Spell))
+                    {
+                        // 退治
+						listDestroy.Add(amon);
+                    }
+                }
+                foreach (var amon in listDestroy)
+                {
+                    _listLiveMonsterLocation.Remove(amon);
+                }
+            }
+
+			// モンスタの削除処理継続
+            foreach (var amon in listDestroy)
+            {
+                // 経験値の増加
+                var monsrc = _listAvailableMonster[amon.MonsterSrcId];
+                int expvalue = monsrc.ExpValue;
+				_parent.incrementExpValue(locSelf.getUserID(), expvalue);
+
+				// モンスタ削除イベントの発生
+                var sig = new GodaiLibrary.GodaiQuest.Signal(SignalType.DestroyMonster);
+                sig.ID = monsrc.ID;
+                sig.Ix = amon.MonsterIx;
+                sig.Iy = amon.MonsterIy;
+                _parent.makeSignalAllUser(sig);
+            }
+            if (listDestroy.Count > 0)
+            {
+                _parent.makeSignal(new GodaiLibrary.GodaiQuest.Signal(SignalType.RefreshExpValue), locSelf.getUserID());
+            }
+        }
+
 		// モンスターの作成
         private void MakeMonster()
         {
@@ -111,8 +165,8 @@ namespace GodaiQuestServer
 
                 for (int it = 0; it < nMakeMonsterCnt; ++it)
                 {
-                    int ix = _rand.Next(0, nMaxSize);
-                    int iy = _rand.Next(0, nMaxSize);
+                    int ix = _rand.Next(0, nMaxSize/2);
+                    int iy = _rand.Next(0, nMaxSize/2);
                     int nMonsterType = _rand.Next(0, _listAvailableMonster.size());
 
                     // 元となるモンスター情報
