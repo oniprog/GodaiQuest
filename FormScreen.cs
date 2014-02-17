@@ -50,7 +50,9 @@ namespace GodaiQuest
 
         private Random rand = new Random();
 
-        private List<BombAnim> _listBombAnim = new List<BombAnim>(); 
+        private List<BombAnim> _listBombAnim = new List<BombAnim>();
+
+        private bool _bEnableCopyRichTextBox = true;	// コピー＆ペーストの禁止（モンスターの呪文のコピーを防ぐため）
 
         private void FormScreen_Load(object sender, EventArgs e)
         {
@@ -604,6 +606,7 @@ namespace GodaiQuest
 				    picHeader.Image = srcAmon.MonsterImage;
 				    richTextBox1.Text = srcAmon.Name + "\r\n=========\r\n" + srcAmon.Spell + "\r\n=========\r\nが苦手";
 				    bDone = true;
+				    _bEnableCopyRichTextBox = false;
 				    break;
 				}
 			}
@@ -638,6 +641,7 @@ namespace GodaiQuest
                     // 情報表示
                     var item = this.mItemInfo.getAItem(nItemID);
                     this.richTextBox1.Text = item.getHeaderString();
+                    _bEnableCopyRichTextBox = true;
                     if (item.getHeaderImage() != null && item.getHeaderImage().Size.Width > 1)
                     {
                         this.picHeader.Image = item.getHeaderImage();
@@ -664,6 +668,7 @@ namespace GodaiQuest
                     {
 
                         this.richTextBox1.Text = "謎のダンジョンです\r\n" + "挑戦者を待ち受けています";
+                        _bEnableCopyRichTextBox = true;
                     }
                     else
                     {
@@ -673,6 +678,7 @@ namespace GodaiQuest
 
                         this.richTextBox1.Text = auser.getName() + "さんのダンジョンです\r\n" + ("" + unpickinfo.count()) +
                                                  "個の未読情報があります\r\n";
+                        _bEnableCopyRichTextBox = true;
                     }
                 }
             }
@@ -1274,7 +1280,8 @@ namespace GodaiQuest
 
         private void richTextBox1_SelectionChanged(object sender, EventArgs e)
         {
-            richTextBox1.Select(0, 0);
+			if ( !_bEnableCopyRichTextBox)
+				richTextBox1.Select(0, 0);
         }
     }
 
