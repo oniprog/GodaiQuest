@@ -165,8 +165,8 @@ namespace GodaiQuestServer
 
                 for (int it = 0; it < nMakeMonsterCnt; ++it)
                 {
-                    int ix = _rand.Next(0, nMaxSize/2);
-                    int iy = _rand.Next(0, nMaxSize/2);
+                    int ix = _rand.Next(0, nMaxSize/4);
+                    int iy = _rand.Next(0, nMaxSize/4);
                     int nMonsterType = _rand.Next(0, _listAvailableMonster.size());
 
                     // 元となるモンスター情報
