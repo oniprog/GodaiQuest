@@ -14,7 +14,7 @@ namespace GodaiQuestServer
     public class UserWorker
     {
         //public int CLIENT_VERSION = 2012120216; 
-        public int CLIENT_VERSION = 2014021618;
+        public int CLIENT_VERSION = 2014021819;
 
         private TcpClient mTcpClient;
         private ServerWorker mParent;
@@ -761,7 +761,13 @@ namespace GodaiQuestServer
 
             int nItemID = this.mNetwork.receiveDWORD();
 
-            Network.sendFiles(this.mNetwork, getItemFolder(nItemID));
+            var listAlreadyFile = new List<Network.LocalFileInfo>();
+			if ( nVersion >= 2 )
+			{
+			    listAlreadyFile = Network.receiveLocalFilesInfo(mNetwork, getItemFolder(nItemID));
+			}
+
+            Network.sendFiles(this.mNetwork, getItemFolder(nItemID), listAlreadyFile);
 
             // アイテムの所有者を探す
             int nItemOwner = this.mParent.getItemOwner(nItemID); 

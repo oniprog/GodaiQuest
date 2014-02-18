@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -228,6 +229,55 @@ namespace GodaiLibrary
             this.mStream.Close();
         }
 
+        /// ローカルのファイル一覧を送信する
+        public static void sendLocalFilesInfo(Network network, String strDirectory)
+        {
+            string strBaseDir = new DirectoryInfo(strDirectory).FullName;
+			sendLocalFilesInfo(network, strBaseDir, strBaseDir);
+			network.sendDWORD(-1);
+        }
+        private static void sendLocalFilesInfo(Network network, String strDirectory, string strBaseDir) {
+
+			DirectoryInfo info = new DirectoryInfo(strDirectory);
+            foreach (var file in info.GetFiles())
+            {
+                int nSize = (int)file.Length; // 注：巨大すぎるファイルは考えない
+                string strName = file.FullName.Substring(strBaseDir.Length + 1);
+                network.sendDWORD(nSize);
+				network.sendString(file.Name);
+            }
+            foreach (var dir in info.GetDirectories())
+            {
+				sendLocalFilesInfo(network, dir.FullName, strBaseDir);               
+            }			
+        }
+
+		// ローカルのファイル情報
+        public struct LocalFileInfo
+        {
+            public int Size;
+            public string FilePath;
+        }
+
+		// ローカルファイルの一覧を受信する
+        public static List<LocalFileInfo> receiveLocalFilesInfo(Network network, String strDirectory)
+        {
+            var listRet = new List<LocalFileInfo>();
+            while (true)
+            {
+                int nFileSize = network.receiveDWORD();
+                if (nFileSize < 0)
+                    break;
+                string strFileName = network.receiveString();
+
+                var localFileInfo = new LocalFileInfo();
+                localFileInfo.FilePath = Path.Combine(strDirectory, strFileName);
+                localFileInfo.Size = nFileSize;
+				listRet.Add(localFileInfo);
+            }
+            return listRet;
+        }
+
         /// ファイルを受信する
         public static void receiveFiles(Network network, String strDirectory)
         {
@@ -320,15 +370,21 @@ namespace GodaiLibrary
         /// ファイルを送信する
         public static void sendFiles(Network network, String strDirectoryOrFile)
         {
+			sendFiles( network, strDirectoryOrFile, null);
+        }
+
+        /// ファイルを送信する
+        public static void sendFiles(Network network, String strDirectoryOrFile, List<LocalFileInfo> listFile ) 
+        {
             try
             {
                 if (File.Exists(strDirectoryOrFile))
                 {
-                    sendFile(network, Path.GetFileName(strDirectoryOrFile), Path.GetFullPath(strDirectoryOrFile), "");
+                    sendFile(network, Path.GetFileName(strDirectoryOrFile), Path.GetFullPath(strDirectoryOrFile), "", listFile);
                 }
                 else
                 {
-                    sendFilesSub(network, strDirectoryOrFile, "");
+                    sendFilesSub(network, strDirectoryOrFile, "",listFile);
                 }
             }
             finally
@@ -337,7 +393,7 @@ namespace GodaiLibrary
             }
         }
 
-        private static void sendFilesSub(Network network, String strDirectory, String strSubPath)
+        private static void sendFilesSub(Network network, String strDirectory, String strSubPath, List<LocalFileInfo> listFile)
         {
             DirectoryInfo dirinfo = new DirectoryInfo(strDirectory);
             if (!dirinfo.Exists)
@@ -345,17 +401,29 @@ namespace GodaiLibrary
 
             foreach (var file in dirinfo.GetFiles())
             {
-                sendFile(network, file.Name, file.FullName, strSubPath);
+                sendFile(network, file.Name, file.FullName, strSubPath, listFile);
             }
             foreach (var dir in dirinfo.GetDirectories())
             {
-                sendFilesSub(network, dir.FullName, Path.Combine(strSubPath, dir.Name));
+                sendFilesSub(network, dir.FullName, Path.Combine(strSubPath, dir.Name), listFile);
             }
         }
 
         // ファイル転送 strSubPathは付加するフォルダ名
-        public static void sendFile(Network network, String strFileName, String strFullPath, String strSubPath)
+        public static void sendFile(Network network, String strFileName, String strFullPath, String strSubPath, List<LocalFileInfo> listFile)
         {
+            if (listFile != null)
+            {
+                for (int it = 0; it < listFile.Count; ++it)
+                {
+                    if (listFile[it].FilePath == strFullPath)
+                    {
+                        int nRealSize = (int)new FileInfo(strFullPath).Length;
+                        if (nRealSize == listFile[it].Size)
+                            return;
+                    }
+                }
+            }
             try
             {
                 System.IO.FileStream win = new System.IO.FileStream(strFullPath, FileMode.Open, FileAccess.Read);

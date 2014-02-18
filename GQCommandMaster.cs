@@ -11,7 +11,7 @@ namespace GodaiQuest
     public class GQCommandMaster
     {
         //public static int CLIENT_VERSION = 2012120216;
-        public static int CLIENT_VERSION = 2014021618;
+        public static int CLIENT_VERSION = 2014021819;
 
         public static int SERVER_PORT = 21014;  // サーバ用のポート
         //public static int SERVER_PORT = 21015;  // サーバ用のポート
@@ -498,7 +498,7 @@ namespace GodaiQuest
                 // ファイルを全部転送する
                 foreach (var fileinfo in setFile)
                 {
-                    Network.sendFile(mNetwork, Path.GetFileName(fileinfo.FullPath), fileinfo.FullPath, Path.GetDirectoryName(fileinfo.HalfPath));
+                    Network.sendFile(mNetwork, Path.GetFileName(fileinfo.FullPath), fileinfo.FullPath, Path.GetDirectoryName(fileinfo.HalfPath), null);
                 }
                 mNetwork.sendByte(0);
 
@@ -519,10 +519,10 @@ namespace GodaiQuest
             lock (mLock)
             {
                 mNetwork.sendDWORD((int)EServerCommand.GetAItem);
-                mNetwork.sendDWORD(1);
-
+                mNetwork.sendDWORD(2); // 2 ローカルのファイル情報を先に転送するようにした
                 mNetwork.sendDWORD(nItemID);
 
+                Network.sendLocalFilesInfo(mNetwork, strDirectory);
                 mNetwork.flush();
 
                 Network.receiveFiles(mNetwork, strDirectory);
@@ -631,7 +631,7 @@ namespace GodaiQuest
                 // ファイルを全部転送する
                 foreach (var fileinfo in setFiles)
                 {
-                    Network.sendFile(mNetwork, Path.GetFileName(fileinfo.FullPath), fileinfo.FullPath, Path.GetDirectoryName(fileinfo.HalfPath));
+                    Network.sendFile(mNetwork, Path.GetFileName(fileinfo.FullPath), fileinfo.FullPath, Path.GetDirectoryName(fileinfo.HalfPath), null);
                 }
                 mNetwork.sendByte(0);
 
