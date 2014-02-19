@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="ProgramFilesFolder">
+            <Directory Id="dir17DCF0D3A3036F2AFACBFF4320503E85" Name="GodaiQuestClient" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="GroupGQC">
+            <Component Id="cmp957FBC3473A0DC8FB256F409E1DB46EE" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{EEB0546F-3198-43ED-B09E-E90A9BE39367}">
+                <File Id="filB51E8F9284680750C49A34A5F885BD6B" KeyPath="yes" Source="$(var.Install_data)\bomb1.png" />
+            </Component>
+            <Component Id="cmpAF19474D3FFBBF2A68CC41EB98343A7F" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{6A98AA73-94C6-4BE0-A6BF-15E54343FF4B}">
+                <File Id="filEE5AE2C5822113A88D980E7894F4B961" KeyPath="yes" Source="$(var.Install_data)\bomb2.png" />
+            </Component>
+            <Component Id="cmp2155598DD70AE7EAF2EC04F15060A985" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{D4490DE3-BE46-443C-978D-6E4639C97F91}">
+                <File Id="fil834B5A20F37E7376BF065FC225AD5433" KeyPath="yes" Source="$(var.Install_data)\GodaiLibrary.dll" />
+            </Component>
+            <Component Id="cmp004E0F7941A04C266A45FA9F22215D57" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{FE792E5A-39D5-4003-A45D-6B6F8C0CDC73}">
+                <File Id="filFAC9C3D5DAB2DC1216001A314A8F2F27" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe" />
+            </Component>
+            <Component Id="cmpA26ACE4FA0401DB24501012F3B8D366F" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{FB26E5ED-A7B0-4F15-8070-9CBBD3570A4D}">
+                <File Id="filB5965BC28AD223C33EED339418F4DDBB" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe.config" />
+            </Component>
+            <Component Id="cmpE70A9C23317ED827EC50818BE4D48EC7" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{DE148C0D-59DA-4011-A909-5FC05EF396D0}">
+                <File Id="fil48D25947F8261A66D3DFCBBCB7388771" KeyPath="yes" Source="$(var.Install_data)\protobuf-net.dll" />
+            </Component>
+            <Component Id="cmp4E0AD25C740C4A6DEB75B04EBEC208FD" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{2962EA31-A330-4B16-B58C-247479310209}">
+                <File Id="filC1685BBD931B7CF3915BF2E246FFB39F" KeyPath="yes" Source="$(var.Install_data)\readme.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
