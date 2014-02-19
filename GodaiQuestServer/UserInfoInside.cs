@@ -27,7 +27,9 @@ namespace GodaiQuestServer
             ret.Mail = this.mMail;
             ret.Name = this.mName;
             ret.PasswordHash = this.mPasswordHash;
-            ret.ImageCharacter = this.mImageCharacter;
+            ret.ImageCharacter = this.mImageCharacter is Bitmap
+                ? this.mImageCharacter as Bitmap
+                : new Bitmap(this.mImageCharacter);
             return ret;
         }
     }

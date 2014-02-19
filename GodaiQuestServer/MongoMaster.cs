@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using GodaiLibrary.GodaiQuest;
@@ -565,7 +567,9 @@ namespace GodaiQuestServer
                 return EServerResult.SUCCESS; // いいのかな？
             }
 
-            userdb.ImageCharacter = user.getCharacterImage();
+            userdb.ImageCharacter = user.getCharacterImage() is Bitmap
+                ? user.getCharacterImage() as Bitmap
+                : new Bitmap(user.getCharacterImage());
             userdb.Name = user.getName();
             this.mUserCollection.Save(userdb);
 
@@ -1365,7 +1369,8 @@ namespace GodaiQuestServer
         public String Mail { get; set; }
         public string Name { get; set; }
         public string PasswordHash { get; set; }
-        public Image ImageCharacter { get; set; }
+
+        public Bitmap ImageCharacter { get; set; }
     }
     public class DBLogon
     {
@@ -1395,7 +1400,9 @@ namespace GodaiQuestServer
     {
         public MongoDB.Bson.ObjectId _id { get; set; }
         public int ImageID { get; set; }
-        public Image Image { get; set; }
+
+        public Bitmap Image { get; set;  }
+
         public DateTime CreatedTime { get; set; }
         public int OwnerID { get; set; }
         public bool CanItemImage { get; set;  }
@@ -1404,7 +1411,7 @@ namespace GodaiQuestServer
         public void setInit(ImagePair pair)
         {
             this.ImageID = pair.getNumber();
-            this.Image = pair.getImage();
+            this.Image = pair.getImage() is Bitmap ? pair.getImage() as Bitmap : new Bitmap(pair.getImage());
             this.CreatedTime = pair.getCreateTime();
             this.OwnerID = pair.getOwner();
             this.Name = pair.getName();
@@ -1472,12 +1479,16 @@ namespace GodaiQuestServer
         public MongoDB.Bson.ObjectId _id { get; set; }
         public int ItemID { get; set; }
         public String HeaderString { get; set; }
-        public Image HeaderImage { get; set; }
+
+        public Bitmap HeaderImage { get; set; }
+
         public int ItemImageID { get; set; } // BlockImageIDと共通
 
         public void setInit(AItem aitem, int nItemImageID) {
             this.HeaderString = aitem.getHeaderString();
-            this.HeaderImage = aitem.getHeaderImage();
+            this.HeaderImage = aitem.getHeaderImage() is Bitmap
+                ? aitem.getHeaderImage() as Bitmap
+                : new Bitmap(aitem.getHeaderImage());
             this.ItemImageID = nItemImageID;
         }
     }
