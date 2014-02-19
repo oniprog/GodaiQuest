@@ -22,8 +22,12 @@ namespace GodaiQuestServer
             FormServer form = new FormServer();
             ServerWorker worker = new ServerWorker();
             worker.startThread(form);
-            form.setWorker(worker);
-            Application.Run(form);
+            worker.EventWeakUp.WaitOne();
+            if (!worker.WakeUpFailed )
+            {
+                form.setWorker(worker);
+                Application.Run(form);
+            }
             worker.setStopThread();
         }
     }

@@ -26,6 +26,8 @@ namespace GodaiQuestServer
         private NPCWorker mNPCWorker;
         private RSSReaderWorker mRSSReaderWorker;
         private MonsterMaster _monster;
+		public System.Threading.ManualResetEvent EventWeakUp = new ManualResetEvent(false);
+        public bool WakeUpFailed = false;
 
         public void startThread(FormServer form)
         {
@@ -34,34 +36,50 @@ namespace GodaiQuestServer
             //
             try
             {
-                this.mMongo = new MongoMaster();
+                bool bMongoDB_OK = true;
+                try
+                {
+                    this.mMongo = new MongoMaster();
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show("MongoDBとの接続で例外が発生しました:" + ex.Message);
+                    bMongoDB_OK = false;
+                }
+
+                if (!bMongoDB_OK || !mMongo.IsAvailableMongoDB())
+                {
+                    System.Windows.Forms.MessageBox.Show("MongoDBとの接続に失敗しました．起動していますか？");
+                    WakeUpFailed = true;
+                    return;
+                }
+                // サーバ用のスレッドを作り実行する
+                Thread thread = new Thread(new ThreadStart(this.run));
+                thread.Start();
+
+                // モンスターリストを生成する
+                _monster = new MonsterMaster(this);
+                Thread thread4 = new Thread(_monster.Run);
+                thread4.IsBackground = true;
+                thread4.Start();
+
+                // NPC用のスレッドを作り実行する
+                this.mNPCWorker = new NPCWorker(this);
+                Thread thread2 = new Thread(new ThreadStart(this.mNPCWorker.Run));
+                thread2.IsBackground = true; // 終了を待たない
+                thread2.Start();
+
+                // Reader用スレッドを作成し実行する
+                this.mRSSReaderWorker = new RSSReaderWorker(this);
+                Thread thread3 = new Thread(new ThreadStart(this.mRSSReaderWorker.Run));
+                thread3.Start();
+
             }
-            catch (Exception ex)
+            finally
             {
-                System.Windows.Forms.MessageBox.Show("MongoDBとの接続に失敗" + ex.Message);
-                return;
+                // 起動には成功したことを返す
+                EventWeakUp.Set();
             }
-
-            // サーバ用のスレッドを作り実行する
-            Thread thread = new Thread(new ThreadStart(this.run));
-            thread.Start();
-
-			// モンスターリストを生成する
-			_monster = new MonsterMaster(this);
-			Thread thread4 = new Thread(_monster.Run);
-            thread4.IsBackground = true;
-			thread4.Start();
-
-            // NPC用のスレッドを作り実行する
-            this.mNPCWorker = new NPCWorker(this);
-            Thread thread2 = new Thread(new ThreadStart(this.mNPCWorker.Run));
-            thread2.IsBackground = true;    // 終了を待たない
-            thread2.Start();
-
-            // Reader用スレッドを作成し実行する
-            this.mRSSReaderWorker = new RSSReaderWorker(this);
-            Thread thread3 = new Thread(new ThreadStart(this.mRSSReaderWorker.Run));
-            thread3.Start();
         }
 
         // サーバ用スレッド

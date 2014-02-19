@@ -74,6 +74,24 @@ namespace GodaiQuestServer
             this.mUserFolderCollection = this.mDB.GetCollection<DBUserFolder>("user_fodler");
         }
 
+		// データベースが有効かを判定する
+        public bool IsAvailableMongoDB()
+        {
+            try
+            {
+                foreach (var user in mUserCollection.FindAll())
+                {
+                    System.Console.WriteLine("Cheking... : " + user.Name);
+                    break;	// コンパイラの最適化で消えてしまわないようにの処置
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         // ユーザーが有効かどうかをチェックする
         public GodaiLibrary.GodaiQuest.EServerResult tryLogon(out int nID, String strMail, String strPasswordHash)
         {
