@@ -38,7 +38,33 @@
 
     <Fragment>
 		<!-- WiX\src\ext\UIExtension\wixlibからコピーしてカスタマイズ -->
+        <CustomAction Id="OpenMongoDBPage" Script="vbscript" >
+            <![CDATA[
+				CreateObject("WScript.Shell").Run("http://www.mongodb.org/downloads")
+            ]]>
+        </CustomAction>
+        <CustomAction Id="CreateMongoDBFolder" Script="vbscript" >
+            <![CDATA[
+				CreateObject("Scripting.FileSystemObject").CreateFolder "c:\data"
+				CreateObject("Scripting.FileSystemObject").CreateFolder "c:\data\db"
+			]]>
+        </CustomAction>
         <UI Id="WixUI_FeatureTreeCustom">
+
+            <Dialog Id ="MongoDBDlg" Width="400" Height="400" Modeless="no" Title="MongoDBについての説明">
+                <Control Id="OK" Type="PushButton" TabSkip="no" Text="OK" X="250" Y="360" Width="80" Height="20">
+                    <Publish Event="NewDialog" Value="CustomizeDlg"/>
+                </Control>
+<!--                <Control Id="CreateFolder" Type="PushButton" X="20" Y="360" Width="160" Height="30" Text="c:\data\dbフォルダ作成" TabSkip="no">
+                   <Publish Event="DoAction" Value="CreateMongoDBFolder"/> 
+                </Control> -->
+                <Control Id="OpenHTML" Type="PushButton" X="80" Y="360" Width="130" Height="20" Text="MongoDBのページを開く" TabSkip="no">
+                   <Publish Event="DoAction" Value="OpenMongoDBPage"/> 
+                </Control>
+                <Control Id="Info" Type="ScrollableText" Width="300" Height="300" X="50" Y="50" Sunken="yes">
+                   <Text SourceFile="readme_MongoDB.rtf"/> 
+                </Control>
+            </Dialog>
 
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
@@ -58,7 +84,7 @@
 
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
 
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg">NOT Installed</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MongoDBDlg">NOT Installed</Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">Installed AND PATCH</Publish>
 
 			<!--

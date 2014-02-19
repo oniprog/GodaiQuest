@@ -7,37 +7,37 @@
     </Fragment>
     <Fragment>
         <ComponentGroup Id="GroupGQS">
-            <Component Id="cmpD1C9903DBD01FD4CD4E12B67D60E949D" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{363718F2-7A3D-4578-8625-AC1B30ACB7F9}">
+            <Component Id="cmpD1C9903DBD01FD4CD4E12B67D60E949D" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{9858E205-B37D-4CCA-A4A3-7994572B684E}">
                 <File Id="fil3CC82FBBE4FE6D86250037E235F9DBE1" KeyPath="yes" Source="$(var.Install_data)\GodaiLibrary.dll" />
             </Component>
-            <Component Id="cmpC961C6BD804F2CC9AC773FD502B46077" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{A852298D-53FC-45EA-B2CC-24C806D84115}">
+            <Component Id="cmpC961C6BD804F2CC9AC773FD502B46077" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{B81CBE40-8C2A-48A0-B84A-7B4DF83BFEF5}">
                 <File Id="fil06B774F29B36C8313BBEA5E7A3307FD0" KeyPath="yes" Source="$(var.Install_data)\GodaiQuestManual.pdf" />
             </Component>
-            <Component Id="cmp70470DA7F7D0F886924219BF695C02EE" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{F9C289C1-9EC7-4127-A54F-CD5367519846}">
+            <Component Id="cmp70470DA7F7D0F886924219BF695C02EE" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{D0ACC3E0-DE6E-46B4-9F79-C6E7ED0796E7}">
                 <File Id="fil94414770B9E3E594B1531E81D4D086EA" KeyPath="yes" Source="$(var.Install_data)\GodaiQuestServer.exe" />
             </Component>
-            <Component Id="cmp5E49DDB6A7343E16ACD4432AEFE5AE40" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{0732BFB5-FC7A-4C49-AA54-EA117C5DC7C8}">
+            <Component Id="cmp5E49DDB6A7343E16ACD4432AEFE5AE40" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{ADD0857A-9A63-46AC-82B7-8949E017D1B7}">
                 <File Id="filF39591923BDB29F00D8ABB12CFED07B7" KeyPath="yes" Source="$(var.Install_data)\MongoDB.Bson.dll" />
             </Component>
-            <Component Id="cmp804022CF58D1C40C8E12020641DDFEC2" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{29DCF820-8228-48A1-901D-F8985E0BC02E}">
+            <Component Id="cmp804022CF58D1C40C8E12020641DDFEC2" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{68C2D8D3-1AAE-48A4-8AF4-598477E5954E}">
                 <File Id="fil48DF330DA0B07E655E57584BEDEDC5D1" KeyPath="yes" Source="$(var.Install_data)\MongoDB.Driver.dll" />
             </Component>
-            <Component Id="cmp2AD49B232616EECFDA6677B15D40A032" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{418FD59D-09A9-4606-87C0-91EFFCB60C9C}">
+            <Component Id="cmp2AD49B232616EECFDA6677B15D40A032" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{9132BB25-2300-4970-B00E-07DB05BF5513}">
                 <File Id="fil785B9689FBA9EEE4AE8466E3E99390FB" KeyPath="yes" Source="$(var.Install_data)\Monster.txt" />
             </Component>
-            <Component Id="cmp94BE632652B56D40D5EF3105D7BB0846" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{BC785F89-E5F1-4816-95A3-0A9C130E4A1B}">
+            <Component Id="cmp94BE632652B56D40D5EF3105D7BB0846" Directory="dirB6CDA1E12379676F896D50B2D7B0EDF3" Guid="{8DDADC9E-0B8A-41BC-9843-CED9A01399C0}">
                 <File Id="filD004D20F7EEAEDDC4F9A78A5EE3F8283" KeyPath="yes" Source="$(var.Install_data)\protobuf-net.dll" />
             </Component>
-            <Component Id="cmpB065D72638FF6A34B6AF0DFE7C697A12" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{03D6AA7A-88F8-45DC-A6B1-7786A6742330}">
+            <Component Id="cmpB065D72638FF6A34B6AF0DFE7C697A12" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{104EB278-4D1E-4723-B0A6-714D94C2B00E}">
                 <File Id="fil4F33CB967E3DA711C49F71CDCCB4FFA1" KeyPath="yes" Source="$(var.Install_data)\MonsterImage\snow1.jpg" />
             </Component>
-            <Component Id="cmpBAC021F421B47035F1AF8790E17C17B5" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{8A7CC75B-A729-4E11-9560-0FD151338C6A}">
+            <Component Id="cmpBAC021F421B47035F1AF8790E17C17B5" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{1DBCFB61-402C-4504-BAA9-4B3FBF03E227}">
                 <File Id="filF09D8C980A95576FAF86F286594C076B" KeyPath="yes" Source="$(var.Install_data)\MonsterImage\snow2.jpg" />
             </Component>
-            <Component Id="cmpE7C17D755A6DCA573582367DB2B6E935" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{0282333D-F904-4FB0-90EA-C2324D568894}">
+            <Component Id="cmpE7C17D755A6DCA573582367DB2B6E935" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{3BA3A95C-AC37-4254-BAC0-7D1410FAF5E2}">
                 <File Id="filA92CB15A24FB74A24326AC9D92D0F767" KeyPath="yes" Source="$(var.Install_data)\MonsterImage\snow_plant1.jpg" />
             </Component>
-            <Component Id="cmp4C9779F8CE8E755ED3FE9F186A6D7C6F" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{53B484A8-708F-4119-8CB2-6BA1495FB634}">
+            <Component Id="cmp4C9779F8CE8E755ED3FE9F186A6D7C6F" Directory="dir39B6BCB59490552D5AF711572D7A33CB" Guid="{4F4D3D7A-9FDE-4767-88FF-57F6CC719FFB}">
                 <File Id="fil4015F3A9FF925BC7AA91F7AD04C06E9E" KeyPath="yes" Source="$(var.Install_data)\MonsterImage\train1.jpg" />
             </Component>
         </ComponentGroup>
