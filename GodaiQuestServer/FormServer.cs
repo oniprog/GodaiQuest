@@ -124,6 +124,26 @@ namespace GodaiQuestServer
                 this.mUserList.Add(auser);
             }
         }
+
+        private void btnInitDefault_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("完全に初期化します．よろしいですか？", "警告", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                return;
+
+            ItemInfo iteminfo;
+            mServerWorker.getItemInfo(out iteminfo);
+            if (iteminfo.Count() != 0)
+            {
+                MessageBox.Show("mongodbを停止したあと，c:\\data\\dbフォルダの中身を空にしてください．その後，再びこのボタンを押してください");
+                return;
+            }
+
+            //var formMail = new FormInputLine("管理ユーザのメールアドレス(ログイン用)", "");
+            //if (formMail.ShowDialog() != DialogResult.OK)
+             //   return;
+
+            mServerWorker.ForceInitializeMongoDB();
+        }
     }
 
     // 拡張メソッド用のクラス

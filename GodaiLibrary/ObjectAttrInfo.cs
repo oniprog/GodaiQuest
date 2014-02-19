@@ -7,7 +7,7 @@ namespace GodaiLibrary.GodaiQuest
 {
     [Serializable()]
     public enum EObjectCommand
-    {
+    {// ユーザからの入力で使うので固定すること
         Nothing,
         GoUp,
         GoDown,

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Windows.Forms;
+using GodaiLibrary;
 using GodaiLibrary.GodaiQuest;
 
 namespace GodaiQuestServer
@@ -27,6 +32,7 @@ namespace GodaiQuestServer
         private RSSReaderWorker mRSSReaderWorker;
         private MonsterMaster _monster;
 		public System.Threading.ManualResetEvent EventWeakUp = new ManualResetEvent(false);
+		public System.Threading.ManualResetEvent EventServerWeakUp = new ManualResetEvent(false);
         public bool WakeUpFailed = false;
 
         public void startThread(FormServer form)
@@ -56,6 +62,7 @@ namespace GodaiQuestServer
                 // サーバ用のスレッドを作り実行する
                 Thread thread = new Thread(new ThreadStart(this.run));
                 thread.Start();
+                EventServerWeakUp.WaitOne();
 
                 // モンスターリストを生成する
                 _monster = new MonsterMaster(this);
@@ -72,6 +79,7 @@ namespace GodaiQuestServer
                 // Reader用スレッドを作成し実行する
                 this.mRSSReaderWorker = new RSSReaderWorker(this);
                 Thread thread3 = new Thread(new ThreadStart(this.mRSSReaderWorker.Run));
+                thread3.IsBackground = true;
                 thread3.Start();
 
             }
@@ -86,7 +94,17 @@ namespace GodaiQuestServer
         public void run()
         {
             TcpListener listener = new TcpListener(IPAddress.Any, SERVER_PORT );
-            listener.Start();
+            try
+            {
+                listener.Start();
+            }
+            catch (Exception )
+            {
+                MessageBox.Show("同時にサーバーを起動することはできません．もしくはポートが使用済みです");
+				System.Environment.Exit(0);
+            }
+
+            EventServerWeakUp.Set();
 
             while (!this.mStopFlag)
             {
@@ -826,5 +844,78 @@ namespace GodaiQuestServer
             }
         }
 #endif
+
+		// 強制初期化する
+		// ユーザは作らない
+        public bool ForceInitializeMongoDB()
+        {
+            String strFolder = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath),
+                "InitImages");
+            const int UserID = 1;
+
+			var objinfo = new ObjectAttrInfo();
+            var tileinfo = new TileInfo();
+			var images = new DungeonBlockImageInfo();
+
+            DungeonInfo dungeon;
+            if (getDungeon(out dungeon, 0, 0) != EServerResult.SUCCESS)
+            {
+                MessageBox.Show("Internal Error: can't get dungeon");
+                return false;
+            }
+
+			using(var loader = new GodaiLibrary.CSVLoader())
+            try
+            {
+                if (!loader.OpenFile(Path.Combine(strFolder, "_InitBlock.txt"), Encoding.UTF8))
+                {
+                    MessageBox.Show("_InitBlock.txtが開けませんでした");
+                    return false;
+                }
+
+				int nObjectID = 0;
+				int nImageID = 0;
+				Image img;
+
+                while (loader.ReadLine())
+                {
+                    String strName = loader.GetString();
+                    String strFileName = loader.GetString();
+                    bool bCanWalk = loader.GetInt() != 0 ? true : false;
+                    EObjectCommand eCommand = (EObjectCommand) loader.GetInt();
+
+                    try
+                    {
+                        img = GodaiLibrary.KLib.loadAndResizeImage(64, 64, Path.Combine(strFolder, strFileName));
+                    }
+                    catch (IOException e)
+                    {
+                        MessageBox.Show(strFileName + "の画像が読めませんでした");
+                        throw e;
+                    }
+                    images.addImage((uint) nImageID, false, img, strName, UserID, DateTime.Now, true);
+                    var itemattr1 = new ObjectAttr(nObjectID, bCanWalk, 0, eCommand, 0, true);
+                    objinfo.addObject(itemattr1);
+
+                    Tile tile1 = new Tile((uint) nObjectID, (uint) nImageID);
+                    tileinfo.addTile(tile1);
+
+                    ++nImageID;
+                    ++nObjectID;
+                }
+
+				// 情報をセットする
+                setDungeon(dungeon, 0, 0, images, objinfo, tileinfo );
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("何らかの例外が発生しました．ロールバックはしないので手動でデータベースを削除してやり直してください:" + e.Message);
+                return false;
+            }
+
+
+            MessageBox.Show("ディフォルトの設定で初期化しました");
+            return true;
+        }
     }
 }

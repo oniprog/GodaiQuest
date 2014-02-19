@@ -194,6 +194,9 @@ namespace GodaiQuestServer
             lock (_cs)
             {
                 var listLocation = locinfo.ToArray();
+                if (listLocation.Count() == 0)
+                    return;
+
                 var targetUesr = listLocation[_targetUesr];
 
                 for (int it = 0; it < _listLiveMonsterLocation.size(); ++it)

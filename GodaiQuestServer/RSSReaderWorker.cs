@@ -53,7 +53,7 @@ namespace GodaiQuestServer
 
                     var item = iteminfo.getAItem(nItemID);
                     String strHeader = item.getHeaderString();
-                    if ( strHeader.Length == 0 )
+                    if ( strHeader == null || strHeader.Length == 0 )
                         continue;
 
                     // タグを探す

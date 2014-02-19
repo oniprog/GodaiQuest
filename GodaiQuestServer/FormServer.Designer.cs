@@ -43,10 +43,13 @@
             this.btnChangePassword = new System.Windows.Forms.Button();
             this.cmbUserName = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.btnInitDefault = new System.Windows.Forms.Button();
             this.tabContorler.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabUser.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabContorler
@@ -54,6 +57,7 @@
             this.tabContorler.Controls.Add(this.tabPage1);
             this.tabContorler.Controls.Add(this.tabPage2);
             this.tabContorler.Controls.Add(this.tabUser);
+            this.tabContorler.Controls.Add(this.tabPage3);
             this.tabContorler.Location = new System.Drawing.Point(12, 12);
             this.tabContorler.Name = "tabContorler";
             this.tabContorler.SelectedIndex = 0;
@@ -202,6 +206,27 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "ユーザ名";
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.btnInitDefault);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(813, 493);
+            this.tabPage3.TabIndex = 3;
+            this.tabPage3.Text = "初期化";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // btnInitDefault
+            // 
+            this.btnInitDefault.Location = new System.Drawing.Point(21, 419);
+            this.btnInitDefault.Name = "btnInitDefault";
+            this.btnInitDefault.Size = new System.Drawing.Size(210, 44);
+            this.btnInitDefault.TabIndex = 0;
+            this.btnInitDefault.Text = "基本初期化実行";
+            this.btnInitDefault.UseVisualStyleBackColor = true;
+            this.btnInitDefault.Click += new System.EventHandler(this.btnInitDefault_Click);
+            // 
             // FormServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -219,6 +244,7 @@
             this.tabPage2.PerformLayout();
             this.tabUser.ResumeLayout(false);
             this.tabUser.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -239,6 +265,8 @@
         private System.Windows.Forms.Button btnChangePassword;
         private System.Windows.Forms.ComboBox cmbUserName;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.Button btnInitDefault;
     }
 }
 

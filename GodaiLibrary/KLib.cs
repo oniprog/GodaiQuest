@@ -22,11 +22,19 @@ namespace GodaiLibrary
             dlg.Filter = "all files|*.*";
             if (dlg.ShowDialog() != DialogResult.OK)
                 return null;
+            var ret = loadAndResizeImage(nResizeWidth, nResizeHeight, dlg.FileName);
+            if (ret == null) return null;
+            // 保存しておく
+            gLoadedFilePath = dlg.FileName;
+            return ret;
+        }
 
-            Image imgSrc;
+        public static Image loadAndResizeImage(int nResizeWidth, int nResizeHeight, string strPath ) {
+
+			Image imgSrc;
             try
             {
-                imgSrc = System.Drawing.Image.FromFile(dlg.FileName);
+                imgSrc = System.Drawing.Image.FromFile(strPath);
             }
             catch (Exception)
             {
@@ -50,9 +58,6 @@ namespace GodaiLibrary
             g.Clear(Color.Gray);
             g.DrawImage(imgSrc, (nResizeWidth - nWidth) / 2, (nResizeHeight - nHeight) / 2, nWidth, nHeight);
             g.Dispose();
-
-            // 保存しておく
-            gLoadedFilePath = dlg.FileName;
 
             return resizeBitmap;
         }
