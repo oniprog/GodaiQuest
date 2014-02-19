@@ -42,6 +42,7 @@
             this.btnDownloadFolder = new System.Windows.Forms.Button();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picPlayer)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,7 +64,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(85, 217);
+            this.btnOK.Location = new System.Drawing.Point(85, 251);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(84, 27);
             this.btnOK.TabIndex = 2;
@@ -74,7 +75,7 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(218, 217);
+            this.btnCancel.Location = new System.Drawing.Point(218, 251);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(84, 27);
             this.btnCancel.TabIndex = 3;
@@ -112,11 +113,11 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 192);
+            this.label3.Location = new System.Drawing.Point(24, 226);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(232, 12);
+            this.label3.Size = new System.Drawing.Size(261, 12);
             this.label3.TabIndex = 7;
-            this.label3.Text = "※あとで変更できますからお気軽に決めてください";
+            this.label3.Text = "※どれもあとで変更できますからお気軽に決めてください";
             // 
             // label4
             // 
@@ -133,6 +134,7 @@
             this.txtDownloadFolder.Name = "txtDownloadFolder";
             this.txtDownloadFolder.Size = new System.Drawing.Size(207, 19);
             this.txtDownloadFolder.TabIndex = 9;
+            this.txtDownloadFolder.Text = "c:\\tmp\\GodaiQuest";
             // 
             // btnDownloadFolder
             // 
@@ -146,7 +148,7 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(111, 155);
+            this.txtPassword.Location = new System.Drawing.Point(111, 189);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(207, 19);
@@ -155,17 +157,27 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(24, 158);
+            this.label5.Location = new System.Drawing.Point(24, 192);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(52, 12);
             this.label5.TabIndex = 11;
             this.label5.Text = "パスワード";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(12, 161);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(310, 12);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "※Godai Questでダウンロードできる資料の，ダウンロード先です．";
+            // 
             // FormCreateAccount
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(368, 261);
+            this.ClientSize = new System.Drawing.Size(368, 296);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.btnDownloadFolder);
@@ -206,5 +218,6 @@
         private System.Windows.Forms.Button btnDownloadFolder;
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
     }
 }
