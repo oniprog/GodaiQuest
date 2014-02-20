@@ -690,6 +690,12 @@ namespace GodaiQuest
         // 出現する
         private void goOtherGround(int nDungeonUesrID, int nDungeonNumber, int nBeforeDungeonUserID)
         {
+			// 爆発情報をクリアする
+            lock (_listBombAnim)
+            {
+                _listBombAnim.Clear();
+            }
+
             // ダンジョンデータロード
             this.mLocation = new ALocation(this.mGQCom.getUserID(), 0, 0, nDungeonUesrID, nDungeonNumber);
             this.loadDungeon(this.mLocation, false);
