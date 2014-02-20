@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Net;
 using System.Net.Sockets;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -218,6 +214,7 @@ namespace GodaiLibrary
             this.sendLength(data.Length);
             this.mStream.Write(data, 0, data.Length);
         }
+
 
         public void flush()
         {

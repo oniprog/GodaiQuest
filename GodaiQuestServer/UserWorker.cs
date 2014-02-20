@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Sockets;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using GodaiLibrary.GodaiQuest;
 using GodaiLibrary;
 
@@ -45,6 +47,19 @@ namespace GodaiQuestServer
 
                 // バージョン番号
                 int nVersion = this.mNetwork.receiveDWORD();
+                if (nVersion > 0x1000)
+                {
+                    // Webサーバ用と判定する
+                    char ch1 = (char) (nVersion & 0xff);
+                    char ch2 = (char) ((nVersion >> 8) & 0xff);
+                    char ch3 = (char) ((nVersion >> 16) & 0xff);
+                    char ch4 = (char) ((nVersion >> 24) & 0xff);
+                    var webServer = new WebServerWorker();
+                    String str1 = (string)ch1 + ch2 + ch3 + ch4;
+                    webServer.SetInitString(str1);
+                    webServer.Run();
+                    return;
+                }
 
                 // 接続OKを返す
                 this.mNetwork.sendDWORD(1);

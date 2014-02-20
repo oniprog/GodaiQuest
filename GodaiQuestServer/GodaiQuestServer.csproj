@@ -80,6 +80,7 @@
     <Compile Include="ServerWorker.cs" />
     <Compile Include="UserInfoInside.cs" />
     <Compile Include="UserWorker.cs" />
+    <Compile Include="WebServerWorker.cs" />
     <EmbeddedResource Include="FormInputLine.resx">
       <DependentUpon>FormInputLine.cs</DependentUpon>
     </EmbeddedResource>
