@@ -1,5 +1,5 @@
-// ƒ‚ƒ“ƒXƒ^[î•ñ
-// ƒ‚ƒ“ƒXƒ^–¼, ƒ‚ƒ“ƒXƒ^ƒCƒ[ƒW, ŒoŒ±’l, ô•¶ƒeƒLƒXƒg
+ï»¿// ãƒ¢ãƒ³ã‚¹ã‚¿ãƒ¼æƒ…å ±
+// ãƒ¢ãƒ³ã‚¹ã‚¿å, ãƒ¢ãƒ³ã‚¹ã‚¿ã‚¤ãƒ¡ãƒ¼ã‚¸, çµŒé¨“å€¤, å‘ªæ–‡ãƒ†ã‚­ã‚¹ãƒˆ
 "SnowMonster1", "MonsterImage\\snow1.jpg", 10, "int main(){}"
 "SnowMonster2", "MonsterImage\\snow1.jpg", 10, "template<class T>;"
 "SnowMonster3", "MonsterImage\\snow1.jpg", 10, "a ? 1 : 0;"
