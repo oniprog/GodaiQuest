@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C7FDDE74-31CC-45B7-8D30-444D793A2CCC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>GodaiQuestLibraryMono</RootNamespace>
+    <AssemblyName>GodaiQuestLibraryMono</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="protobuf-net">
+      <HintPath>GodaiQuestLibraryMono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="GodaiLibrary\CSVLoader.cs" />
+    <Compile Include="GodaiLibrary\Crypto.cs" />
+    <Compile Include="GodaiLibrary\DungeonInfo.cs" />
+    <Compile Include="GodaiLibrary\ExpValueInfo.cs" />
+    <Compile Include="GodaiLibrary\IslandGroundInfo.cs" />
+    <Compile Include="GodaiLibrary\ItemArticleInfo.cs" />
+    <Compile Include="GodaiLibrary\ItemInfo.cs" />
+    <Compile Include="GodaiLibrary\KLib.cs" />
+    <Compile Include="GodaiLibrary\LocationInfo.cs" />
+    <Compile Include="GodaiLibrary\MessageInfo.cs" />
+    <Compile Include="GodaiLibrary\MonsterInfo.cs" />
+    <Compile Include="GodaiLibrary\Network.cs" />
+    <Compile Include="GodaiLibrary\ObjectAttrInfo.cs" />
+    <Compile Include="GodaiLibrary\PickupedInfo.cs" />
+    <Compile Include="GodaiLibrary\RandaomDungeonInfo.cs" />
+    <Compile Include="GodaiLibrary\RealMonsterInfo.cs" />
+    <Compile Include="GodaiLibrary\RealMonsterLocationInfo.cs" />
+    <Compile Include="GodaiLibrary\ServerCommand.cs" />
+    <Compile Include="GodaiLibrary\SignalQueue.cs" />
+    <Compile Include="GodaiLibrary\TileInfo.cs" />
+    <Compile Include="GodaiLibrary\UserInfo.cs" />
+    <Compile Include="GodaiLibrary\godaiquest.cs" />
+    <Compile Include="GodaiLibrary\MessageBoxMono.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -49,6 +49,7 @@ namespace GodaiQuestServer
                 int nVersion = this.mNetwork.receiveDWORD();
                 if (nVersion > 0x1000)
                 {
+#if false
                     // Webサーバ用と判定する
                     char ch1 = (char) (nVersion & 0xff);
                     char ch2 = (char) ((nVersion >> 8) & 0xff);
@@ -58,6 +59,7 @@ namespace GodaiQuestServer
                     String str1 = (string)ch1 + ch2 + ch3 + ch4;
                     webServer.SetInitString(str1);
                     webServer.Run();
+#endif
                     return;
                 }
 

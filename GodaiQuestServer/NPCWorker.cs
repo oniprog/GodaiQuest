@@ -79,6 +79,8 @@ namespace GodaiQuestServer
             foreach (var tile in tileinfo)
             {
                 var obj = objectinfo.getObject((int)tile.getObjectID());
+				if ( obj == null )
+					return false;
                 if (!obj.canWalk() )
                 {
                     if (tileWall == null || rand.NextDouble() < 0.1) {

@@ -256,7 +256,7 @@ namespace GodaiQuestServer
         private bool ReadInitFile()
         {
             string strDir = Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-            string strPath = Path.Combine(strDir, "monster.txt");
+            string strPath = Path.Combine(strDir, "Monster.txt");
 
 			// CSV形式とする
             int nCntMonster = 0;
@@ -272,10 +272,12 @@ namespace GodaiQuestServer
                     int nExpValue = loader.GetInt();
                     string strSpell = loader.GetString();
 
+					strImagePath = strImagePath.Replace("\\", ""+Path.DirectorySeparatorChar);
+
                     Image image;
                     try
                     {
-                        image = Image.FromFile(Path.Combine(strDir, strImagePath));
+                       image = Image.FromFile(Path.Combine(strDir, strImagePath));
                     }
                     catch (FileNotFoundException)
                     {

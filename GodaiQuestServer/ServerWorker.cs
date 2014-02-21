@@ -19,8 +19,12 @@ namespace GodaiQuestServer
         public static int SERVER_PORT = 21014;  // サーバ用のポート
         //public static int SERVER_PORT = 21015;  // サーバ用のポート
 
-        private FormServer mForm;
-        private bool mStopFlag = false;
+#if __MonoCS__
+		private FormServerMono mForm;
+#else
+		private FormServer mForm;
+#endif
+		private bool mStopFlag = false;
         private MongoMaster mMongo;
         private object mSync = new object();
         private Dictionary<int, int> mDicLogonUser = new Dictionary<int, int>();
@@ -32,8 +36,12 @@ namespace GodaiQuestServer
 		public System.Threading.ManualResetEvent EventServerWeakUp = new ManualResetEvent(false);
         public bool WakeUpFailed = false;
 
-        public void startThread(FormServer form)
-        {
+#if __MonoCS__
+		public void startThread(FormServerMono form)
+#else
+		public void startThread(FormServer form)
+#endif
+		{
             this.mForm = form;
 
             //
@@ -46,13 +54,13 @@ namespace GodaiQuestServer
                 }
                 catch (Exception ex)
                 {
-                    System.Windows.Forms.MessageBox.Show("MongoDBとの接続で例外が発生しました:" + ex.Message);
+                    GodaiLibrary.MessageBox2.Show("MongoDBとの接続で例外が発生しました:" + ex.Message);
                     bMongoDB_OK = false;
                 }
 
                 if (!bMongoDB_OK || !mMongo.IsAvailableMongoDB())
                 {
-                    System.Windows.Forms.MessageBox.Show("MongoDBとの接続に失敗しました．起動していますか？");
+                    GodaiLibrary.MessageBox2.Show("MongoDBとの接続に失敗しました．起動していますか？");
                     WakeUpFailed = true;
                     return;
                 }
@@ -97,7 +105,7 @@ namespace GodaiQuestServer
             }
             catch (Exception )
             {
-                MessageBox.Show("同時にサーバーを起動することはできません．もしくはポートが使用済みです");
+                GodaiLibrary.MessageBox2.Show("同時にサーバーを起動することはできません．もしくはポートが使用済みです");
 				System.Environment.Exit(0);
             }
 
@@ -857,7 +865,7 @@ namespace GodaiQuestServer
             DungeonInfo dungeon;
             if (getDungeon(out dungeon, 0, 0) != EServerResult.SUCCESS)
             {
-                MessageBox.Show("Internal Error: can't get dungeon");
+                GodaiLibrary.MessageBox2.Show("Internal Error: can't get dungeon");
                 return false;
             }
 
@@ -866,7 +874,7 @@ namespace GodaiQuestServer
             {
                 if (!loader.OpenFile(Path.Combine(strFolder, "_InitBlock.txt"), Encoding.UTF8))
                 {
-                    MessageBox.Show("_InitBlock.txtが開けませんでした");
+                    GodaiLibrary.MessageBox2.Show("_InitBlock.txtが開けませんでした");
                     return false;
                 }
 
@@ -887,7 +895,7 @@ namespace GodaiQuestServer
                     }
                     catch (IOException e)
                     {
-                        MessageBox.Show(strFileName + "の画像が読めませんでした");
+                        GodaiLibrary.MessageBox2.Show(strFileName + "の画像が読めませんでした");
                         throw e;
                     }
                     images.addImage((uint) nImageID, false, img, strName, UserID, DateTime.Now, true);
@@ -906,12 +914,12 @@ namespace GodaiQuestServer
             }
             catch (Exception e)
             {
-                MessageBox.Show("何らかの例外が発生しました．ロールバックはしないので手動でデータベースを削除してやり直してください:" + e.Message);
+                GodaiLibrary.MessageBox2.Show("何らかの例外が発生しました．ロールバックはしないので手動でデータベースを削除してやり直してください:" + e.Message);
                 return false;
             }
 
 
-            MessageBox.Show("ディフォルトの設定で初期化しました");
+            GodaiLibrary.MessageBox2.Show("ディフォルトの設定で初期化しました");
             return true;
         }
     }

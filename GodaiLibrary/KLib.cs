@@ -38,7 +38,7 @@ namespace GodaiLibrary
             }
             catch (Exception)
             {
-                MessageBox.Show("ファイルが読み込めませんでした");
+                GodaiLibrary.MessageBox2.Show("ファイルが読み込めませんでした");
                 return null;
             }
 

@@ -239,7 +239,7 @@ namespace GodaiLibrary
             foreach (var file in info.GetFiles())
             {
                 int nSize = (int)file.Length; // 注：巨大すぎるファイルは考えない
-                string strName = file.FullName.Substring(strBaseDir.Length + 1);
+                //string strName = file.FullName.Substring(strBaseDir.Length + 1);
                 network.sendDWORD(nSize);
 				network.sendString(file.Name);
             }
@@ -449,7 +449,7 @@ namespace GodaiLibrary
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                GodaiLibrary.MessageBox2.Show(ex.Message);
             }
         }
 
