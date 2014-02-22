@@ -1,16 +1,8 @@
-doctype html
-html
-  head
-    title("Godai Quest Info")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    h1 GodaiQuest
-      span#small 　　　新感覚 情報共有 SNS
+extends ./layout.jade
 
-    if error_message
-      div
-        p.error_message=error_message
+-var title = "Godai Quest Info";
 
+block content
     if iteminfo
       - var aitem = iteminfo[info_id];
         div#box

@@ -1,11 +1,8 @@
-doctype html
-html
-  head
-    title("Godai Quest User List")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    h1 GodaiQuest
-      span#small 　　　新感覚 情報共有 SNS
+extends ./layout.jade
+
+-var title = "Godai Quest User List";
+
+block content
     each dic in userinfo.uesr_dic
       if dic
         if dic.auser
@@ -14,6 +11,3 @@ html
               img(src=dic.auser.uri_image, style="width:60px")
               span #{dic.auser.user_name}さん
           p #{mapUserItem[dic.auser.user_id].length}個の未読情報があります
-    if error_message
-       div
-         p.error_message=error_message

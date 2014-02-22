@@ -1,16 +1,8 @@
-doctype html
-html
-  head
-    title("Godai Quest Info List")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    h1 GodaiQuest
-      span#small 　　　新感覚 情報共有 SNS
+extends ./layout.jade
 
-    if error_message
-      div
-        p.error_message=error_message
+-var title = "Godai Quest Info List";
 
+block content
     h2 #{name}さんの未読情報
     if iteminfo
       each aitem in iteminfo

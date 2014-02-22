@@ -1,12 +1,8 @@
-doctype html
-html
-  head
-    title("Godai Quest")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    h1 GodaiQuest
-      span#small 　　　新感覚 情報共有 SNS
+extends ./layout.jade
 
+-var title = "Godai Quest Login Page";
+
+block content
     div.loginbox
       form(name="login", action="login", method="post")
         p メールアドレス:
@@ -19,6 +15,3 @@ html
         input(type="reset")
         input.loginbutton(type="submit", value="login")
       br
-    if error_message
-       div
-         p.error_message=error_message
