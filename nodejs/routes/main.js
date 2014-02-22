@@ -244,3 +244,15 @@ exports.info = function(req, res) {
     });
 
 }
+
+// ログアウト処理
+exports.logout = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    // ログアウト処理
+    network.closeGodaiQuestServer(client);
+    res.render('index', { error_message: "ログアウトしました"});
+}

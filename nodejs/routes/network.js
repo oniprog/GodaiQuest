@@ -489,6 +489,7 @@ module.exports = {
     writeDword: writeDword,
     getClient : getClient,
     connectGodaiQuestServer:connectGodaiQuestServer,
+    closeGodaiQuestServer: closeGodaiQuestServer,
     getAllUserInfo : getAllUserInfo,
     getUnpickedupItemInfo : getUnpickedupItemInfo,
     getItemInfo : getItemInfo,
