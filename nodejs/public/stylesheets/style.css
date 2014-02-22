@@ -10,6 +10,11 @@ h1 {
     font-size:12pt;
 }
 
+#box {
+    font-size:14pt;
+    padding:10px 10px;
+    border-style: solid;
+}
 .loginbutton {
     width:400px;
 }

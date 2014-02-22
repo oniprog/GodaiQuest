@@ -9,7 +9,10 @@ html
     each dic in userinfo.uesr_dic
       if dic
         if dic.auser
-          h2 #{dic.auser.user_name}さんの情報
+          h2
+            A(href="info_list?view_id="+dic.auser.user_id) 
+              img(src=dic.auser.uri_image, style="width:60px")
+              span #{dic.auser.user_name}さん
           p #{mapUserItem[dic.auser.user_id].length}個の未読情報があります
     if error_message
        div

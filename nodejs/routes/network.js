@@ -55,6 +55,7 @@ var COM_GetRealMonsterSrcInfo =43;
 var builder = ProtoBuf.loadProtoFile("routes/godaiquest.proto");
 var LoginMessage = builder.build("godaiquest.Login");
 var UserInfoMessage = builder.build("godaiquest.UserInfo");
+var ItemInfoMessage = builder.build("godaiquest.ItemInfo");
 
 // Dword送信
 function writeDword(client, dword, callback) {
@@ -266,7 +267,31 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
     return client;
  }
 
+// URI Imageに変換する
+function convURIImage( image ) {
+    return "data:image/png;base64," + image.toString('base64');
+}
+
+
 // Godai Questサーバーからユーザー一覧を得る
+/*
+message AUser {
+
+	optional int32 user_id = 1;
+	optional string mail_address = 2;
+	optional string user_name = 3;
+	optional bytes user_image = 4;
+}
+message AUserDic {
+
+	optional int32 index = 1;
+	optional AUser auser = 2;
+}
+message UserInfo {
+
+	repeated AUserDic uesr_dic = 1;
+}
+*/
 function getAllUserInfo(client, callback) {
 
     async.waterfall([
@@ -285,6 +310,12 @@ function getAllUserInfo(client, callback) {
         },
         function(data, callback) {
             var userinfo = UserInfoMessage.decode(data);
+
+            for( var it in userinfo.uesr_dic ) {
+                var auser = userinfo.uesr_dic[it].auser;
+                auser.uri_image = convURIImage( auser.user_image );
+            }
+            
             callback( null, userinfo );
         }
     ], function(err, userinfo) {
@@ -322,7 +353,6 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
             for( var it=0; it<list_length; ++it ) {
                 var Id = readDword( client );
                 listItemId.push( Id );
-                console.log( Id );
             }
             callback( null, listItemId );
         }
@@ -331,11 +361,58 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
     });
 }
 
+// アイテム情報を得る
+/*
+  message AItem {
+
+	optional int32 item_id  = 1;
+	optional int32 item_image_id = 2;
+	optional string header_string = 3;
+	optional bytes header_image = 4;
+	optional bool bNew = 5;
+}
+
+message AItemDic {
+	optional int32 index = 1;
+	optional AItem aitem = 2;
+}
+message ItemInfo {
+
+	repeated AItemDic aitem_dic = 1;
+}
+*/
+function getItemInfo( client, callback) {
+
+    async.waterfall([
+        function(callback) {
+            writeDword( client, COM_GetItemInfo );
+            writeDword( client, 0 );  // version
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("アイテム情報の取得に失敗しました");
+            }
+            else {
+                readProtoMes( client, callback );
+            }
+        },
+        function(data, callback) {
+            var iteminfo = ItemInfoMessage.decode(data);
+            callback( null, iteminfo );
+       }
+    ], function(err, iteminfo) {
+        callback(err, iteminfo );
+    });
+}
+
 module.exports = {
     writeDword: writeDword,
     getClient : getClient,
     connectGodaiQuestServer:connectGodaiQuestServer,
     getAllUserInfo : getAllUserInfo,
-    getUnpickedupItemInfo : getUnpickedupItemInfo
+    getUnpickedupItemInfo : getUnpickedupItemInfo,
+    getItemInfo : getItemInfo
 }
         

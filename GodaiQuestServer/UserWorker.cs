@@ -252,7 +252,7 @@ namespace GodaiQuestServer
                         {
                             ComGetRealMonsterSrcInfo();
                         }
-                        else
+						else
                         {
                             throw new Exception("Invalid Command : " + this.mMail);
                         }

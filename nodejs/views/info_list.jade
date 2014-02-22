@@ -1,0 +1,33 @@
+doctype html
+html
+  head
+    title("Godai Quest Info List")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h1 GodaiQuest
+      span#small 　　　新感覚 情報共有 SNS
+
+    if error_message
+      div
+        p.error_message=error_message
+
+    h2 #{name}さんの未読情報
+    if iteminfo
+      each aitem in iteminfo
+        div#box
+          - var lines = aitem.header_string.split("\n");
+          - var cnt = 0; for( var it in lines ) { if (lines[it].length>0 ) ++cnt; if ( cnt > 5 ) break; 
+            div #{lines[it]}
+          - }
+          br
+          br
+          a(href="info?view_id="+view_id+"&info_id="+aitem.item_id, target="_blank") 読む
+        br
+        br
+        
+    br
+    br
+
+    if !allinfo
+      div
+        a(href="info_list_all?view_id="+view_id) 全部の書き込みを表示する

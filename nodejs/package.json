@@ -12,6 +12,7 @@
     "connect-mongo" : "*",
     "nodemon": "*",
     "protobufjs": "*",
-    "crypto":"*"
+    "crypto":"*",
+    "node-html-encoder":"*"
   }
 }

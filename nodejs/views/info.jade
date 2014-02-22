@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title("Godai Quest Info")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h1 GodaiQuest
+      span#small 　　　新感覚 情報共有 SNS
+
+    if error_message
+      div
+        p.error_message=error_message
+
+    if iteminfo
+      - var aitem = iteminfo[info_id];
+        div#box
+          - var lines = aitem.header_string.split("\n");
+          each line in lines
+            div #{line} &nbsp;
+          br
+          br
+        br
+        br
+        
+    br
+    br
