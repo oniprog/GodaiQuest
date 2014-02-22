@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title("Godai Quest User List")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h1 GodaiQuest
+      span#small 　　　新感覚 情報共有 SNS
+    each dic in userinfo.uesr_dic
+      if dic
+        if dic.auser
+          h2 #{dic.auser.user_name}さんの情報
+          p #{mapUserItem[dic.auser.user_id].length}個の未読情報があります
+    if error_message
+       div
+         p.error_message=error_message

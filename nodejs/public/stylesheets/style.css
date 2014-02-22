@@ -1,0 +1,29 @@
+body {
+  padding: 50px;
+}
+
+h1 {
+    font-size:32pt;text-shadow: 1px 1px 2px #0000ff;
+}
+
+#small {
+    font-size:12pt;
+}
+
+.loginbutton {
+    width:400px;
+}
+
+.error_message {
+    border-style: solid;
+    color : #ff0000;
+    width:520px;
+    padding:10px;
+}
+
+.loginbox {
+    border-style: solid;
+    width:530px;
+}
+
+

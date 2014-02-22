@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title("Godai Quest")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h1 GodaiQuest
+      span#small 　　　新感覚 情報共有 SNS
+
+    div.loginbox
+      form(name="login", action="login", method="post")
+        p メールアドレス:
+        
+          input(type="text", name="mailaddress", size="60")
+        p パスワード : &nbsp; &nbsp; &nbsp;
+        
+          input(type="password", name="password", size="60")
+
+        input(type="reset")
+        input.loginbutton(type="submit", value="login")
+    if error_message
+       div
+         p.error_message=error_message
