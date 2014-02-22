@@ -58,6 +58,36 @@ var LoginMessage = builder.build("godaiquest.Login");
 var UserInfoMessage = builder.build("godaiquest.UserInfo");
 var ItemInfoMessage = builder.build("godaiquest.ItemInfo");
 
+// ロック処理のコールバックリスト 
+var listLockCallback = [];
+var lockedConn = false;
+
+// ロック処理（同時にアクセスしないように)
+function lockConn(callback) {
+
+    if ( !lockedConn ) {
+        // ロックの取得できた
+        lockedConn = true;
+        callback();
+    }
+    else {
+        // ロック取得できなかった
+        listLockCallback.push( callback );
+    }
+}
+// ロック解除処理
+function unlockConn() {
+
+    if ( !lockedConn ) return;
+    if ( listLockCallback.length == 0 ) {
+        lockedConn = false;
+    }
+    else {
+        var callback = listLockCallback.splice(0, 1)[0];
+        callback();
+    }
+}
+
 // Dword送信
 function writeDword(client, dword, callback) {
 
@@ -212,6 +242,9 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
 
     async.waterfall([
         function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
             client.connect('21014', 'localhost', callback );
         },
         function(callback) {
@@ -256,6 +289,7 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
             callback( null, userId, client );
         }
     ], function(err, userId, client ) {
+        unlockConn();
         callback(err, userId, client);
     });
     client.on('close', function() {
@@ -297,6 +331,9 @@ function getAllUserInfo(client, callback) {
 
     async.waterfall([
         function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
             writeDword( client, COM_GetUserInfo );
             writeDword( client, 0 ); // Version
             readCommandResult( client, callback );
@@ -320,6 +357,7 @@ function getAllUserInfo(client, callback) {
             callback( null, userinfo );
         }
     ], function(err, userinfo) {
+        unlockConn();
         callback( err, userinfo );
     });
 }
@@ -329,6 +367,9 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
 
     var list_length = 0;
     async.waterfall( [
+        function(callback) {
+            lockConn(callback);
+        },
         function(callback) {
             writeDword( client, COM_GetUnpickedupItemInfo );
             writeDword( client, 0 ); // Version
@@ -358,6 +399,7 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
             callback( null, listItemId );
         }
     ], function(err, listItemId ) {
+        unlockConn();
         callback( err, listItemId );
     });
 }
@@ -386,6 +428,9 @@ function getItemInfo( client, callback) {
 
     async.waterfall([
         function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
             writeDword( client, COM_GetItemInfo );
             writeDword( client, 0 );  // version
             readCommandResult( client, callback );
@@ -404,12 +449,16 @@ function getItemInfo( client, callback) {
             callback( null, iteminfo );
        }
     ], function(err, iteminfo) {
+        unlockConn();
         callback(err, iteminfo );
     });
 }
 function getItemInfoByUserId( client, user_id, callback) {
 
     async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
         function(callback) {
             writeDword( client, COM_GetItemInfoByUserId );
             writeDword( client, 0 );  // version
@@ -428,8 +477,9 @@ function getItemInfoByUserId( client, user_id, callback) {
         function(data, callback) {
             var iteminfo = ItemInfoMessage.decode(data);
             callback( null, iteminfo );
-       }
+        }
     ], function(err, iteminfo) {
+        unlockConn();
         callback(err, iteminfo );
     });
 }

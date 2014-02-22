@@ -4,6 +4,14 @@ body {
 
 h1 {
     font-size:32pt;text-shadow: 1px 1px 2px #0000ff;
+    color: #c0c000;
+    border-style: none none none none;
+}
+
+h2 {
+    text-shadow: 1px 1px 1px #0000ff;
+    color: #c0c000;
+    border-style: none none solid;
 }
 
 #small {
@@ -13,7 +21,8 @@ h1 {
 #box {
     font-size:14pt;
     padding:10px 10px;
-    border-style: solid;
+    border-style: inset;
+    background: #e0e0e0;
 }
 .loginbutton {
     width:400px;

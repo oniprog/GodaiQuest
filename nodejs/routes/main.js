@@ -9,6 +9,7 @@ function simpleHtmlEncode( str ) {
     return str;
 }
 
+// userinfoを取得(キャッシュがあれば使う)
 function getUserInfoCache( client, req, callback ) {
 
     if ( !req.session.userinfo )
@@ -33,6 +34,7 @@ function getUserInfo( client, req, callback) {
     });
 }
 
+// ログイン処理
 exports.login = function(req, res){
 
     var email = req.body.mailaddress;

@@ -38,6 +38,7 @@ global.connect_gqs = {};
 global.connect_num = 1;
 
 app.get('/', routes.index);
+app.get('/login', routes.index);
 app.post('/login', main.login);
 //app.get('/main', main.main);
 app.get('/user_list', main.user_list);
