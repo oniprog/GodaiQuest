@@ -142,7 +142,7 @@ exports.info_list = function(req, res) {
         },
         function(_userinfo, callback) {
             userinfo = _userinfo;
-            network.getItemInfo(client, callback);
+            network.getItemInfoByUserId(client, view_id, callback);
         }, 
         function(_iteminfo, callback) {
             iteminfoall = _iteminfo;
@@ -181,8 +181,6 @@ exports.info_list_all = function(req, res) {
     var userinfo;
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
-    if ( !view_id )
-        view_id = user_id;
 
     var iteminfo = {};
     async.waterfall( [
@@ -191,13 +189,12 @@ exports.info_list_all = function(req, res) {
         },
         function(_userinfo, callback) {
             userinfo = _userinfo;
-            network.getItemInfo(client, callback);
+            network.getItemInfoByUserId(client, view_id, callback);
         }, 
         function(_iteminfo, callback) {
             for(var it2 in _iteminfo.aitem_dic ) {
                 var dic = _iteminfo.aitem_dic[it2];
                 var itemid = dic.aitem.item_id;
-//                dic.aitem.header_string = simpleHtmlEncode( dic.aitem.header_string);
                 iteminfo[itemid] = dic.aitem; // AItemの情報が入る
             }
             callback( null );
@@ -221,8 +218,6 @@ exports.info = function(req, res) {
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
     var info_id = req.query.info_id;
-    if ( !view_id )
-        view_id = user_id;
 
     var iteminfo = {};
 
@@ -232,7 +227,7 @@ exports.info = function(req, res) {
         },
         function(_userinfo, callback ) {
             userinfo = _userinfo;
-            network.getItemInfo(client, callback);
+            network.getItemInfoByUserId(client, view_id, callback);
         }, 
         function(_iteminfo, callback) {
             for(var it2 in _iteminfo.aitem_dic ) {

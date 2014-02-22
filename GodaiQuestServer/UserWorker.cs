@@ -252,6 +252,10 @@ namespace GodaiQuestServer
                         {
                             ComGetRealMonsterSrcInfo();
                         }
+                        else if (eCommand == EServerCommand.GetItemInfoByUserId)
+                        {
+							ComGetItemInfoByUserId();
+                        }
 						else
                         {
                             throw new Exception("Invalid Command : " + this.mMail);
@@ -743,6 +747,24 @@ namespace GodaiQuestServer
             this.mNetwork.sendBinary(memory.ToArray());
 #endif
         }
+
+		// コマンド：アイテム一覧（特定のユーザの）を得る
+		private void ComGetItemInfoByUserId ()
+		{
+			addLog ("Command : get item info "+ mMail );
+			int nVersion = mNetwork.receiveDWORD();
+			int nUserId = mNetwork.receiveDWORD();
+
+            ItemInfo iteminfo;
+            var result = this.mParent.getItemInfoByUserId(out iteminfo, nUserId);
+            this.mNetwork.sendDWORD((int)result);
+            if (result != EServerResult.SUCCESS)
+            {
+                return;
+            }
+
+            this.mNetwork.Serialize(iteminfo.getSerialize());
+		}
 
         /// コマンド：アイテム一覧を得る
         private void ComGetItemInfo()

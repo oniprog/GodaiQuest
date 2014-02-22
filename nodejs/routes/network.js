@@ -50,6 +50,7 @@ var COM_ChangePassword = 40;
 var COM_SetUserFolder  = 41;
 var COM_GetUserFolder  = 42;
 var COM_GetRealMonsterSrcInfo =43;
+var COM_GetItemInfoByUserId = 44;
 
 //
 var builder = ProtoBuf.loadProtoFile("routes/godaiquest.proto");
@@ -406,6 +407,33 @@ function getItemInfo( client, callback) {
         callback(err, iteminfo );
     });
 }
+function getItemInfoByUserId( client, user_id, callback) {
+
+    async.waterfall([
+        function(callback) {
+            writeDword( client, COM_GetItemInfoByUserId );
+            writeDword( client, 0 );  // version
+            writeDword( client, user_id );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("アイテム情報の取得に失敗しました");
+            }
+            else {
+                readProtoMes( client, callback );
+            }
+        },
+        function(data, callback) {
+            var iteminfo = ItemInfoMessage.decode(data);
+            callback( null, iteminfo );
+       }
+    ], function(err, iteminfo) {
+        callback(err, iteminfo );
+    });
+}
+
 
 module.exports = {
     writeDword: writeDword,
@@ -413,6 +441,7 @@ module.exports = {
     connectGodaiQuestServer:connectGodaiQuestServer,
     getAllUserInfo : getAllUserInfo,
     getUnpickedupItemInfo : getUnpickedupItemInfo,
-    getItemInfo : getItemInfo
+    getItemInfo : getItemInfo,
+    getItemInfoByUserId : getItemInfoByUserId
 }
         

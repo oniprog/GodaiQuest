@@ -545,6 +545,29 @@ namespace GodaiQuestServer
             return EServerResult.SUCCESS;
         }
 
+        // アイテム一覧を得る(特定のユーザの)
+        public EServerResult getItemInfoByUserId (out ItemInfo iteminfo, int nUserId)
+		{
+			var itemowner = mItemOwnerCollection.Find (Query.EQ ("UserID", nUserId));
+			var listItem = new List<int> ();
+
+			foreach (var itemownerdb in itemowner) {
+				listItem.Add (itemownerdb.ItemID);
+			}
+
+            iteminfo = new ItemInfo();
+			foreach( var nItemId in listItem ) {
+				var itemdb_All = this.mItemCollection.Find(Query.EQ ("ItemID", nItemId));
+				if (itemdb_All != null ) {
+					foreach(var itemdb in itemdb_All ) {
+		                AItem item = new AItem(itemdb.ItemID, itemdb.ItemImageID, itemdb.HeaderString, itemdb.HeaderImage, false);
+		                iteminfo.addItem(item);
+					}
+				}
+            }
+            return EServerResult.SUCCESS;
+        }
+
         // アイテム一覧を得る
         public EServerResult getItemInfo(out ItemInfo iteminfo)
         {

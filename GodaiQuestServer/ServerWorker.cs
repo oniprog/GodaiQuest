@@ -339,6 +339,15 @@ namespace GodaiQuestServer
         }
 
         // アイテム一覧を得る
+        public EServerResult getItemInfoByUserId(out ItemInfo iteminfo, int nUserId)
+        {
+            lock (this.mSync)
+            {
+                return this.mMongo.getItemInfoByUserId(out iteminfo, nUserId);
+            }
+        }
+
+		// アイテム一覧を得る
         public EServerResult getItemInfo(out ItemInfo iteminfo)
         {
             lock (this.mSync)

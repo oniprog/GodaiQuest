@@ -49,7 +49,8 @@ namespace GodaiLibrary.GodaiQuest
         ChangePassword,
         SetUserFolder,
         GetUserFolder,
-		GetRealMonsterSrcInfo	// モンスターの元情報を得る
+		GetRealMonsterSrcInfo, // モンスターの元情報を得る
+		GetItemInfoByUserId
     }
 
     public enum EServerResult
