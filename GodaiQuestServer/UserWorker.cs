@@ -676,7 +676,6 @@ namespace GodaiQuestServer
 
             int nVersion = this.mNetwork.receiveDWORD();
 
-
             UserInfo userinfo;
             var result = this.mParent.getUserInfo(out userinfo);
             this.mNetwork.sendDWORD((int)result);
