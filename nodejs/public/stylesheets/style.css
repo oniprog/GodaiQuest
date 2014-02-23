@@ -24,6 +24,13 @@ h2 {
     border-style: inset;
     background: #e0e0e0;
 }
+#box2 {
+    font-size:8pt;
+    padding:2px 2px;
+    border-style: inset;
+    background: #e0e0e0;
+}
+
 .loginbutton {
     width:400px;
 }

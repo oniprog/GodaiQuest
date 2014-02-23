@@ -8,10 +8,10 @@ block content
     if before || next
       div#box2
         if before 
-          A(href="info_list?view_id="+view_id+"&index="+(+index-pagesize)) <<戻る
+          A(href="info_list_all?view_id="+view_id+"&index="+(+index-pagesize)) <<戻る
         if next 
-          A(href="info_list?view_id="+view_id+"&index="+(+index+pagesize)) 進む>> 
-
+          A(href="info_list_all?view_id="+view_id+"&index="+(+index+pagesize)) 進む>> 
+      
     if iteminfo
       each aitem in iteminfo
         div#box

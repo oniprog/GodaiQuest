@@ -133,6 +133,7 @@ function getAUser( req, user_id, callback) {
 }
 
 // 未読の情報一覧表示
+var LIST_COUNT = 10;
 exports.info_list = function(req, res) {
 
     var client = checkLogin(req,res);
@@ -141,9 +142,16 @@ exports.info_list = function(req, res) {
 
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
+    var index = req.query.index;
+    if ( !index ) index = 0;
+    
     if ( !view_id )
         view_id = user_id;
 
+    // ページめくりの表示
+    var flag_before = false, flag_next = false;
+
+    var cnt = 0;
     var userinfo;
     var iteminfoall, iteminfo = {};
     async.waterfall( [
@@ -166,7 +174,17 @@ exports.info_list = function(req, res) {
                     var dic = iteminfoall.aitem_dic[it2];
                     if ( dic.aitem.item_id == itemid ) {
 //                        dic.aitem.header_string = simpleHtmlEncode( dic.aitem.header_string);
-                        iteminfo[itemid] = dic.aitem; // AItemの情報が入る
+                        if ( cnt < index ) {
+                            flag_before = true;
+                        }
+                        else if ( cnt >= index && cnt < index+LIST_COUNT) {
+                            iteminfo[itemid] = dic.aitem; // AItemの情報が入る
+                        }
+                        else if ( cnt >= index+LIST_COUNT ) {
+                            flag_next = true;
+                        }
+                            
+                        ++cnt;
                         break;
                     }
                 }
@@ -177,7 +195,7 @@ exports.info_list = function(req, res) {
             getAUser( req, view_id, callback );
         }
     ], function(err, auser) {
-        res.render('info_list', {pretty:true, error_message:err, name:auser.user_name, iteminfo:iteminfo, view_id:view_id});
+        res.render('info_list', {error_message:err, name:auser.user_name, iteminfo:iteminfo, view_id:view_id, index:index, before:flag_before, next:flag_next});
     });
 }
 
@@ -195,8 +213,14 @@ exports.info_list_all = function(req, res) {
         gotoTopPage();
         return;
     }
+    var index = req.query.index;
+    if ( !index ) index = 0;
+
+    // ページめくりの表示
+    var flag_before = false, flag_next = false;
 
     var iteminfo = {};
+    var cnt = 0;
     async.waterfall( [
         function(callback) {
             getUserInfoCache( client, req, callback );
@@ -209,7 +233,16 @@ exports.info_list_all = function(req, res) {
             for(var it2 in _iteminfo.aitem_dic ) {
                 var dic = _iteminfo.aitem_dic[it2];
                 var itemid = dic.aitem.item_id;
-                iteminfo[itemid] = dic.aitem; // AItemの情報が入る
+                if ( cnt < index ) {
+                    flag_before = true;
+                }
+                else if ( cnt >= index && cnt < index+LIST_COUNT ) {
+                    iteminfo[itemid] = dic.aitem; // AItemの情報が入る
+                }
+                else if ( cnt >= index + LIST_COUNT ) {
+                    flag_next = true;
+                }
+                ++cnt;
             }
             callback( null );
         },
@@ -217,7 +250,7 @@ exports.info_list_all = function(req, res) {
             getAUser( req, view_id, callback );
         }
     ], function(err, auser) {
-        res.render('info_list', {allinfo:1, error_message:err, view_id:view_id, name:auser.user_name, iteminfo:iteminfo});
+        res.render('info_list_all', {allinfo:1, error_message:err, view_id:view_id, name:auser.user_name, iteminfo:iteminfo, index:index, before:flag_before, next:flag_next, pagesize:LIST_COUNT});
     });
 }
 
@@ -271,7 +304,7 @@ exports.info = function(req, res) {
             network.getArticleString(client, info_id, callback );
         }
     ], function(err, article_content) {
-        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content});
+        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_cont, pagesize:LIST_COUNT});
     });
 
 }
