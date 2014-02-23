@@ -3,7 +3,22 @@ extends ./layout.jade
 -var title = "Godai Quest Info";
 
 block content
-    if listFiles && listFiles.lenght > 0 
+
+    if article_content && article_content.length > 0
+      div(style="display:box; display:-webkit-box; display:-moz-box; box-orient:horizontal")
+        textarea(cols="60", rows="10", readonly, wrap="soft") #{article_content}
+        div(style="text-shadow:1px 1px 1px #0000ff") #### 投稿内容を書いてください ####
+          form(action="info?view_id="+view_id+"&info_id="+info_id, method="post")
+            textarea(name="inputtext", cols="60", rows="7", wrap="soft")
+            br
+            input(type="reset")
+            input(type="submit", style="width:300px", value="投稿")
+        div
+          br
+          form(action="info_del_article?view_id="+view_id+"&info_id="+info_id, method="post")
+            input(type="submit", value="最後の投稿を削除", style="height:100px")
+ 
+    if listFiles && listFiles.length > 0 
       div#box
         each afile in listFiles
           - if ( afile.path.substr(-4).toLowerCase() == ".jpg" || afile.path.substr(-4).toLowerCase() == ".png" ) {
@@ -13,7 +28,8 @@ block content
           span
             A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
           span &nbsp; &nbsp;
-
+    div &nbsp;
+          
     if iteminfo
       - var aitem = iteminfo[info_id];
       div#box

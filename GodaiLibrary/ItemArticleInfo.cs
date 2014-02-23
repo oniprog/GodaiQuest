@@ -28,7 +28,10 @@ namespace GodaiLibrary.GodaiQuest
             mArticleID = itemarticle.article_id;
             mUserID = itemarticle.user_id;
             mContents = itemarticle.contents;
-            mCreateTime = DateTime.FromBinary(itemarticle.cretae_time);
+			if( itemarticle.cretae_time == 0 )
+				mCreateTime = DateTime.Now;
+			else
+	            mCreateTime = DateTime.FromBinary(itemarticle.cretae_time);
         }
 
         public godaiquest.ItemArticle getSerialize()
@@ -62,6 +65,10 @@ namespace GodaiLibrary.GodaiQuest
         {
             return this.mCreateTime;
         }
+		public void setCreateTime (DateTime dt)
+		{
+			mCreateTime = dt;
+		}
         public void setArticleID(int nArticleID_)
         {
             this.mArticleID = nArticleID_;

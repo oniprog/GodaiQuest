@@ -16,6 +16,7 @@
     "node-html-encoder":"*",
     "path" : "*",
     "zlib" : "*",
-    "st": "*"
+    "st": "*",
+    "node-int64":"*"
   }
 }

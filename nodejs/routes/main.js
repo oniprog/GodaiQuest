@@ -36,6 +36,12 @@ function getUserInfo( client, req, callback) {
     });
 }
 
+// トップページに移動する
+function gotoTopPage() {
+    res.render('index', {error_messsage: "ログインしてください"});
+}
+    
+
 // ログイン処理
 exports.login = function(req, res){
 
@@ -185,6 +191,10 @@ exports.info_list_all = function(req, res) {
     var userinfo;
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
+    if ( !view_id ) {
+        gotoTopPage();
+        return;
+    }
 
     var iteminfo = {};
     async.waterfall( [
@@ -222,9 +232,14 @@ exports.info = function(req, res) {
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
     var info_id = req.query.info_id;
+    if ( !view_id || !info_id ) {
+        gotoTopPage();
+        return;
+    }
 
     var iteminfo = {};
     var download_folder;
+    var listFiles;
     
     async.waterfall( [
         function(callback) {
@@ -242,12 +257,54 @@ exports.info = function(req, res) {
                 // 一個しか読まないけれども
             }
             download_folder = path.join( global.DOWNLOAD_FOLDER, ""+itemid );
+            // アイテム情報を得る
+            console.log(info_id);
             network.getAItem(client, info_id, callback);
+        },
+        function(_listFiles, callback) {
+            listFiles = _listFiles;
+            // 読んだことにする
+            network.readMarkArticle( client, view_id, info_id, callback );
+        },
+        function(callback) {
+            // 記事の内容を読む
+            network.getArticleString(client, info_id, callback );
         }
-    ], function(err, listFiles) {
-        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles});
+    ], function(err, article_content) {
+        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content});
     });
 
+}
+
+// 投稿の書き込み
+exports.info_post = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var userinfo;
+    var user_id = req.session.user_id;
+    var view_id = req.query.view_id;
+    var info_id = req.query.info_id;
+    var contents = req.body.inputtext;
+    if ( !view_id || !info_id ) {
+        gotoTopPage();
+        return;
+    }
+
+    if ( !contents || contents.length == 0 ) {
+        res.redirect("info?view_id="+view_id+"&info_id="+info_id);
+        return;
+    }
+
+    async.waterfall([
+        function(callback) {
+            network.setItemArticle( client, info_id, 0, user_id, contents, callback );
+        }
+    ], function(err) {
+        res.redirect("info?view_id="+view_id+"&info_id="+info_id);
+    });
 }
 
 // ログアウト処理

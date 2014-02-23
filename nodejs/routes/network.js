@@ -7,6 +7,7 @@ var filegqs = require('./filegqs');
 var path = require('path');
 var zlib = require('zlib');
 var fs = require('fs');
+var Int64 = require('node-int64');
 
 //
 var CLIENT_VERSION = 2014021819;
@@ -62,6 +63,7 @@ var builder = ProtoBuf.loadProtoFile("routes/godaiquest.proto");
 var LoginMessage = builder.build("godaiquest.Login");
 var UserInfoMessage = builder.build("godaiquest.UserInfo");
 var ItemInfoMessage = builder.build("godaiquest.ItemInfo");
+var ItemArticleMessage = builder.build("godaiquest.ItemArticle");
 
 // ロック処理のコールバックリスト 
 var listLockCallback = [];
@@ -731,6 +733,82 @@ function getAItem(client, item_id, callback) {
     });
 }
 
+// 記事を読む
+function getArticleString( client, item_id, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            
+            writeDword( client, COM_GetArticleString );
+            writeDword( client, 0 ); // version
+            writeDword( client, item_id );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("記事への書き込みの取得に失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readString( client, callback );
+        }
+    ], function(err, article_content) {
+        unlockConn();
+        callback(err, article_content);
+    });
+}
+
+// 記事の書き込み
+/*
+  message ItemArticle {
+
+	optional int32 item_id = 1;
+	optional int32 article_id = 2;
+	optional int32 user_id = 3;
+	optional string contents = 4;
+	optional sfixed64 cretae_time = 5;
+}*/
+function setItemArticle( client, item_id, article_id, user_id, contents, callback ) {
+
+    async.waterfall( [
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_SetItemArticle );
+            writeDword( client, 0 ); // version
+            var item_article = new ItemArticleMessage();
+            item_article.item_id = item_id;
+            item_article.article_id = article_id;
+            item_article.user_id = user_id;
+            item_article.contents = contents;
+            item_article.create_time = new Int64(0);
+            writeProtoMes( client, item_article );
+
+            readCommandResult( client, callback );
+        },
+        function( callback ) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("記事内容の書き込みに失敗しました");
+            }
+            else {
+                callback();
+            }
+        }
+    ] , function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
 module.exports = {
     writeDword: writeDword,
     getClient : getClient,
@@ -741,5 +819,7 @@ module.exports = {
     getItemInfo : getItemInfo,
     getItemInfoByUserId : getItemInfoByUserId,
     readMarkArticle : readMarkArticle,
-    getAItem: getAItem
+    getAItem: getAItem,
+    getArticleString: getArticleString,
+    setItemArticle: setItemArticle
 }

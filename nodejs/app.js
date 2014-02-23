@@ -48,6 +48,7 @@ app.get('/user_list', main.user_list);
 app.get('/info_list', main.info_list);
 app.get('/info_list_all', main.info_list_all);
 app.get('/info', main.info);
+app.post('/info', main.info_post );
 app.get('/logout', main.logout );
 
 var mount = st({ path: __dirname + '/public', url: '/public' });

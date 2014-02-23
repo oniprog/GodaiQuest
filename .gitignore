@@ -29,3 +29,4 @@ important_data
 GodaiQuestServer/obj
 bin/Debug/
 obj/
+nodejs/public/download/
