@@ -9,6 +9,7 @@ var main = require('./routes/main');
 var http = require('http');
 var path = require('path');
 //var MongoStore = require('connect-mongo')(express);
+var st = require('st');
 
 var app = express();
 
@@ -25,7 +26,7 @@ app.use(express.methodOverride());
 app.use(express.cookieParser());
 app.use(express.session({secret:"alkjfsdlkejk"}));
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use("/public", express.static(path.join(__dirname, 'public'), {redirect:true}));
 
 
 // development only
@@ -37,6 +38,8 @@ if ('development' == app.get('env')) {
 global.connect_gqs = {};
 global.connect_num = 1;
 
+global.DOWNLOAD_FOLDER = __dirname + "/public/download/";
+
 app.get('/', routes.index);
 app.get('/login', routes.index);
 app.post('/login', main.login);
@@ -47,15 +50,11 @@ app.get('/info_list_all', main.info_list_all);
 app.get('/info', main.info);
 app.get('/logout', main.logout );
 
-http.createServer(app).listen(app.get('port'), function(){
+var mount = st({ path: __dirname + '/public', url: '/public' });
+
+app.configure(function() {app.use(mount);});
+var server = http.createServer(app);
+server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-// 死んでいるセッションの接続を切る
-function checkSessionAccess() {
-
-}
-
-setTimeout(function() {
-    checkSessionAccess();
-}, 60 * 1000);

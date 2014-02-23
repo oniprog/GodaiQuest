@@ -13,6 +13,9 @@
     "nodemon": "*",
     "protobufjs": "*",
     "crypto":"*",
-    "node-html-encoder":"*"
+    "node-html-encoder":"*",
+    "path" : "*",
+    "zlib" : "*",
+    "st": "*"
   }
 }

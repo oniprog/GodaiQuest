@@ -267,7 +267,7 @@ namespace GodaiLibrary
                     break;
                 string strFileName = network.receiveString();
 
-                var localFileInfo = new LocalFileInfo();
+                var localFileInfo = new LocalFileInfo();	
                 localFileInfo.FilePath = Path.Combine(strDirectory, strFileName);
                 localFileInfo.Size = nFileSize;
 				listRet.Add(localFileInfo);
@@ -356,11 +356,21 @@ namespace GodaiLibrary
             this.sendLength(info.Length);
 
             // ファイル更新日付送信
-            var time = info.LastAccessTime;
+			var time = info.LastAccessTime;
+
+			// ファイル日付のやりとりを変更する
+#if false
+			DateTime timeoffset = new DateTime( 1970, 1, 1, 0, 0, 0 );
+			var diffTime= time - timeoffset;
+			var millseconds = (int)diffTime.TotalMilliseconds;
+			sendDWORD( millseconds );
+#endif
+#if false
             MemoryStream memory = new MemoryStream();
             BinaryFormatter formatter = new BinaryFormatter();
             formatter.Serialize(memory, time);
             this.sendBinary(memory.ToArray());
+#endif
         }
 
 
@@ -413,7 +423,7 @@ namespace GodaiLibrary
             {
                 for (int it = 0; it < listFile.Count; ++it)
                 {
-                    if (listFile[it].FilePath == strFullPath)
+                    if (listFile[it].FilePath == strFullPath )
                     {
                         int nRealSize = (int)new FileInfo(strFullPath).Length;
                         if (nRealSize == listFile[it].Size)

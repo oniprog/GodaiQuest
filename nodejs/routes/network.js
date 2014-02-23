@@ -1,7 +1,12 @@
+// ネットワーク、サーバとの接続関連
 var async = require('async');
 var net = require('net');
 var ProtoBuf = require('protobufjs');
 var crypto = require('crypto');
+var filegqs = require('./filegqs');
+var path = require('path');
+var zlib = require('zlib');
+var fs = require('fs');
 
 //
 var CLIENT_VERSION = 2014021819;
@@ -139,9 +144,16 @@ function readProtoMes( client, callback ) {
 }
 // Byte受信
 function readByte( client ) {
-    var ret = client.read_buffer.readInt8(0);
+    var ret = client.read_buffer.readUInt8(0);
     client.read_buffer = client.read_buffer.slice(1);
     return ret;
+}
+
+// Byte書き込み
+function writeByte( client, data ) {
+    var buf = new Buffer(1);
+    buf.writeUInt8( data, 0 );
+    client.write(buf);
 }
 
 // Dword受信
@@ -165,6 +177,136 @@ function writeProtoMes( client, mes ) {
     client.write( buf );
 }
 
+// 文字列送信
+function writeString( client, str ) {
+
+    var buf = new Buffer( str, "ucs2" );
+    writeLength( client, buf.length );
+    client.write(buf);
+}
+
+// ファイル情報を送る
+// { path:relativePath, fullpath:filepath, size:stats.size}
+function writeFileInfoSub( client, fileinfo) {
+
+    writeDword( client, fileinfo.size );
+    writeString( client, fileinfo.path );
+}
+
+// ファイル情報を送る
+function writeFileInfo( client, listFiles) {
+
+    for(var it in listFiles) {
+        var afile = listFiles[it];
+        writeFileInfoSub( client, afile );
+    }
+    writeDword( client, -1);
+}
+
+// 文字列を得る
+function readString( client, callback ) {
+
+    var length_str;
+    async.waterfall([
+        function(callback) {
+            readLength(client, callback );
+        },
+        function(_length_str, callback) {
+            length_str = _length_str;
+            setReadCallback( client, length_str, callback );
+        },
+        function(callback) {
+            var str_ret = client.read_buffer.slice(0, length_str);
+            client.read_buffer = client.read_buffer.slice(length_str);
+            callback( null, str_ret.toString("ucs2") );
+        }
+    ], function(err, str_ret ) {
+        callback( null, str_ret );
+    });
+}
+
+// バイナリをよむ
+function readBinary( client, callback ) {
+
+    var length_binary;
+    async.waterfall([
+        function(callback) {
+            readLength(client, callback );
+        },
+        function(_length_binary, callback) {
+            length_binary = _length_binary;
+            setReadCallback( client, length_binary, callback );
+        },
+        function(callback) {
+            var ret = client.read_buffer.slice(0, length_binary);
+            client.read_buffer = client.read_buffer.slice(length_binary);
+            callback( null, ret );
+        }
+    ], function(err, ret ) {
+        callback( null, ret );
+    });
+}
+
+
+// ファイルを受信する
+function readFile( client, dir_base, callback ) {
+
+    var filepath;
+    var filename;
+    var outcallback = callback;
+    var outfd, data;
+    async.waterfall( [
+        function(callback) {
+            setReadCallback( client, 1, callback );
+        },
+        function(callback) {
+            var end_code = readByte( client );
+            if ( end_code == 0 ) {
+                outcallback( null, 0);
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readString( client, callback );
+        },
+        function(_filename, callback) {
+            filename = _filename;
+            filepath = path.join( dir_base, filename );
+            readBinary( client, callback );
+        },
+        function(data, callback) {
+            zlib.gunzip( data, callback );
+        },
+        function(_data, callback ) {
+            data = _data;
+            console.log("receive file : " + filepath );
+            fs.open( filepath, "w", callback );
+        },
+        function(_outfd, callback) {
+            outfd = _outfd;
+            fs.write( outfd, data, 0, data.length, null, callback );
+        },
+        function(write_byte, buf, callback) {
+            fs.close( outfd, callback );
+        }
+    ], function(err) {
+        callback(err, 1 );
+    });
+}
+// ファイル群を送付する
+function readFiles( client, dir_base, callback ) {
+
+    readFile( client, dir_base, function(err, end_code) {
+        if ( err ) { callback(err); }
+        else {
+            if ( end_code == 0 ) callback();
+            else readFiles( client, dir_base, callback );
+        }
+    });
+}
+
 // 長さ取得を行う
 // 最初のバイトに、長さが埋め込まれている
 function readLength( client, callback ) {
@@ -173,7 +315,7 @@ function readLength( client, callback ) {
         else {
             var ch1 = readByte( client );
             if( ch1 < 0x10 ) {
-                callback( null, ch1 );
+                callback( null, ch1 & 0x0f );
                 return;
             }
             var req_byte = (ch1 & 0xf0) >> 4; 
@@ -189,6 +331,39 @@ function readLength( client, callback ) {
             });
         }
     });
+}
+
+// 長さを送信する
+function writeLength( client, length ) {
+
+    if ( length < 0x10 ) {
+        var buf = new Buffer(1);
+        buf.writeUInt8(length, 0);
+        client.write(buf);
+    }
+    else if (length < 0xfff ) { 
+        var buf = new Buffer(2);
+        buf.writeUInt8((length >> 8) | 0x10, 0 );
+        buf.writeUInt8( length & 0xff, 1 );
+        client.write(buf);
+    }
+    else if ( length < 0xfffff ) {
+        
+        var buf = new Buffer(3);
+        buf.writeUInt8((length >> 16) | 0x20, 0 );
+        buf.writeUInt8((length >> 8) & 0xff, 1 );
+        buf.writeUInt8( length & 0xff, 2 );
+        client.write(buf);
+    }
+    else {
+
+        var buf = new Buffer(4);
+        buf.writeUInt8((length >> 24) | 0x30, 0 );
+        buf.writeUInt8((length >> 16) & 0xff, 1 );
+        buf.writeUInt8((length >> 8) & 0xff, 2 );
+        buf.writeUInt8( length & 0xff, 3 );
+        client.write(buf);
+    }
 }
 
 // データ読み込みのCallbackを設定する
@@ -484,6 +659,77 @@ function getItemInfoByUserId( client, user_id, callback) {
     });
 }
 
+// 読み込んだことを記録する(特殊ダンジョン用かな)
+function readMarkArticle( client, user_id, item_id, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_ReadArticle );
+            writeDword( client, 0 ); // version
+            writeDword( client, item_id );
+            writeDword( client, user_id );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ){
+                callback("アイテムを読んだことを記録できなかった");
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
+// アイテム情報をダウンロードする（あと、読んだことにする)
+function getAItem(client, item_id, callback) {
+
+    var download_folder = path.join( global.DOWNLOAD_FOLDER, ""+item_id );
+
+    var listFiles;
+    async.waterfall( [
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            // フォルダ作成
+            fs.exists( download_folder, function(exists) {
+                if ( !exists ) 
+                    fs.mkdir( download_folder, callback );
+                else
+                    callback();
+            });
+        },
+        function(callback) {
+            // ファイルリストを得る
+            filegqs.getFileList( download_folder, callback );
+        },
+        function(_listFiles, callback) {
+            listFiles = _listFiles;
+            writeDword( client, COM_GetAItem );
+            writeDword( client, 2 ); // version
+            writeDword( client, item_id );
+            // ファイル情報を送信する
+            writeFileInfo( client, listFiles );
+            // ファイルの受信
+            readFiles( client, download_folder, callback );
+        },
+        function(callback) {
+            // ファイルリストを得る(再)
+            filegqs.getFileList( download_folder, callback );
+        }
+    ], function(err, listFiles) {
+        unlockConn();
+        callback(err, listFiles);
+    });
+}
 
 module.exports = {
     writeDword: writeDword,
@@ -493,6 +739,7 @@ module.exports = {
     getAllUserInfo : getAllUserInfo,
     getUnpickedupItemInfo : getUnpickedupItemInfo,
     getItemInfo : getItemInfo,
-    getItemInfoByUserId : getItemInfoByUserId
+    getItemInfoByUserId : getItemInfoByUserId,
+    readMarkArticle : readMarkArticle,
+    getAItem: getAItem
 }
-        

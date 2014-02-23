@@ -704,7 +704,7 @@ namespace GodaiQuestServer
             var expvaluedb = this.mExpValueCollection.FindOne(Query.EQ("UserID", nUserID));
             if (expvaluedb == null)
             {
-#if DEBUG
+#if false
                 expvalue = new ExpValue(nUserID, 10000, 1000); 
 #else
                 expvalue = new ExpValue(nUserID, 0, 0); 

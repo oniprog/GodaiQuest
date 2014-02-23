@@ -909,7 +909,8 @@ namespace GodaiQuestServer
 
             if (nDeleteMoto != 0 )
             {
-                Directory.Delete(strItemFolder, true);
+				if ( File.Exists(strItemFolder) )
+	                Directory.Delete(strItemFolder, true);
             }
 
             Network.receiveFiles(this.mNetwork, strItemFolder);

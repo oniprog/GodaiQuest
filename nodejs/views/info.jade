@@ -3,16 +3,27 @@ extends ./layout.jade
 -var title = "Godai Quest Info";
 
 block content
+    if listFiles && listFiles.lenght > 0 
+      div#box
+        each afile in listFiles
+          - if ( afile.path.substr(-4).toLowerCase() == ".jpg" || afile.path.substr(-4).toLowerCase() == ".png" ) {
+            span
+              img(src="public/download/"+info_id+"/"+afile.path, style="width:64px;height:64px")
+          - }
+          span
+            A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
+          span &nbsp; &nbsp;
+
     if iteminfo
       - var aitem = iteminfo[info_id];
-        div#box
-          - var lines = aitem.header_string.split("\n");
-          each line in lines
-            div #{line} &nbsp;
-          br
-          br
+      div#box
+        - var lines = aitem.header_string.split("\n");
+        each line in lines
+          div #{line} &nbsp;
         br
         br
+      br
+      br
         
     br
     br

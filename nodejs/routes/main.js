@@ -1,5 +1,7 @@
 var network = require("./network");
 var async = require("async"); 
+var filegqs = require("./filegqs");
+var path = require('path');
 //var html_encoder = require("node-html-encoder").Encoder();
 
 // htmlエンコード(使わない。というか使えない. FAQみたらそんなの必要ないでしょって。)
@@ -222,7 +224,8 @@ exports.info = function(req, res) {
     var info_id = req.query.info_id;
 
     var iteminfo = {};
-
+    var download_folder;
+    
     async.waterfall( [
         function(callback) {
             getUserInfoCache( client, req, callback );
@@ -236,11 +239,13 @@ exports.info = function(req, res) {
                 var dic = _iteminfo.aitem_dic[it2];
                 var itemid = dic.aitem.item_id;
                 iteminfo[itemid] = dic.aitem; // AItemの情報が入る
+                // 一個しか読まないけれども
             }
-            callback();
-        },
-    ], function(err) {
-        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id});
+            download_folder = path.join( global.DOWNLOAD_FOLDER, ""+itemid );
+            network.getAItem(client, info_id, callback);
+        }
+    ], function(err, listFiles) {
+        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles});
     });
 
 }
