@@ -550,7 +550,7 @@ namespace GodaiQuest
                                     int idy = idrawy;
                                     foreach (var mesline in listMes)
                                     {
-                                        gra.DrawString(mesline, font, Brushes.Black, idrawx + 36, idy);
+                                        gra.DrawString(mesline, font, Brushes.Black, idrawx + BLOCK_SIZE+4, idy);
                                         idy += (int)gra.MeasureString(mesline, font).Height;
                                     }
                                 }
