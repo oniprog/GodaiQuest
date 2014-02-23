@@ -809,6 +809,34 @@ function setItemArticle( client, item_id, article_id, user_id, contents, callbac
     });
 }
 
+// 記事の最後の書き込みを削除する
+function deleteLastItemArticle(client, item_id, callback) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_DeleteLastItemArticle );
+            writeDword( client, 0 ); // version
+            writeDword( client, item_id );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback( "記事の削除に失敗しました");
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
 module.exports = {
     writeDword: writeDword,
     getClient : getClient,
@@ -821,5 +849,6 @@ module.exports = {
     readMarkArticle : readMarkArticle,
     getAItem: getAItem,
     getArticleString: getArticleString,
-    setItemArticle: setItemArticle
+    setItemArticle: setItemArticle,
+    deleteLastItemArticle: deleteLastItemArticle
 }

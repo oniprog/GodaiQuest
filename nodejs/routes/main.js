@@ -307,6 +307,33 @@ exports.info_post = function(req, res) {
     });
 }
 
+// 最後に書き込んだ記事を削除する
+exports.info_del_article = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var userinfo;
+    var user_id = req.session.user_id;
+    var view_id = req.query.view_id;
+    var info_id = req.query.info_id;
+    if ( !view_id || !info_id ) {
+        gotoTopPage();
+        return;
+    }
+
+    async.waterfall([
+        function(callback) {
+            network.deleteLastItemArticle( client, info_id, callback );
+        }
+    ], function(err) {
+        if (err) 
+            console.log(err);
+        res.redirect("info?view_id="+view_id+"&info_id="+info_id);
+    });
+}
+
 // ログアウト処理
 exports.logout = function(req, res) {
 
