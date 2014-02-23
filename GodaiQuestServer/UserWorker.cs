@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Sockets;
@@ -457,7 +457,7 @@ namespace GodaiQuestServer
             TileInfo tileinfo = new TileInfo(set_dungeon.tile_info);
 
 			if (nUserID == 0)
-			{
+			{	
 				// 大陸の修正用
 				var result = this.mParent.setDungeonForIsland(this.mUserID, dungeon, images, objectinfo, tileinfo);
 				this.mNetwork.sendDWORD((int)result);

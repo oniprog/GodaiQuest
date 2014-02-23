@@ -2,6 +2,7 @@ var network = require("./network");
 var async = require("async"); 
 var filegqs = require("./filegqs");
 var path = require('path');
+var dungeon = require('./dungeon');
 //var html_encoder = require("node-html-encoder").Encoder();
 
 // htmlエンコード(使わない。というか使えない. FAQみたらそんなの必要ないでしょって。)
@@ -304,7 +305,7 @@ exports.info = function(req, res) {
             network.getArticleString(client, info_id, callback );
         }
     ], function(err, article_content) {
-        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_cont, pagesize:LIST_COUNT});
+        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content, pagesize:LIST_COUNT});
     });
 
 }
@@ -365,6 +366,49 @@ exports.info_del_article = function(req, res) {
             console.log(err);
         res.redirect("info?view_id="+view_id+"&info_id="+info_id);
     });
+}
+
+/////////////////////////////////////////////////////////
+// 記事の書き込み
+exports.write_info = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var user_id = req.session.user_id;
+    var dungeon_id = user_id;
+    var level = 0;
+    
+    var dungeon_info, object_attr_info;
+    var rest_item_cnt;
+    async.waterfall([
+        function(callback) {
+            network.getDungeon( client, dungeon_id, level, callback );
+        },
+        function(_dungeon_info, callback) {
+            dungeon_info = _dungeon_info;
+            network.getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+
+            rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
+            if (rest_item_cnt == 0 ) {
+                callback("アイテムを置くためのスペースがありません。ダンジョンを広げてください")
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
+    });
+}
+
+// 記事の書き込み
+exports.write_info_post = function(req, res) {
+
 }
 
 // ログアウト処理

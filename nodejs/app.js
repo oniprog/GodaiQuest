@@ -52,6 +52,8 @@ app.post('/info', main.info_post );
 app.post('/info_del_article', main.info_del_article);
 app.get('/info_del_article', main.info);
 app.get('/logout', main.logout );
+app.get('/write_info', main.write_info);
+app.post('/write_info', main.write_info_post);
 
 var mount = st({ path: __dirname + '/public', url: '/public' });
 

@@ -3,11 +3,17 @@ extends ./layout.jade
 -var title = "Godai Quest User List";
 
 block content
-    each dic in userinfo.uesr_dic
-      if dic
-        if dic.auser
-          h2
-            A(href="info_list?view_id="+dic.auser.user_id) 
-              img(src=dic.auser.uri_image, style="width:60px")
-              span #{dic.auser.user_name}さん
-          p #{mapUserItem[dic.auser.user_id].length}個の未読情報があります
+  h2 メニュー
+  div#box2
+    a(href="write_info") 新規記事を書く
+
+  h2 未読情報
+
+  each dic in userinfo.uesr_dic
+    if dic
+      if dic.auser
+        h2
+          A(href="info_list?view_id="+dic.auser.user_id) 
+            img(src=dic.auser.uri_image, style="width:60px")
+            span #{dic.auser.user_name}さん
+        p #{mapUserItem[dic.auser.user_id].length}個の未読情報があります

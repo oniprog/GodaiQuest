@@ -64,6 +64,13 @@ var LoginMessage = builder.build("godaiquest.Login");
 var UserInfoMessage = builder.build("godaiquest.UserInfo");
 var ItemInfoMessage = builder.build("godaiquest.ItemInfo");
 var ItemArticleMessage = builder.build("godaiquest.ItemArticle");
+var GetDungeonMessage = builder.build("godaiquest.GetDungeon");
+var DungeonInfoMessage = builder.build("godaiquest.DungeonInfo");
+var SetDungeonMessage = builder.build("godaiquest.SetDungeon");
+var DungeonBlockImageInfoMessage = builder.build("godaiquest.DungeonBlockImageInfo");
+var ObjectAttrInfoMessage = builder.build("godaiquest.ObjectAttrInfo");
+var TileInfoMessage = builder.build("godaiquest.TileInfo");
+var IslandGroundInfoMessage = builder.build("godaiquest.IslandGroundInfo");
 
 // ロック処理のコールバックリスト 
 var listLockCallback = [];
@@ -837,6 +844,471 @@ function deleteLastItemArticle(client, item_id, callback) {
     });
 }
 
+// ダンジョンの深さを得る
+function getDungeonDepth(clinet, dungeon_id, callback) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetDungeonDepth );
+            writeDword( client, 0 ); // version
+            writeDword( client, dungeon_id );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback( "ダンジョンの深さ取得に失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            // 深さを得る
+            setReadCallback(client, 4, function(err) {
+                if ( err ) {callback(err); }
+                else {
+                    var depth = readDword( client );
+                    callback( err, depth );
+                }
+            });
+        }
+    ], function(err, depth) {
+        unlockConn();
+        callback(err, depth);
+    });
+}
+
+// ダンジョン情報を得る
+/*
+message GetDungeon {
+	// ダンジョンID
+	optional int32	id = 1;
+	// ダンジョン番号
+	optional int32 	dungeon_number = 2;
+}
+message DungeonInfo {
+	// ダンジョンの情報
+	optional bytes dungeon = 1;
+	// サイズX
+	optional int32 size_x = 2;
+	// サイズY
+	optional int32 size_y = 3;
+	// ダンジョン番号
+	optional int32 dungeon_number = 4;
+}
+*/
+function getDungeon( client, dungeon_id, level, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetDungeon );
+            writeDword( client, 0 ); // version
+
+            var get_dungeon = new GetDungeonMessage();
+            get_dungeon.id = dungeon_id;
+            get_dungeon.dungeon_number = level;
+            writeProtoMes( client, get_dungeon );
+
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if (okcode != 1 ) {
+                callback("ダンジョン情報の読み込みに失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readProtoMes(client, callback);
+        },
+        function(data, callback) {
+            var dungeon = DungeonInfoMessage.decode(data);
+            callback(null, dungeon);
+        }
+    ], function(err, dungeon) {
+        unlockConn();
+        callback(err, dungeon);
+    });
+}
+
+// ダンジョンイメージ群を得る
+/*
+message ImagePair {
+	optional int32 number = 1;
+	optional bytes image = 2;
+	optional string name = 3;
+	optional int32 owner = 4;
+	optional sfixed64 created = 5;
+	optional bool can_item_image = 6;
+	optional bool new_image = 7;
+}
+
+message ImagePairDic {
+
+	optional uint32 index = 1;
+	optional ImagePair imagepair = 2;
+}
+
+message DungeonBlockImageInfo {
+
+	optional uint32 max_image_num = 1;
+	repeated ImagePairDic image_dic = 2;
+}
+
+*/
+function getDungeonImageBlock(client, callback) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetDungeonBlockImage );
+            writeDowrd( client, 0 ); //version
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("ダンジョンイメージの取得に失敗した");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readProtoMes(client, callback );
+        },
+        function(data, callback) {
+            var dungeon_block_image_info = DungeonBlockImageInfoMessage.decode(data);
+            callback( null, dungeon_block_image_info );
+        }
+    ], function(err, dungeon_block_image_info) {
+        unlockConn();
+        callback(err, dungeon_block_image_info);
+    });
+}
+
+// オブジェクトの情報を得る
+/*
+message ObjectAttr {
+
+	optional int32 object_id = 1;
+	optional bool can_walk = 2;
+	optional int32 item_id = 3;
+	optional bool bNew = 4;
+	optional int32 command = 5;
+	optional int32 command_sub = 6;
+}
+
+message ObjectAttrDic {
+
+	optional int32 index = 1;
+	optional ObjectAttr object_attr = 2;
+}
+
+message ObjectAttrInfo {
+
+	optional int32 new_id = 1;
+	repeated ObjectAttrDic object_attr_dic = 2;
+}
+*/  
+function getObjectAttrInfo( client, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetObjectAttrInfo );
+            writeDword( client, 0 ); // version
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword(client);
+            if ( okcode != 1 ) {
+                callback("オブジェクトの情報取得に失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readProtoMes( client, callback );
+        },
+        function(data, callback) {
+            var object_attr_info = ObjectAttrInfoMessage.decode(data);
+            callback( null, object_attr_info );
+        },
+        function(object_attr_info, callback) {
+            // 使いやすい用に作り替える
+            var formed = []; 
+            for( var it in object_attr_info.object_attr_dic ) {
+                var objattr = object_attr_info.object_attr_dic[it].object_attr;
+                formed[+objattr.object_id] = objattr;
+            }
+            callback( null, formed );
+        }
+    ], function(err, object_attr_info) {
+        unlockConn();
+        callback(err, object_attr_info);
+    });
+}
+
+// タイル情報を得る
+/*
+message Tile {
+
+	optional uint64	tile_id = 1;
+}
+
+message TileDic {
+
+	optional uint64 index = 1;
+	optional Tile tile = 2;
+}
+
+message TileInfo {
+
+	repeated TileDic tile_dic = 1;
+}
+*/
+function getTileList( client, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetTileList );
+            writeDword( client, 0 ); // version
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword(client);
+            if ( okcode != 1 ) {
+                callback( "タイル情報を得る" );
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readProtoMes( client, callback );
+        },
+        function(data, callback) {
+            var tileinfo = TileInfoMessage.decode(data);
+            callback( null, tileinfo );
+        }
+    ], function(err, tileinfo) {
+        unlockConn();
+        callback(err, tileinfo);
+    });
+}
+
+// 
+// ダンジョンを設定する
+/*
+message SetDungeon {
+
+	// ユーザID
+	optional int32 user_id = 1;
+	// ダンジョン番号
+	optional int32 dungeon_number = 2;
+
+	// ダンジョンの情報
+	optional DungeonInfo dungeon_info = 3;
+
+	// イメージ情報
+	optional DungeonBlockImageInfo images = 4;
+
+	optional ObjectAttrInfo object_info = 5;
+
+	optional TileInfo tile_info = 6;
+}
+message DungeonInfo {
+	// ダンジョンの情報
+	optional bytes dungeon = 1;
+	// サイズX
+	optional int32 size_x = 2;
+	// サイズY
+	optional int32 size_y = 3;
+	// ダンジョン番号
+	optional int32 dungeon_number = 4;
+}
+message ImagePair {
+	optional int32 number = 1;
+	optional bytes image = 2;
+	optional string name = 3;
+	optional int32 owner = 4;
+	optional sfixed64 created = 5;
+	optional bool can_item_image = 6;
+	optional bool new_image = 7;
+}
+
+message ImagePairDic {
+
+	optional uint32 index = 1;
+	optional ImagePair imagepair = 2;
+}
+
+message DungeonBlockImageInfo {
+
+	optional uint32 max_image_num = 1;
+	repeated ImagePairDic image_dic = 2;
+}
+
+message ObjectAttr {
+
+	optional int32 object_id = 1;
+	optional bool can_walk = 2;
+	optional int32 item_id = 3;
+	optional bool bNew = 4;
+	optional int32 command = 5;
+	optional int32 command_sub = 6;
+}
+
+message ObjectAttrDic {
+
+	optional int32 index = 1;
+	optional ObjectAttr object_attr = 2;
+}
+
+message ObjectAttrInfo {
+
+	optional int32 new_id = 1;
+	repeated ObjectAttrDic object_attr_dic = 2;
+}
+message Tile {
+
+	optional uint64	tile_id = 1;
+}
+
+message TileDic {
+
+	optional uint64 index = 1;
+	optional Tile tile = 2;
+}
+
+message TileInfo {
+
+	repeated TileDic tile_dic = 1;
+}
+
+*/
+function setDungeon( client, set_dungeon, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_SetDungeon );
+            writeDword( client, 0 ); // version
+            writeProtoMes( client, set_dungeon );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback( "ダンジョンの設定に失敗した");
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
+// SetDungeonを作成する
+function makeSetDungeon() {
+    var setDungeon = new SetDungeonMessage();
+    return setDungeon;
+}
+
+// 大陸の土地情報を得る
+/*
+message IslandGround {
+
+	optional int32 user_id = 1;
+	optional int32 ix1 = 2;
+	optional int32 iy1 = 3;
+	optional int32 ix2 = 4;
+	optional int32 iy2 = 5;
+}
+
+message IslandGroundInfo {
+
+	repeated IslandGround ground_list = 1;
+}
+*/
+function getIslandGroundInfo(client, callback) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_GetIslandGroundInfo );
+            writeDword( client, 0 ); // version
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword(client);
+            if ( okcode != 1 ) {
+                callback("大陸の土地情報の取得に失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            readProtoMes( client, callback );
+        },
+        function(data, callback) {
+            var island_ground_info = IslandGroundInfoMessage.decode(data);
+            callback( island_ground_info );
+        }
+    ], function(err, island_ground_info) {
+        unlockConn();
+        callback(err, island_ground_info);
+    });
+
+}
+// 特定ユーザの大陸情報を得る
+function getIslandGroundInfoByUser(client, user_id, callback) {
+
+    async.waterfall([
+        function(callback) {
+            getIslandGroundInfo(callback);
+        },
+        function(island_ground_info, callback) {
+            for(var it in island_ground_info.ground_list ) {
+                var ground_info = island_ground_info.ground_list[it];
+                if ( ground_info.user_id == user_id ) {
+                    callback( null, ground_info );
+                    return;
+                }
+            }
+            callback("UserIdに対応する大陸情報がありませんでした");
+        }
+    ], function(err, ground_info) {
+        callback(err, ground_info);
+    });
+}
+
 module.exports = {
     writeDword: writeDword,
     getClient : getClient,
@@ -850,5 +1322,14 @@ module.exports = {
     getAItem: getAItem,
     getArticleString: getArticleString,
     setItemArticle: setItemArticle,
-    deleteLastItemArticle: deleteLastItemArticle
+    deleteLastItemArticle: deleteLastItemArticle,
+    getDungeonDepth: getDungeonDepth,
+    getDungeon:getDungeon,
+    getDungeonImageBlock:getDungeonImageBlock,
+    getObjectAttrInfo: getObjectAttrInfo,
+    getTileList: getTileList,
+    setDungeon: setDungeon,
+    makeSetDungeon: makeSetDungeon,
+    getIslandGroundInfo : getIslandGroundInfo,
+    getIslandGroundInfoByUser : getIslandGroundInfoByUser
 }
