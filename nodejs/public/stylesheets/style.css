@@ -8,6 +8,10 @@ h1 {
     border-style: none none none none;
 }
 
+textarea {
+    tab-size:4;
+}
+
 h2 {
     text-shadow: 1px 1px 1px #0000ff;
     color: #c0c000;

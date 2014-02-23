@@ -41,7 +41,6 @@ function getUserInfo( client, req, callback) {
 function gotoTopPage() {
     res.render('index', {error_messsage: "ログインしてください"});
 }
-    
 
 // ログイン処理
 exports.login = function(req, res){
@@ -368,7 +367,6 @@ exports.info_del_article = function(req, res) {
     });
 }
 
-/////////////////////////////////////////////////////////
 // 記事の書き込み
 exports.write_info = function(req, res) {
 
@@ -380,18 +378,61 @@ exports.write_info = function(req, res) {
     var dungeon_id = user_id;
     var level = 0;
     
-    var dungeon_info, object_attr_info;
+    var dungeon_info;
+    var island_info, island_ground_info;
     var rest_item_cnt;
+    var object_attr_info, moto_object_attr_info;
+    var block_images_info, tile_info, mapObjIdToItemId;
     async.waterfall([
+        // 0. 情報取得フェーズ
         function(callback) {
+            // オブジェクトの情報取得
+            network.getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, _moto_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+            moto_object_attr_info = _moto_object_attr_info;
+            // イメージ情報
+            network.getDungeonImageBlock(client, callback );
+        },
+        function(_block_images_info, callback) {
+            block_images_info = _block_images_info;
+
+            // タイル情報取得
+            network.getTileList( client, callback );
+        },
+        function(_tile_info, callback ){
+            tile_info = _tile_info;
+            mapObjIdToItemId = dungeon.makeMapObjIdToItemIdFromTileInfo(tile_info);
+            callback();
+        },
+        function(callback) {
+            // 1. 大陸に入り口を設置
+            network.getDungeon( client, 0, 0, callback ); // 大陸
+        },
+        function(_island_info, callback) {
+            island_info = _island_info;
+            network.getIslandGroundInfoByUser( client, user_id, callback );
+        },
+        function(_island_ground_info, callback) {
+            island_ground_info = _island_ground_info;
+            dungeon.setDungeonEntracne( island_info, island_ground_info, object_attr_info, mapObjIdToItemId);
+            var island_mes = network.makeSetDungeon();
+            island_mes.user_id = 0; // 大陸 
+            island_mes.dungeon_info = island_info;
+            island_mes.images = block_images_info;
+            island_mes.object_info = moto_object_attr_info;
+            island_mes.tile_info = tile_info;
+            network.setDungeon( client, island_mes, callback );
+        },
+        function(callback) {
+            callback("stop");
             network.getDungeon( client, dungeon_id, level, callback );
         },
         function(_dungeon_info, callback) {
             dungeon_info = _dungeon_info;
-            network.getObjectAttrInfo( client, callback );
         },
         function(_object_attr_info, callback) {
-            object_attr_info = _object_attr_info;
 
             rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
             if (rest_item_cnt == 0 ) {

@@ -1,4 +1,5 @@
 // ネットワーク、サーバとの接続関連
+var Long = require('long');
 var async = require('async');
 var net = require('net');
 var ProtoBuf = require('protobufjs');
@@ -973,7 +974,7 @@ function getDungeonImageBlock(client, callback) {
         },
         function(callback) {
             writeDword( client, COM_GetDungeonBlockImage );
-            writeDowrd( client, 0 ); //version
+            writeDword( client, 0 ); //version
             readCommandResult( client, callback );
         },
         function(callback) {
@@ -1056,11 +1057,11 @@ function getObjectAttrInfo( client, callback ) {
                 var objattr = object_attr_info.object_attr_dic[it].object_attr;
                 formed[+objattr.object_id] = objattr;
             }
-            callback( null, formed );
+            callback( null, formed, object_attr_info );
         }
-    ], function(err, object_attr_info) {
+    ], function(err, easy_objattr_info, object_attr_info) {
         unlockConn();
-        callback(err, object_attr_info);
+        callback(err, easy_objattr_info, object_attr_info);
     });
 }
 
@@ -1279,7 +1280,7 @@ function getIslandGroundInfo(client, callback) {
         },
         function(data, callback) {
             var island_ground_info = IslandGroundInfoMessage.decode(data);
-            callback( island_ground_info );
+            callback( null, island_ground_info );
         }
     ], function(err, island_ground_info) {
         unlockConn();
@@ -1292,7 +1293,7 @@ function getIslandGroundInfoByUser(client, user_id, callback) {
 
     async.waterfall([
         function(callback) {
-            getIslandGroundInfo(callback);
+            getIslandGroundInfo(client, callback);
         },
         function(island_ground_info, callback) {
             for(var it in island_ground_info.ground_list ) {
