@@ -896,7 +896,17 @@ namespace GodaiQuestServer
                     String strName = loader.GetString();
                     String strFileName = loader.GetString();
                     bool bCanWalk = loader.GetInt() != 0 ? true : false;
-                    EObjectCommand eCommand = (EObjectCommand) loader.GetInt();
+					var nCommand = loader.GetInt();
+					EObjectCommand eCommand;
+					bool bCanItem = false;
+					if ( nCommand < 5 ) { 
+						eCommand = (EObjectCommand)nCommand;
+					}
+					else { 
+						eCommand = EObjectCommand.Nothing;
+						bCanItem = true;
+						bCanWalk = true;
+					}
 
                     try
                     {
@@ -907,7 +917,7 @@ namespace GodaiQuestServer
                         GodaiLibrary.MessageBox2.Show(strFileName + "の画像が読めませんでした");
                         throw e;
                     }
-                    images.addImage((uint) nImageID, false, img, strName, UserID, DateTime.Now, true);
+                    images.addImage((uint) nImageID, bCanItem, img, strName, UserID, DateTime.Now, true);
                     var itemattr1 = new ObjectAttr(nObjectID, bCanWalk, 0, eCommand, 0, true);
                     objinfo.addObject(itemattr1);
 
