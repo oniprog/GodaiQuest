@@ -407,6 +407,67 @@ exports.write_info = function(req, res) {
             callback();
         },
         function(callback) {
+            // 1. ダンジョン1階の情報を得る
+            network.getDungeon( client, dungeon_id, level, callback );
+        },
+        function(_dungeon_info, callback) {
+            dungeon_info = _dungeon_info;
+        },
+        function(_object_attr_info, callback) {
+            // 2. ダンジョンの空きスペースをチェックする
+            rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
+            if (rest_item_cnt == 0 ) {
+                callback("アイテムを置くためのスペースがありません。ダンジョンを広げてください")
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
+    });
+}
+
+// 記事の書き込み
+exports.write_info_post = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var user_id = req.session.user_id;
+    var dungeon_id = user_id;
+    var level = 0;
+    
+    var dungeon_info;
+    var island_info, island_ground_info;
+    var rest_item_cnt;
+    var object_attr_info, moto_object_attr_info;
+    var block_images_info, tile_info, mapObjIdToItemId;
+    async.waterfall([
+        // 0. 情報取得フェーズ
+        function(callback) {
+            // オブジェクトの情報取得
+            network.getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, _moto_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+            moto_object_attr_info = _moto_object_attr_info;
+            // イメージ情報
+            network.getDungeonImageBlock(client, callback );
+        },
+        function(_block_images_info, callback) {
+            block_images_info = _block_images_info;
+
+            // タイル情報取得
+            network.getTileList( client, callback );
+        },
+        function(_tile_info, callback ){
+            tile_info = _tile_info;
+            mapObjIdToItemId = dungeon.makeMapObjIdToItemIdFromTileInfo(tile_info);
+            callback();
+        },
+        function(callback) {
             // 1. 大陸に入り口を設置
             network.getDungeon( client, 0, 0, callback ); // 大陸
         },
@@ -426,30 +487,10 @@ exports.write_info = function(req, res) {
             network.setDungeon( client, island_mes, callback );
         },
         function(callback) {
-            callback("stop");
-            network.getDungeon( client, dungeon_id, level, callback );
-        },
-        function(_dungeon_info, callback) {
-            dungeon_info = _dungeon_info;
-        },
-        function(_object_attr_info, callback) {
-
-            rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
-            if (rest_item_cnt == 0 ) {
-                callback("アイテムを置くためのスペースがありません。ダンジョンを広げてください")
-            }
-            else {
-                callback();
-            }
         }
     ], function(err) {
-        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
+        callback(err);
     });
-}
-
-// 記事の書き込み
-exports.write_info_post = function(req, res) {
-
 }
 
 // ログアウト処理
