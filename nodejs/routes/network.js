@@ -9,6 +9,7 @@ var path = require('path');
 var zlib = require('zlib');
 var fs = require('fs');
 var Int64 = require('node-int64');
+var dungeon = require('./dungeon');
 
 //
 var CLIENT_VERSION = 2014021819;
@@ -70,6 +71,9 @@ var DungeonInfoMessage = builder.build("godaiquest.DungeonInfo");
 var SetDungeonMessage = builder.build("godaiquest.SetDungeon");
 var DungeonBlockImageInfoMessage = builder.build("godaiquest.DungeonBlockImageInfo");
 var ObjectAttrInfoMessage = builder.build("godaiquest.ObjectAttrInfo");
+var ObjectAttrDicMessage = builder.build("godaiquest.ObjectAttrDic");
+var ObjectAttrMessage = builder.build("godaiquest.ObjectAttr");
+
 var TileInfoMessage = builder.build("godaiquest.TileInfo");
 var IslandGroundInfoMessage = builder.build("godaiquest.IslandGroundInfo");
 var ImagePairMessage = builder.build("godaiquest.ImagePair");
@@ -166,6 +170,12 @@ function readByte( client ) {
 function writeByte( client, data ) {
     var buf = new Buffer(1);
     buf.writeUInt8( data, 0 );
+    client.write(buf);
+}
+
+// バイナリを保存する
+function writeBinary( client, data ) {
+    var buf = new Buffer( data );
     client.write(buf);
 }
 
@@ -378,6 +388,42 @@ function writeLength( client, length ) {
         client.write(buf);
     }
 }
+
+// ファイルを送信する
+function writeFiles( client, base_dir, filelist, callback ) {
+
+
+    var allcallback = callback;
+    var filename;
+
+    async.waterfall([
+        function(callback) {
+            filename = filelist.shift();
+            if ( !filename ) {
+                writeByte( client, 0 );
+                allcallback();
+                return;
+            }
+            writeByte( client, 1 );
+            writeString( client, filename );
+            callback();
+        },
+        function(callback) {
+            var filepath = path.join( base_dir, filename );
+            console.log("send file : " + filepath );
+            fs.open( filepath, "r", callback );
+        },
+        function(callback) {
+            zlib.gzip( buf, callback );
+        },
+        function(data, callback) {
+            writeBinary( client, data );
+        }
+    ], function(err) {
+        writeFiles( client, base_dir, filelist, callback );
+    });
+}
+
 
 // データ読み込みのCallbackを設定する
 function setReadCallback( client, length, callback ) {
@@ -1362,7 +1408,77 @@ function getSomeItemImagePair( client, index, callback ) {
     });
 }
 
-// 新アイテムを保存する
+// アイテムを設定する
+function setAItem( client, aitem_mes, imagepair_mes, basedir, filelist, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_SetAItem );
+            writeDword( client, 0 ); // version
+            writeProtoMes( client, aitem_mes );
+            writeProtoMes( client, imagepair_mes );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("アイテムの設定に失敗しました");
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            // ファイルを送信する
+            writeFiles( client, basedir, filelist, callback );
+        },
+        function(callback) {
+            // Itemを受信する
+            readProtoMes( client, callback );
+        },
+        function( data, callback ) {
+            var aitem = AItemMessage.decode(data);
+            callback( null, aitem );
+        }
+    ], function(err, aitem) {
+        unlockConn();
+        callback(err, aitem);
+    });
+}
+
+// モンスタ化する
+function setMonster( client, item_id, bMonster, callback ) {
+
+    aysnc.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            writeDword( client, COM_SetMonster );
+            writeDword( client, 0 ); // nVersion
+            writeDword( client, item_id );
+            writeDword( client, bMonster );
+            readCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode != 1 ) {
+                callback("モンスター化に失敗しました");
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback( err );
+    });
+}
+
+// 新アイテムを作成する
 /*
 message ImagePair {
 	optional int32 number = 1;
@@ -1382,18 +1498,17 @@ message AItem {
 	optional bool bNew = 5;
 }
 */
-function createNewItem( client, header_string, callback ){
+function createNewItem( client, header_string, bMonster, callback ){
 
-    var dungeon_block_image_info;
-    var new_imagepair;
-    var new_aitem;
+    var aitem;
     async.waterfall([
         function(callback) {
             getSomeItemImagePair(client, 0/*index*/, callback );
         },
         function(imagepair, callback) {
 
-            new_imagepair = new ImagePairMessage();
+//            ImagePair imagepair = new ImagePair(this.mImageID, true, this.picItem.Image, "", mGQCom.getUserID(), DateTime.Now, this.mNewItemImage);
+            var new_imagepair = new ImagePairMessage();
             new_imagepair.number = imagepair.number;
             new_imagepair.image = imagepair.image;
             new_imagepair.name = imagepair.name;
@@ -1402,25 +1517,131 @@ function createNewItem( client, header_string, callback ){
             new_imagepair.can_item_image = true;
             new_imagepair.new_image = false;
 
-            new_aitem = new AItemMessage();
+//            AItem item = new AItem(0, this.mImageID, this.txtHeader.Text, this.picHeader.Image, true);
+            var new_aitem = new AItemMessage();
             new_aitem.item_id = 0;
             new_aitem.item_image_id = imagepair.number;
             new_aitem.hader_string = header_string;
             new_aitem.new = true;
 
-            dungeon_block_image_info = _dungeon_block_image_info;
-
-            for(var it in dungeon_block_image_info.image_dic ) {
-            }
-            
-            network.getObjectAttrInfo( client, callback );
+//            this.mGQCom.setAItem(ref item, imagepair, this.mFileSet);
+            setAItem( client, new_aitem, new_imagepair, "", [], callback );
         },
-        function(objattr_info, moto_object_attr_info, callback) {
-            var new_id = moto_object_attr_info.new_id;
-            
+        function(_aitem, callback) {
+            aitem = _aitem;
+            // 場合によってはモンスタ化する
+//            this.mGQCom.setMonster(item.getItemID(), this.chkProblem.Checked);
+            setMonster( client, aitem.item_id, bMonster, callback );
         }
     ], function(err) {
         unlockConn();
+        callback(err, aitem);
+    });
+}
+
+// バッファ内に書き込む
+function writeUint32Buf( buf, index, value ) {
+
+    buf[index+0] = value & 0xff;
+    buf[index+1] = (value >> 8 ) & 0xff;
+    buf[index+2] = (value >> 16 ) & 0xff;
+    buf[index+3] = (value >> 24 ) & 0xff;
+}
+
+
+// アイテムを配置する
+/*
+message ObjectAttr {
+
+	optional int32 object_id = 1;
+	optional bool can_walk = 2;
+	optional int32 item_id = 3;
+	optional bool bNew = 4;
+	optional int32 command = 5;
+	optional int32 command_sub = 6;
+}
+*/
+function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
+
+    var object_attr_info, moto_object_attr_info;
+    var block_images_info;
+    var tile_info;
+    var dungeon_info;
+    var dungeon_mes;
+    
+    async.waterfall([
+        function(callback) {
+            // オブジェクトの情報取得
+            getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, _moto_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+            moto_object_attr_info = _moto_object_attr_info;
+            // イメージ情報
+            getDungeonImageBlock(client, callback );
+        },
+        function(_block_images_info, callback) {
+            block_images_info = _block_images_info;
+
+            // タイル情報取得
+            getTileList( client, callback );
+        },
+        function(_tile_info, callback ){
+            tile_info = _tile_info;
+
+            // ダンジョンを得る
+            getDungeon( client, user_id, 0/*level*/, callback );
+        },
+        function(_dungeon_info, callback) {
+            dungeon_info = _dungeon_info;
+            var obj = new ObjectAttrMessage();
+            obj.object_id = ++moto_object_attr_info.new_id;
+            obj.can_walk = true;
+            obj.item_id = new_item.item_id;
+            obj.bNew = true;
+            obj.command = COMMAND_Nothing;
+            obj.command_sub = 0;
+            var objdic = ObjectAttrDicMessage();
+            objdic.index = obj.object_id;
+            objdic.object_attr = obj;
+            moto_object_attr_info.object_attr_dic.push(objdic);
+
+            dungeon_mes = makeSetDungeon();
+            dungeon_mes.user_id = user_id; 
+            dungeon_mes.dungeon_info = dungeon_info;
+            dungeon_mes.images = block_images_info;
+            dungeon_mes.object_info = moto_object_attr_info;
+            dungeon_mes.tile_info = tile_info;
+
+            setDungeon( client, dungeon_mes, callback );
+        },
+        function(callback) {
+            // オブジェクトの情報取得
+            getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, _moto_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+            moto_object_attr_info = _moto_object_attr_info;
+
+            var obj;
+            for(var it in object_attr_info) {
+                obj = object_attr_info[it];
+                if( obj.item_id == new_item.item_id )
+                    break
+            }
+            var obj_id = obj.object_id;
+
+            // ダンジョンの書きかえ
+            var body = dungeon_info.dungeon;
+            var wbody = new Uint8Array( body.array, body.offset );
+            var sizex = dungeon_info.size_x;
+            var index = ix*8 + iy * sizex * 8;
+            writeUint32Buf( wbody, index+0, +obj_id );
+            writeUint32Buf( wbody, index+4, +new_item.item_id );
+
+            setDungeon( client, dungeon_mes, callback );
+        }
+    ], function(err) {
         callback(err);
     });
 }
@@ -1447,5 +1668,9 @@ module.exports = {
     setDungeon: setDungeon,
     makeSetDungeon: makeSetDungeon,
     getIslandGroundInfo : getIslandGroundInfo,
-    getIslandGroundInfoByUser : getIslandGroundInfoByUser
+    getIslandGroundInfoByUser : getIslandGroundInfoByUser,
+    setAItem: setAItem,
+    setMonster: setMonster,
+    createNewItem: createNewItem,
+    placeNewItem:placeNewItem
 }
