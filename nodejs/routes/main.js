@@ -3,6 +3,9 @@ var async = require("async");
 var filegqs = require("./filegqs");
 var path = require('path');
 var dungeon = require('./dungeon');
+var Busboy = require('busboy');
+var os = require('os');
+var fs = require('fs');
 //var html_encoder = require("node-html-encoder").Encoder();
 
 // htmlエンコード(使わない。というか使えない. FAQみたらそんなの必要ないでしょって。)
@@ -382,7 +385,7 @@ exports.write_info = function(req, res) {
     var island_info, island_ground_info;
     var rest_item_cnt;
     var object_attr_info, moto_object_attr_info;
-    var block_images_info, tile_info, mapObjIdToItemId;
+    var block_images_info, tile_info, mapObjIdToImageId;
     async.waterfall([
         // 0. 情報取得フェーズ
         function(callback) {
@@ -403,7 +406,7 @@ exports.write_info = function(req, res) {
         },
         function(_tile_info, callback ){
             tile_info = _tile_info;
-            mapObjIdToItemId = dungeon.makeMapObjIdToItemIdFromTileInfo(tile_info);
+            mapObjIdToImageId = dungeon.makeMapObjIdToImageIdFromTileInfo(tile_info);
             callback();
         },
         function(callback) {
@@ -416,7 +419,7 @@ exports.write_info = function(req, res) {
         function(_object_attr_info, callback) {
             // 2. ダンジョンの空きスペースをチェックする
             rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
-            if (rest_item_cnt == 0 ) {
+            if (rest_item_cnt-1/*階段分*/ == 0 ) {
                 callback("アイテムを置くためのスペースがありません。ダンジョンを広げてください")
             }
             else {
@@ -443,7 +446,7 @@ exports.write_info_post = function(req, res) {
     var island_info, island_ground_info;
     var rest_item_cnt;
     var object_attr_info, moto_object_attr_info;
-    var block_images_info, tile_info, mapObjIdToItemId;
+    var block_images_info, tile_info, mapObjIdToImageId;
     async.waterfall([
         // 0. 情報取得フェーズ
         function(callback) {
@@ -464,7 +467,7 @@ exports.write_info_post = function(req, res) {
         },
         function(_tile_info, callback ){
             tile_info = _tile_info;
-            mapObjIdToItemId = dungeon.makeMapObjIdToItemIdFromTileInfo(tile_info);
+            mapObjIdToImageId = dungeon.makeMapObjIdToImageIdFromTileInfo(tile_info);
             callback();
         },
         function(callback) {
@@ -472,7 +475,7 @@ exports.write_info_post = function(req, res) {
             network.getDungeon( client, 0, 0, callback ); // 大陸
         },
         function(_island_info, callback) {
-            island_info = _island_info;
+            island_info = _island_info; // 大陸内の自分の領地のある範囲
             network.getIslandGroundInfoByUser( client, user_id, callback );
         },
         function(_island_ground_info, callback) {
@@ -487,11 +490,53 @@ exports.write_info_post = function(req, res) {
             network.setDungeon( client, island_mes, callback );
         },
         function(callback) {
+            // 2. 情報を登録する
+            network.createNewItem( client, callback );
+        },
+        function(callback) {
+            // 3. ダンジョン内に情報を配置する
+            network.getDungeon( client, user_id, 0, callback );
+        },
+        function(_dungeon_info, callback) {
+            dungeon_info = _dungeon_info;
+            dungeon.setPlaceNewInfo( dungeon_info, object_attr_info, mapObjIdToItemId);
         }
     ], function(err) {
         callback(err);
     });
 }
+
+// ファイルアップロード処理のテスト
+exports.test_upload = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    res.render('test_upload' );
+}
+
+// ファイルアップロード処理のテスト
+exports.test_upload_post = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype ) {
+        var saveTo = path.join(os.tmpDir(), path.basename(filename) );
+        console.log(saveTo);
+        file.pipe(fs.createWriteStream(saveTo));
+    });
+    req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
+        console.log("fileld " + key + ":"+ value );
+    });
+    req.busboy.on('finish', function() {
+        res.redirect('test_upload' );
+    });
+    req.pipe(req.busboy);
+}
+
 
 // ログアウト処理
 exports.logout = function(req, res) {

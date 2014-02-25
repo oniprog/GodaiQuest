@@ -1,0 +1,11 @@
+extends ./layout.jade
+
+-var title = "Godai Quest Upload Test";
+
+block content
+  h2 アップロードするファイルを指定してください
+  div#box
+    form(method="post", action="test_upload", enctype="multipart/form-data")
+      input(type="text", name="textfield")
+      input(type="file", name="filefield")
+      input(type="submit")

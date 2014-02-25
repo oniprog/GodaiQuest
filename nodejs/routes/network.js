@@ -72,6 +72,9 @@ var DungeonBlockImageInfoMessage = builder.build("godaiquest.DungeonBlockImageIn
 var ObjectAttrInfoMessage = builder.build("godaiquest.ObjectAttrInfo");
 var TileInfoMessage = builder.build("godaiquest.TileInfo");
 var IslandGroundInfoMessage = builder.build("godaiquest.IslandGroundInfo");
+var ImagePairMessage = builder.build("godaiquest.ImagePair");
+var AItemMessage = builder.build("godaiquest.AItem");
+
 
 // ロック処理のコールバックリスト 
 var listLockCallback = [];
@@ -1307,6 +1310,118 @@ function getIslandGroundInfoByUser(client, user_id, callback) {
         }
     ], function(err, ground_info) {
         callback(err, ground_info);
+    });
+}
+
+// 適当なアイテムを得る 
+/*
+message ImagePair {
+	optional int32 number = 1;
+	optional bytes image = 2;
+	optional string name = 3;
+	optional int32 owner = 4;
+	optional sfixed64 created = 5;
+	optional bool can_item_image = 6;
+	optional bool new_image = 7;
+}
+
+message ImagePairDic {
+
+	optional uint32 index = 1;
+	optional ImagePair imagepair = 2;
+}
+message DungeonBlockImageInfo {
+
+	optional uint32 max_image_num = 1;
+	repeated ImagePairDic image_dic = 2;
+}
+*/
+function getSomeItemImagePair( client, index, callback ) {
+
+    var dungeon_block_image_info;
+    async.waterfall([
+        function(callback) {
+            network.getDungeonImageBlock(client, callback );
+        },
+        function(_dungeon_block_image_info, callback) {
+            dungeon_block_image_info = _dungeon_block_image_info;
+
+            for(var it in dungeon_block_image_info.image_dic ) {
+                var imagepair = dungeon_block_image_info.image_dic[it].imagepair;
+                if  ( imagepair.can_item_image ) {
+                    if ( index == 0 ) {
+                        callback( null, imagepair );
+                        return;
+                    }
+                    --index;
+                }
+            }
+        }
+    ], function(err, imagepair) {
+        callback(err, imagepair);
+    });
+}
+
+// 新アイテムを保存する
+/*
+message ImagePair {
+	optional int32 number = 1;
+	optional bytes image = 2;
+	optional string name = 3;
+	optional int32 owner = 4;
+	optional sfixed64 created = 5;
+	optional bool can_item_image = 6;
+	optional bool new_image = 7;
+}
+message AItem {
+
+	optional int32 item_id  = 1;
+	optional int32 item_image_id = 2;
+	optional string header_string = 3;
+	optional bytes header_image = 4;
+	optional bool bNew = 5;
+}
+*/
+function createNewItem( client, header_string, callback ){
+
+    var dungeon_block_image_info;
+    var new_imagepair;
+    var new_aitem;
+    async.waterfall([
+        function(callback) {
+            getSomeItemImagePair(client, 0/*index*/, callback );
+        },
+        function(imagepair, callback) {
+
+            new_imagepair = new ImagePairMessage();
+            new_imagepair.number = imagepair.number;
+            new_imagepair.image = imagepair.image;
+            new_imagepair.name = imagepair.name;
+            new_imagepair.owner = imagepair.owner;
+            new_imagepair.created = 0;
+            new_imagepair.can_item_image = true;
+            new_imagepair.new_image = false;
+
+            new_aitem = new AItemMessage();
+            new_aitem.item_id = 0;
+            new_aitem.item_image_id = imagepair.number;
+            new_aitem.hader_string = header_string;
+            new_aitem.new = true;
+
+            dungeon_block_image_info = _dungeon_block_image_info;
+
+            for(var it in dungeon_block_image_info.image_dic ) {
+            }
+            
+            network.getObjectAttrInfo( client, callback );
+        },
+        function(objattr_info, moto_object_attr_info, callback) {
+            var new_id = moto_object_attr_info.new_id;
+            
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
     });
 }
 

@@ -18,6 +18,9 @@
     "zlib" : "*",
     "st": "*",
     "node-int64":"*",
-    "long":"*"
+    "long":"*",
+    "connect":"*",
+    "body-parser":"*",
+    "raw-body":"*"
   }
 }

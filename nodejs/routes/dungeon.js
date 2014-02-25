@@ -38,7 +38,7 @@ message TileInfo {
 	repeated TileDic tile_dic = 1;
 }
 */
-function makeMapObjIdToItemIdFromTileInfo( tileinfo ) {
+function makeMapObjIdToImageIdFromTileInfo( tileinfo ) {
 
     var ret = [];
     for(var it in tileinfo.tile_dic){
@@ -92,7 +92,7 @@ function writeUint32( buf, index, value ) {
 }
 
 // 大陸に入り口を置く
-function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapObjIdToItemId) {
+function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapObjIdToImageId) {
     var ix1 = +island_ground_info.ix1;
     var iy1 = +island_ground_info.iy1;
     var ix2 = +island_ground_info.ix2;
@@ -122,7 +122,7 @@ function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapO
     }
     if ( !objattr ) return;
     // objattr.item_idは頼りにならない
-    var item_id = mapObjIdToItemId[objattr.object_id];
+    var image_id = mapObjIdToImageId[objattr.object_id];
         
     // 強制書き込み実行
     var iforcex = Math.floor( Math.random() * (ix2-ix1)) + ix1;
@@ -133,11 +133,38 @@ function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapO
 
     var address = iforcex * 8 + iforcey * sizex * 8/2;
     writeUint32(buf, address+0, +objattr.object_id );
-    writeUint32(buf, address+4, +item_id );
+    writeUint32(buf, address+4, +image_id );
+}
+
+// ダンジョン内に情報を置く
+function setPlaceNewInfo( dungeon_info, objattr_info, mapObjIdToItemId ) {
+    var body = dungeon_info.dungeon;
+    var rbody = new Int32Array( body.toArrayBuffer() );
+    var wbody = new Uint8Array( body.array, body.offset );
+
+    // 空きスペースを見つける
+    var sizex = dungeon.size_x;
+    var sizey = dungeon.size_y;
+    var it, size = sizex * sizeY * 2;
+    for( it=0; it<size; it+=2 ) {
+        var objId = rbody[it+0];
+        var obj = objattr_info[objId];
+        if ( obj.command == COMMAND_GoOutDungeon )
+            continue;
+        if ( !isItem(obj.item_id) )
+            break; // アイテム以外の場所
+    }
+    if ( it == size )
+        return false;
+
+    
+
+    return true;
 }
 
 module.exports = {
     getDungeonSpaceCnt: getDungeonSpaceCnt,
     setDungeonEntracne: setDungeonEntracne,
-    makeMapObjIdToItemIdFromTileInfo: makeMapObjIdToItemIdFromTileInfo
+    makeMapObjIdToImageIdFromTileInfo: makeMapObjIdToImageIdFromTileInfo,
+    setPlaceNewInfo: setPlaceNewInfo
 };
