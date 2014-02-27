@@ -1766,9 +1766,12 @@ function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
 }
 
 module.exports = {
+    lockConn:lockConn,
+    unlockConn:unlockConn,
     writeDword: writeDword,
     writeDwordRev: writeDwordRev,
     ensureReadByte:ensureReadByte,
+    readDword:readDword,
     getClient : getClient,
     connectGodaiQuestServer:connectGodaiQuestServer,
     closeGodaiQuestServer: closeGodaiQuestServer,

@@ -22,6 +22,8 @@
     "connect":"*",
     "body-parser":"*",
     "raw-body":"*",
-    "docco":"*"
+    "docco":"*",
+    "mocha": "*",
+    "chai":"*"
   }
 }
