@@ -28,3 +28,12 @@ html
           }
         }
       }
+      function applyEffect(text) {
+        var ret = text.replace(/\r/g, "").replace(/\n/g, "<BR>\r\n");
+        var htmlreg = /\b(http[s]?:\/\/.+?)(?=[\s\b\t\r\n<>])/g;
+        ret = ret.replace(htmlreg, '!!!!$1!!!!' );
+        ret = ret.replace(/[!]{4}(.+?[.](jpg|png))[!]{4}/g, '<a href="$1" target="_blank"><img style="width:64px;height:64px" src="$1"></a>');
+        ret = ret.replace(/[!]{4}(.+?)[!]{4}/g, '<a href="$1" target="_blank">$1</a>');
+        return ret;
+      }
+      $( function() { var t1 = $(".text").each(function(){ $(this).html(applyEffect($(this).html()));}); })

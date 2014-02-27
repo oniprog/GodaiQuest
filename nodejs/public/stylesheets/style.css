@@ -43,6 +43,21 @@ h2 {
     display:inline;
 }
 
+.monospace {
+    font-family: monospace;
+}
+
+.boxbox {
+    width: 400px;
+    height:200px;
+    margin: 0 0;
+    overflow-y: auto;
+    border: 1px solid #0f0;
+    padding: 2px;
+    text-align: justify;
+    background: transparent;
+}
+
 #loginbutton {
     width:400px;
 }

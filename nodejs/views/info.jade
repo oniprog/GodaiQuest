@@ -9,10 +9,11 @@ block content
 
     if article_content !== undefined
       div(style="display:box; display:-webkit-box; display:-moz-box; box-orient:horizontal")
-        textarea(cols="60", rows="10", readonly, wrap="soft") #{article_content}
+        //textarea(cols="60", rows="10", readonly, wrap="soft") #{article_content} 
+        div.boxbox.text.monospace #{article_content}
         div(style="text-shadow:1px 1px 1px #0000ff") #### 投稿内容を書いてください ####
           form(action="info?view_id="+view_id+"&info_id="+info_id, method="post")
-            textarea(name="inputtext", cols="60", rows="7", wrap="soft")
+            textarea(name="inputtext", cols="60", rows="12", wrap="soft")
             br
             input(type="reset")
             input(type="submit", style="width:300px", value="投稿")
