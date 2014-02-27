@@ -6,6 +6,7 @@ var dungeon = require('./dungeon');
 var Busboy = require('busboy');
 var os = require('os');
 var fs = require('fs');
+//var devnull = require('dev-null');
 //var html_encoder = require("node-html-encoder").Encoder();
 
 // htmlエンコード(使わない。というか使えない. FAQみたらそんなの必要ないでしょって。)
@@ -294,7 +295,6 @@ exports.info = function(req, res) {
             }
             download_folder = path.join( global.DOWNLOAD_FOLDER, ""+itemid );
             // アイテム情報を得る
-            console.log(info_id);
             network.getAItem(client, info_id, callback);
         },
         function(_listFiles, callback) {
@@ -570,36 +570,72 @@ exports.write_info_post = function(req, res) {
 }
 
 // ファイルアップロード処理のテスト
-exports.test_upload = function(req, res) {
+exports.upload_file = function(req, res) {
 
     var client = checkLogin(req,res);
     if ( !client )
         return;
 
-    res.render('test_upload' );
+    //res.render('index' );
+    res.redirect('info');
 }
 
 // ファイルアップロード処理のテスト
-exports.test_upload_post = function(req, res) {
+exports.upload_file_post = function(req, res) {
 
     var client = checkLogin(req,res);
     if ( !client )
         return;
 
+    var info_id = req.query.info_id;
+    var view_id = req.query.view_id;
+    if ( !info_id || !view_id ) {
+
+        res.redirect("index");
+        return;
+    }
+    var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
+    
     req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype ) {
-        var saveTo = path.join(os.tmpDir(), path.basename(filename) );
+        var saveTo = path.join(dir_base, path.basename(filename) );
+        if ( filename === undefined ) {
+            saveTo = path.join( os.tmpDir(), "nothing" );
+        }
         console.log(saveTo);
         file.pipe(fs.createWriteStream(saveTo));
     });
     req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
-        console.log("fileld " + key + ":"+ value );
+//        console.log("fileld " + key + ":"+ value );
     });
     req.busboy.on('finish', function() {
-        res.redirect('test_upload' );
+        res.redirect('info?info_id='+info_id+'&view_id='+view_id );
     });
     req.pipe(req.busboy);
 }
 
+// ファイルを削除する
+exports.delete_file_post = function(req, res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var info_id = req.query.info_id;
+    var view_id = req.query.view_id;
+    var filename = req.query.filename;
+    if ( !info_id || !view_id ) {
+
+        res.redirect("index");
+        return;
+    }
+
+    var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
+    var delete_path = path.join( dir_base, path.normalize(""+filename) );
+    fs.unlink( delete_path, function() {
+        console.log( "delete file "+ delete_path);
+        res.redirect('info?info_id='+info_id+'&view_id='+view_id );
+    });
+}
 
 // ログアウト処理
 exports.logout = function(req, res) {
@@ -607,6 +643,9 @@ exports.logout = function(req, res) {
     var client = checkLogin(req,res);
     if ( !client )
         return;
+
+    var user_id = req.session.user_id;
+    var item_id = req.body.item_id;
 
     // ログアウト処理
     network.closeGodaiQuestServer(client);

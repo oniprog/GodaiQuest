@@ -65,8 +65,10 @@ app.get('/info_del_article', main.info);
 app.get('/logout', main.logout );
 app.get('/write_info', main.write_info);
 app.post('/write_info', main.write_info_post);
-app.get('/test_upload', main.test_upload);
-app.post('/test_upload', main.test_upload_post);
+app.get('/upload_file', main.info);
+app.post('/upload_file', main.upload_file_post);
+app.get('/delete_file', main.info);
+app.post('/delete_file', main.delete_file_post);
 
 var mount = st({ path: __dirname + '/public', url: '/public' });
 

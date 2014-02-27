@@ -4,7 +4,10 @@ extends ./layout.jade
 
 block content
 
-    if article_content && article_content.length > 0
+    h2 情報 &nbsp; &nbsp;
+      a.small(href="info_list?view_id="+view_id) 戻る
+
+    if article_content !== undefined
       div(style="display:box; display:-webkit-box; display:-moz-box; box-orient:horizontal")
         textarea(cols="60", rows="10", readonly, wrap="soft") #{article_content}
         div(style="text-shadow:1px 1px 1px #0000ff") #### 投稿内容を書いてください ####
@@ -19,20 +22,44 @@ block content
             input(type="submit", value="最後の投稿を削除", style="height:100px")
  
     if listFiles && listFiles.length > 0 
-      div#box
+      div.box
         each afile in listFiles
           - if ( afile.path.substr(-4).toLowerCase() == ".jpg" || afile.path.substr(-4).toLowerCase() == ".png" ) {
             span
               img(src="public/download/"+info_id+"/"+afile.path, style="width:64px;height:64px")
           - }
-          span
-            A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
+              form.dinline(action="delete_file?filename="+afile.path+"&view_id="+view_id+"&info_id="+info_id, method="post")
+                input(type="submit", value="×")
+                A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
           span &nbsp; &nbsp;
     div &nbsp;
           
+    div.box
+      form(action="upload_file?view_id="+view_id+"&info_id="+info_id, method="post", enctype="multipart/form-data")
+        div(id="filepoint")
+          input(type="hidden", name="info_id", value=view_id)
+          input(type="hidden", name="view_id", value=info_id)
+        div
+          input(type="submit", value="アップロードする")
+          button(type="button", id="add_file") 追加
+
+      script().
+        $( function() {
+          g_cnt = 0;
+          function deleteUploadFile() {var name=$(this).data("id"); $("#"+name).remove(); $("#b"+name).remove();}
+          function addUploadFile(){
+            ++g_cnt;
+            var name = "b" + (""+g_cnt);
+            var new_elem1 = $("<input>").attr("type", "file").attr("id", "b"+(""+g_cnt)).attr("name", name);
+            var new_elem2 = $("<button>×</button>").attr("type","button").attr("id", "bb"+g_cnt ).data("id", "b"+(""+g_cnt)).click(deleteUploadFile);
+            $("#filepoint").append( new_elem2 ).append( new_elem1 );
+          }; 
+          $("#add_file").click(function(){ addUploadFile(); });
+          addUploadFile();// 初回無条件に追加
+        });
     if iteminfo
       - var aitem = iteminfo[info_id];
-      div#box
+      div.box
         - var lines = aitem.header_string.split("\n");
         each line in lines
           div #{line} &nbsp;

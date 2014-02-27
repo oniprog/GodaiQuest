@@ -3,10 +3,11 @@ extends ./layout.jade
 -var title = "Godai Quest Info List";
 
 block content
-    h2 #{name}さんの未読情報
+    h2 #{name}さんの未読情報 &nbsp; &nbsp;
+      a(href="user_list") 戻る
 
     if before || next
-      div#box2
+      div.box2
         if before 
           A(href="info_list?view_id="+view_id+"&index="+(+index-pagesize)) <<戻る
         if next 
@@ -14,7 +15,7 @@ block content
 
     if iteminfo
       each aitem in iteminfo
-        div#box
+        div.box
           - var lines = aitem.header_string.split("\n");
           - var cnt = 0; for( var it in lines ) { if (lines[it].length>0 ) ++cnt; if ( cnt > 5 ) break; 
             div #{lines[it]}

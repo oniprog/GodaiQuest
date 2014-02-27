@@ -825,6 +825,8 @@ function getArticleString( client, item_id, callback ) {
         }
     ], function(err, article_content) {
         unlockConn();
+        if ( article_content === undefined )
+            article_content = "";
         callback(err, article_content);
     });
 }

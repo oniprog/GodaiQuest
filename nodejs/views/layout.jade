@@ -3,10 +3,11 @@ html
   head
     title= title
     link(rel='stylesheet', href='/public/stylesheets/style.css')
+    script(type="text/javascript", src="http://code.jquery.com/jquery-2.1.0.min.js")
   body
     h1 GodaiQuest
-      span#small 　　　新感覚 情報共有 SNS &nbsp; &nbsp; 
-      a.logout(href="logout") logout
+      span.small 　　　新感覚 情報共有 SNS &nbsp; &nbsp; 
+      a#logout(href="logout") logout
 
     if error_message
        div

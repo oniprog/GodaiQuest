@@ -18,39 +18,47 @@ h2 {
     border-style: none none solid;
 }
 
-#small {
+.small {
     font-size:12pt;
 }
 
-#box {
+.box {
     font-size:14pt;
     padding:10px 10px;
     border-style: inset;
     background: #e0e0e0;
 }
-#box2 {
+.box2 {
     font-size:8pt;
     padding:2px 2px;
     border-style: inset;
     background: #e0e0e0;
 }
 
-.loginbutton {
+.hbox {
+    display:box;
+    box-orient:horizontal;
+}
+.dinline {
+    display:inline;
+}
+
+#loginbutton {
     width:400px;
 }
 
-.error_message {
+#error_message {
     border-style: solid;
     color : #ff0000;
     width:520px;
     padding:10px;
 }
 
-.loginbox {
+#loginbox {
     border-style: solid;
     width:530px;
 }
 
-.logout {
+#logout {
     font-size:10pt;
 }
