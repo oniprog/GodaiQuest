@@ -55,6 +55,26 @@ function makeMapObjIdToImageIdFromTileInfo( tileinfo ) {
     return ret;
 }
 
+/*
+message ObjectAttr {
+	optional int32 object_id = 1;
+	optional bool can_walk = 2;
+	optional int32 item_id = 3;
+	optional bool bNew = 4;
+	optional int32 command = 5;
+	optional int32 command_sub = 6;
+}
+*/
+function makeMapItemIdToObjIdFromObjectAttrInfo( object_attr_info ) {
+
+    var ret = [];
+    for(var it in object_attr_info ) {
+        var objattr = object_attr_info[it];
+        ret[+objattr.item_id] = +objattr.object_id;
+    }
+    return ret;
+}
+
 // ダンジョンの空きスペースの数を数える
 /*
 message DungeonInfo {
@@ -122,7 +142,7 @@ function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapO
     }
     if ( !objattr ) return;
     // objattr.item_idは頼りにならない
-    var image_id = mapObjIdToImageId[objattr.object_id];
+    var image_id = mapObjIdToImageId[+objattr.object_id];
         
     // 強制書き込み実行
     var iforcex = Math.floor( Math.random() * (ix2-ix1)) + ix1;
@@ -137,27 +157,29 @@ function setDungeonEntracne( island_info, island_ground_info, objattr_info, mapO
 }
 
 // ダンジョン内に情報を置く
-function setPlaceNewInfo( dungeon_info, objattr_info, mapObjIdToItemId ) {
+function setItemToEmptyArea( dungeon_info, objattr_info, mapItemIdToObjectId, new_item) {
     var body = dungeon_info.dungeon;
     var rbody = new Int32Array( body.toArrayBuffer() );
     var wbody = new Uint8Array( body.array, body.offset );
 
     // 空きスペースを見つける
-    var sizex = dungeon.size_x;
-    var sizey = dungeon.size_y;
-    var it, size = sizex * sizeY * 2;
+    var sizex = dungeon_info.size_x;
+    var sizey = dungeon_info.size_y;
+    var it, size = sizex * sizey * 2;
     for( it=0; it<size; it+=2 ) {
         var objId = rbody[it+0];
         var obj = objattr_info[objId];
-        if ( obj.command == COMMAND_GoOutDungeon )
-            continue;
+//        if ( obj.command == COMMAND_GoOutDungeon )
+ //           continue; // 外に出る出口以外の場所
         if ( !isItem(obj.item_id) )
             break; // アイテム以外の場所
     }
     if ( it == size )
         return false;
 
-    
+    writeUint32( wbody, it*4+4, +new_item.item_image_id);
+    var newObjId = mapItemIdToObjectId[ +new_item.item_id];
+    writeUint32( wbody, it*4+0, +newObjId);
 
     return true;
 }
@@ -166,5 +188,6 @@ module.exports = {
     getDungeonSpaceCnt: getDungeonSpaceCnt,
     setDungeonEntracne: setDungeonEntracne,
     makeMapObjIdToImageIdFromTileInfo: makeMapObjIdToImageIdFromTileInfo,
-    setPlaceNewInfo: setPlaceNewInfo
+    makeMapItemIdToObjIdFromObjectAttrInfo:makeMapItemIdToObjIdFromObjectAttrInfo,
+    setItemToEmptyArea: setItemToEmptyArea 
 };

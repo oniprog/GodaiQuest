@@ -415,8 +415,9 @@ exports.write_info = function(req, res) {
         },
         function(_dungeon_info, callback) {
             dungeon_info = _dungeon_info;
+            callback();
         },
-        function(_object_attr_info, callback) {
+        function(callback) {
             // 2. ダンジョンの空きスペースをチェックする
             rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
             if (rest_item_cnt-1/*階段分*/ == 0 ) {
@@ -441,12 +442,17 @@ exports.write_info_post = function(req, res) {
     var user_id = req.session.user_id;
     var dungeon_id = user_id;
     var level = 0;
+
+    var text = req.body.inputtext;
     
     var dungeon_info;
     var island_info, island_ground_info;
     var rest_item_cnt;
     var object_attr_info, moto_object_attr_info;
     var block_images_info, tile_info, mapObjIdToImageId;
+    var mapObjIdToItemId;
+    var mapItemIdToObjectId;
+    var new_item;
     async.waterfall([
         // 0. 情報取得フェーズ
         function(callback) {
@@ -471,7 +477,22 @@ exports.write_info_post = function(req, res) {
             callback();
         },
         function(callback) {
-            // 1. 大陸に入り口を設置
+            network.getDungeon( client, user_id, 0, callback );
+        },
+        function(_dungeon_info, callback) {
+            dungeon_info = _dungeon_info;
+
+            // 1. ダンジョンの空きスペースをチェックする
+            rest_item_cnt = dungeon.getDungeonSpaceCnt( dungeon_info, object_attr_info );
+            if (rest_item_cnt-1/*階段分*/ == 0 ) {
+                callback("アイテムを置くためのスペースがありません。ダンジョンを広げてください")
+            }
+            else {
+                callback();
+            }
+        },
+        function(callback) {
+            // 2. 大陸に入り口を設置
             network.getDungeon( client, 0, 0, callback ); // 大陸
         },
         function(_island_info, callback) {
@@ -480,7 +501,7 @@ exports.write_info_post = function(req, res) {
         },
         function(_island_ground_info, callback) {
             island_ground_info = _island_ground_info;
-            dungeon.setDungeonEntracne( island_info, island_ground_info, object_attr_info, mapObjIdToItemId);
+            dungeon.setDungeonEntracne( island_info, island_ground_info, object_attr_info, mapObjIdToImageId);
             var island_mes = network.makeSetDungeon();
             island_mes.user_id = 0; // 大陸 
             island_mes.dungeon_info = island_info;
@@ -490,19 +511,61 @@ exports.write_info_post = function(req, res) {
             network.setDungeon( client, island_mes, callback );
         },
         function(callback) {
-            // 2. 情報を登録する
-            network.createNewItem( client, callback );
+            // 3. 情報を登録する
+            network.createNewItem( client, text, false/*no monster*/, moto_object_attr_info, callback );
+        },
+        function(_new_item, callback) {
+            new_item = _new_item;
+            // ダンジョンを登録し直さないと更新されないので
+            var dungeon_mes = network.makeSetDungeon();
+            dungeon_mes.user_id = user_id;
+            dungeon_mes.dungeon_info = dungeon_info;
+            dungeon_mes.images = block_images_info;
+            dungeon_mes.object_info = moto_object_attr_info;
+            dungeon_mes.tile_info = tile_info;
+            network.setDungeon( client, dungeon_mes, callback );
         },
         function(callback) {
-            // 3. ダンジョン内に情報を配置する
+            network.getObjectAttrInfo( client, callback );
+        },
+        function(_object_attr_info, _moto_object_attr_info, callback) {
+            object_attr_info = _object_attr_info;
+            moto_object_attr_info = _moto_object_attr_info;
+            mapItemIdToObjectId = dungeon.makeMapItemIdToObjIdFromObjectAttrInfo( object_attr_info );
+
+            // イメージ情報
+            network.getDungeonImageBlock(client, callback );
+        },
+        function(_block_images_info, callback) {
+            block_images_info = _block_images_info;
+
+            // タイル情報取得
+            network.getTileList( client, callback );
+        },
+        function(_tile_info, callback ){
+            tile_info = _tile_info;
+            mapObjIdToImageId = dungeon.makeMapObjIdToImageIdFromTileInfo(tile_info);
+
+            // 4. ダンジョン内に情報を配置する
             network.getDungeon( client, user_id, 0, callback );
         },
         function(_dungeon_info, callback) {
             dungeon_info = _dungeon_info;
-            dungeon.setPlaceNewInfo( dungeon_info, object_attr_info, mapObjIdToItemId);
-        }
+            if ( !dungeon.setItemToEmptyArea( dungeon_info, object_attr_info, mapItemIdToObjectId, new_item) ) {
+                callback("ダンジョン内に情報を置けませんでした");
+                return;
+            }
+            var dungeon_mes = network.makeSetDungeon();
+            dungeon_mes.user_id = user_id;
+            dungeon_mes.dungeon_info = dungeon_info;
+            dungeon_mes.images = block_images_info;
+            dungeon_mes.object_info = moto_object_attr_info;
+            dungeon_mes.tile_info = tile_info;
+            network.setDungeon( client, dungeon_mes, callback );
+        } 
     ], function(err) {
-        callback(err);
+        if ( !err ) err = "記事を書き込みました";
+        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
     });
 }
 

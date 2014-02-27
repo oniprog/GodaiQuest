@@ -14,6 +14,13 @@ var dungeon = require('./dungeon');
 //
 var CLIENT_VERSION = 2014021819;
 
+// dungeonよりコピーした
+var COMMAND_Nothing = 0;
+var COMMAND_GoUp = 1;
+var COMMAND_GoDown = 2;
+var COMMAND_IntoDungeon = 3;
+var COMMAND_GoOutDungeon = 4;
+
 // コマンド
 var COM_AddUser = 1;
 var COM_TryLogon = 2;
@@ -1387,7 +1394,7 @@ function getSomeItemImagePair( client, index, callback ) {
     var dungeon_block_image_info;
     async.waterfall([
         function(callback) {
-            network.getDungeonImageBlock(client, callback );
+            getDungeonImageBlock(client, callback );
         },
         function(_dungeon_block_image_info, callback) {
             dungeon_block_image_info = _dungeon_block_image_info;
@@ -1402,6 +1409,7 @@ function getSomeItemImagePair( client, index, callback ) {
                     --index;
                 }
             }
+            callback("アイテムが見つかりません");
         }
     ], function(err, imagepair) {
         callback(err, imagepair);
@@ -1452,7 +1460,7 @@ function setAItem( client, aitem_mes, imagepair_mes, basedir, filelist, callback
 // モンスタ化する
 function setMonster( client, item_id, bMonster, callback ) {
 
-    aysnc.waterfall([
+    async.waterfall([
         function(callback) {
             lockConn(callback);
         },
@@ -1498,9 +1506,10 @@ message AItem {
 	optional bool bNew = 5;
 }
 */
-function createNewItem( client, header_string, bMonster, callback ){
+function createNewItem( client, header_string, bMonster, moto_object_attr_info, callback ){
 
     var aitem;
+    var object_attr_dic;
     async.waterfall([
         function(callback) {
             getSomeItemImagePair(client, 0/*index*/, callback );
@@ -1521,16 +1530,32 @@ function createNewItem( client, header_string, bMonster, callback ){
             var new_aitem = new AItemMessage();
             new_aitem.item_id = 0;
             new_aitem.item_image_id = imagepair.number;
-            new_aitem.hader_string = header_string;
-            new_aitem.new = true;
+            new_aitem.header_string = header_string;
+            new_aitem.header_image = null;
+            new_aitem.bNew = true;
 
 //            this.mGQCom.setAItem(ref item, imagepair, this.mFileSet);
             setAItem( client, new_aitem, new_imagepair, "", [], callback );
         },
         function(_aitem, callback) {
             aitem = _aitem;
+
+            object_attr_dic = new ObjectAttrDicMessage();
+            var new_id = ++moto_object_attr_info.new_id;
+            object_attr_dic.index = new_id;
+            object_attr = new ObjectAttrMessage();
+            object_attr_dic.object_attr = object_attr;
+            object_attr.object_id = new_id;
+            object_attr.can_walk = true;
+            object_attr.item_id = aitem.item_id;
+            object_attr.bNew = true;
+            object_attr.command = COMMAND_Nothing;
+            object_attr.command_sub = 0;
+            moto_object_attr_info.object_attr_dic.push( object_attr_dic );
+            
             // 場合によってはモンスタ化する
 //            this.mGQCom.setMonster(item.getItemID(), this.chkProblem.Checked);
+            //
             setMonster( client, aitem.item_id, bMonster, callback );
         }
     ], function(err) {
@@ -1560,6 +1585,7 @@ message ObjectAttr {
 	optional int32 command = 5;
 	optional int32 command_sub = 6;
 }
+未使用
 */
 function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
 

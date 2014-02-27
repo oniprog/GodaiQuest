@@ -481,7 +481,7 @@ namespace GodaiLibrary
         // バイト配列をImageオブジェクトに変換
         public static Image ByteArrayToImage(byte[] b)
         {
-            if (b.Length == 0)
+            if (b == null || b.Length <= 1)
                 return null;
 
             ImageConverter imgconv = new ImageConverter();

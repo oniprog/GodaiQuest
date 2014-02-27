@@ -1,0 +1,50 @@
+内部仕様についてのメモ
+
+■アイテムイメージの取得
+ 1. getDungeonImageBlockを使って得る
+ 2. その中から canItemImageであるものだけを使う
+ 3. これらがimagepairである。getNumber()にて、mImageIDを得ることができる。
+
+■新規アイテムの作成手順
+ 1. mImageID = 0　新しいイメージのとき mNewItemImage = true
+ 　 それ以外のときは、mImageIDを"アイテムイメージの取得"を使って得る
+         mNewItemImage = false
+         
+ 2. ImagePairを新規作成する
+    ImagePair imagepair = new ImagePair(this.mImageID, true, this.picItem.Image, "", nUserID, DateTime.Now, mNewItemImage);
+
+ 3. アイテムを登録する
+    AItem item = new AItem(0, this.mImageID, this.txtHeader.Text, this.picHeader.Image, true);
+    this.mGQCom.setAItem(ref item, imagepair, this.mFileSet);
+
+    mFileSetはファイル一覧
+    itemは新規作成したアイテム
+    
+ 4. 場合によってはモンスタ化する
+    this.mGQCom.setMonster(item.getItemID(), this.chkProblem.Checked);
+
+■新規情報の作成の手順について
+ 1. ダンジョン情報を取得する(getDungeon)
+ 2. ObjectAttr()にオブジェクトの情報をセットする
+    ObjectAttr obj = new ObjectAttr(this.mObjectAttrInfo.newObjectID(), true, item.getItemID(), EObjectCommand.Nothing, 0, true);
+
+ 3. ObjectAttrInfoに追加する
+ 4. 保存したObjectAttrInfoを取得しなおす。
+ 　このとき、新しいobjectIdが（かぶらないように）ふられている。
+ 　(getItemID()を使用して取得する)
+
+ 5. ダンジョンにアイテムを配置する。
+
+■ダンジョンの情報について
+ 64ビットが1つの情報となる。
+ 上位がimageID
+ 下位がobjectID
+ となる。
+
+■アイテムかの判定
+ 　objectIdを得て、ObjectAttrInfoから取得して、そのitemIdが0以上ならアイテムとなる
+    var nObjectID = this.mDungeon.getDungeonContentAt(ix, iy);
+    var obj = this.mObjectAttrInfo.getObject((int)nObjectID);
+    if (obj.getItemID() >0 )
+        アイテムだ;
+

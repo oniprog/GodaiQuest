@@ -590,7 +590,7 @@ namespace GodaiQuestServer
                 return EServerResult.SUCCESS; // いいのかな？
             }
 
-            userdb.ImageCharacter = user.getCharacterImage() is Bitmap
+            userdb.ImageCharacter = user.getCharacterImage() == null ? null : user.getCharacterImage() is Bitmap
                 ? user.getCharacterImage() as Bitmap
                 : new Bitmap(user.getCharacterImage());
             userdb.Name = user.getName();
@@ -1434,7 +1434,7 @@ namespace GodaiQuestServer
         public void setInit(ImagePair pair)
         {
             this.ImageID = pair.getNumber();
-            this.Image = pair.getImage() is Bitmap ? pair.getImage() as Bitmap : new Bitmap(pair.getImage());
+            this.Image = pair.getImage () == null ? null : pair.getImage() is Bitmap ? pair.getImage() as Bitmap : new Bitmap(pair.getImage());
             this.CreatedTime = pair.getCreateTime();
             this.OwnerID = pair.getOwner();
             this.Name = pair.getName();
@@ -1509,7 +1509,8 @@ namespace GodaiQuestServer
 
         public void setInit(AItem aitem, int nItemImageID) {
             this.HeaderString = aitem.getHeaderString();
-            this.HeaderImage = aitem.getHeaderImage() is Bitmap
+            this.HeaderImage = aitem.getHeaderImage() == null ? null :
+				aitem.getHeaderImage() is Bitmap
                 ? aitem.getHeaderImage() as Bitmap
                 : new Bitmap(aitem.getHeaderImage());
             this.ItemImageID = nItemImageID;
