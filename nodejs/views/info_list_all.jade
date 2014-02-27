@@ -3,7 +3,8 @@ extends ./layout.jade
 -var title = "Godai Quest Info List";
 
 block content
-    h2 #{name}さんの未読情報
+    h2 #{name}さんの未読情報 &nbsp; &nbsp;
+      a(href="user_list") 戻る
 
     if before || next
       div.box2

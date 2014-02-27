@@ -1,3 +1,4 @@
+// メイン（現時点では全部を詰め込んである)
 var network = require("./network");
 var async = require("async"); 
 var filegqs = require("./filegqs");
@@ -54,9 +55,18 @@ exports.login = function(req, res){
 
     network.connectGodaiQuestServer(email, password, function(err, user_id, client) {
         if ( err ) {
+            // すでに同じe-mailの接続があるときは切る
+            for(var it in global.connect_gqs) {
+                var client = global.connect_gqs[it];
+                if ( client.email == email ) {
+                    network.closeGodaiQuestServer(client);
+                    break;
+                }
+            }
             res.render('index', { error_message: err, mailaddress:email });
         }
         else {
+            // リダイレクトしてログイン処理終了
             req.session.user_id = user_id;
             req.session.client_number = client.number;
             res.redirect('user_list');
@@ -65,7 +75,7 @@ exports.login = function(req, res){
 //    res.redirect('list');
 };
 
-//
+// ログインしているかをチェックする
 function checkLogin( req, res ) {
 
     // 接続チェック
@@ -73,6 +83,7 @@ function checkLogin( req, res ) {
         res.render('index', {error_messsage: "ログインしてください"});
         return null;
     }
+    // クライアントを得ることができるかをチェックする
     var client = network.getClient( req.session.client_number );
     if ( !client ) {
         res.render('index', {error_messsage: "ログインしてください"});
@@ -95,12 +106,12 @@ exports.user_list = function(req, res){
 
     async.waterfall([
         function(callback) {
-//            network.getAllUserInfo(client, callback);
-
+            // ユーザ情報を得る
             getUserInfo( client, req, callback);
         },
         function(_userinfo, callback) {
             userinfo = _userinfo;
+            // ダンジョンごとに未読情報を得る
             async.forEach( userinfo.uesr_dic, function(dic, callback) {
                 var dungeon_id = dic.auser.user_id;
                 network.getUnpickedupItemInfo( client, user_id, dungeon_id, function(err, listItemId) {
@@ -136,8 +147,10 @@ function getAUser( req, user_id, callback) {
     callback( "not found a user" );
 }
 
-// 未読の情報一覧表示
+// 一覧に表示する記事の数
 var LIST_COUNT = 10;
+
+// 未読の情報一覧表示
 exports.info_list = function(req, res) {
 
     var client = checkLogin(req,res);
@@ -634,7 +647,8 @@ exports.delete_file_post = function(req, res) {
     }
 
     var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
-    var delete_path = path.join( dir_base, path.normalize(""+filename) );
+    filename = path.normalize(filename).replace("..", "");
+    var delete_path = path.join( dir_base, filename );
     fs.unlink( delete_path, function() {
         console.log( "delete file "+ delete_path);
         res.redirect('info?info_id='+info_id+'&view_id='+view_id );
@@ -649,7 +663,7 @@ exports.logout = function(req, res) {
         return;
 
     var user_id = req.session.user_id;
-    var item_id = req.body.item_id;
+    //var item_id = req.body.item_id;
 
     // ログアウト処理
     network.closeGodaiQuestServer(client);

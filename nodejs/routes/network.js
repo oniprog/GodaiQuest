@@ -70,7 +70,8 @@ var COM_GetUserFolder  = 42;
 var COM_GetRealMonsterSrcInfo =43;
 var COM_GetItemInfoByUserId = 44;
 
-//
+// プロトコルバッファの生成用オブジェクト
+// godaiquest.proto参照のこと
 var builder = ProtoBuf.loadProtoFile("routes/godaiquest.proto");
 var LoginMessage = builder.build("godaiquest.Login");
 var UserInfoMessage = builder.build("godaiquest.UserInfo");
@@ -90,15 +91,16 @@ var ImagePairMessage = builder.build("godaiquest.ImagePair");
 var AItemMessage = builder.build("godaiquest.AItem");
 
 
-/** ロック処理のコールバックリスト */
+// ロック時のコールバック格納用
+// lockCcon, unlockConn
 var listLockCallback = [];
+// ロックしているときtrue
+// lockCcon, unlockConn
 var lockedConn = false;
 
-/**
- ロック処理
- 複数のプロセスが同時にネットワークにアクセスしないように制限する。
- 再入には対応していない
-**/
+// ロック処理
+// 複数のプロセスが同時にネットワークにアクセスしないように制限する。
+// 再入には対応していない
 function lockConn(callback) {
 
     if ( !lockedConn ) {
@@ -108,29 +110,29 @@ function lockConn(callback) {
     }
     else {
         // ロック取得できなかった
+        // すぐに返るけれども、あとで呼べるようにしておく
         listLockCallback.push( callback );
     }
 }
-/**
-* ロック解除処理
-*/
+
+// ロック解除処理
 function unlockConn() {
 
+    // ロックしてなければ何もしない
     if ( !lockedConn ) return;
     if ( listLockCallback.length == 0 ) {
+        // ロック解除
         lockedConn = false;
     }
     else {
+        // 保存してあるコールバックを呼ぶ
         var callback = listLockCallback.splice(0, 1)[0];
         callback();
     }
 }
 
-/**
-* Dword送信
- @param(DWORD) dword 送信するデータ
- @static
-*/
+// Dword送信
+// callback引数は省略可能
 function writeDword(client, dword, callback) {
 
     var buf = new Buffer(4);
@@ -145,11 +147,8 @@ function writeDword(client, dword, callback) {
         client.write(buf);
 }
 
-/**
- Dword送信(逆向きにして)
- @param(DWORD) dword 送信するデータ
- @static
-*/
+// Dword送信(逆向きにして)
+// callback引数は省略可能
 function writeDwordRev(client, dword, callback) {
 
     var buf = new Buffer(4);
@@ -164,19 +163,21 @@ function writeDwordRev(client, dword, callback) {
         client.write(buf);
 }
 
-/**
- プロトコルバッファのオブジェクトの受信用
-*/
+// プロトコルバッファのオブジェクトの受信用
 function readProtoMes( client, callback ) {
 
-    setReadCallback( client, 4,function(err) {
+    // 4バイト受信することを確実にする
+    ensureReadByte( client, 4,function(err) {
         if ( err ) callback(err);
         else {
+            // バイト数を読み込む
             var readbyte = readDwordRev( client );
-            setReadCallback( client, readbyte, function(err) {
+            // バイト数を受信することを確実にする
+            ensureReadByte( client, readbyte, function(err) {
 
                 if ( err) callback( err );
                 else {
+                    // 読み込んだデータを取り出して渡す
                     var ret = client.read_buffer.slice(0, readbyte);
                     client.read_buffer = client.read_buffer.slice(readbyte);
                     callback( null, ret );
@@ -185,11 +186,7 @@ function readProtoMes( client, callback ) {
         }
     });
 }
-/**
- readProtoMesのコールバック
- @callback network.readProtoMes
- @param(Buffer) 受信したデータ
-*/
+
 // Byte受信
 function readByte( client ) {
     var ret = client.read_buffer.readUInt8(0);
@@ -243,7 +240,10 @@ function writeString( client, str ) {
 // { path:relativePath, fullpath:filepath, size:stats.size}
 function writeFileInfoSub( client, fileinfo) {
 
+    // ファイルサイズ
+    // -1ならば終了
     writeDword( client, fileinfo.size );
+    // ファイル名
     writeString( client, fileinfo.path );
 }
 
@@ -254,6 +254,7 @@ function writeFileInfo( client, listFiles) {
         var afile = listFiles[it];
         writeFileInfoSub( client, afile );
     }
+    // -1で終了する 
     writeDword( client, -1);
 }
 
@@ -263,15 +264,19 @@ function readString( client, callback ) {
     var length_str;
     async.waterfall([
         function(callback) {
+            // 長さを得る
             readLength(client, callback );
         },
         function(_length_str, callback) {
+            // 読み込みを保証する
             length_str = _length_str;
-            setReadCallback( client, length_str, callback );
+            ensureReadByte( client, length_str, callback );
         },
         function(callback) {
+            // 文字列本体を得る
             var str_ret = client.read_buffer.slice(0, length_str);
             client.read_buffer = client.read_buffer.slice(length_str);
+            // utf-8に変換する
             callback( null, str_ret.toString("ucs2") );
         }
     ], function(err, str_ret ) {
@@ -289,7 +294,7 @@ function readBinary( client, callback ) {
         },
         function(_length_binary, callback) {
             length_binary = _length_binary;
-            setReadCallback( client, length_binary, callback );
+            ensureReadByte( client, length_binary, callback );
         },
         function(callback) {
             var ret = client.read_buffer.slice(0, length_binary);
@@ -311,11 +316,14 @@ function readFile( client, dir_base, callback ) {
     var outfd, data;
     async.waterfall( [
         function(callback) {
-            setReadCallback( client, 1, callback );
+            // 継続フラグを受信する
+            ensureReadByte( client, 1, callback );
         },
         function(callback) {
+            // 継続するかのチェック
             var end_code = readByte( client );
             if ( end_code == 0 ) {
+                // 終了する
                 outcallback( null, 0);
             }
             else {
@@ -323,38 +331,47 @@ function readFile( client, dir_base, callback ) {
             }
         },
         function(callback) {
+            // ファイル名を得る
             readString( client, callback );
         },
         function(_filename, callback) {
             filename = _filename;
             filepath = path.join( dir_base, filename );
+            // バイナリを読む
             readBinary( client, callback );
         },
         function(data, callback) {
+            // 展開する
             zlib.gunzip( data, callback );
         },
         function(_data, callback ) {
+            // ファイルを開いて保存する
             data = _data;
             console.log("receive file : " + filepath );
             fs.open( filepath, "w", callback );
         },
         function(_outfd, callback) {
+            // ファイルに書き込み 
             outfd = _outfd;
             fs.write( outfd, data, 0, data.length, null, callback );
         },
         function(write_byte, buf, callback) {
+            // ファイルをクローズする
             fs.close( outfd, callback );
         }
     ], function(err) {
+        // 継続を渡す
         callback(err, 1 );
     });
 }
 // ファイル群を送付する
 function readFiles( client, dir_base, callback ) {
 
+    // ファイルを読む 
     readFile( client, dir_base, function(err, end_code) {
         if ( err ) { callback(err); }
         else {
+            // 継続時は自分自身を再帰呼び出しする
             if ( end_code == 0 ) callback();
             else readFiles( client, dir_base, callback );
         }
@@ -362,9 +379,19 @@ function readFiles( client, dir_base, callback ) {
 }
 
 // 長さ取得を行う
-// 最初のバイトに、長さが埋め込まれている
+//
+// 最初のバイト(f1b)に、長さが埋め込まれている
+//
+// f1b < 0x10   そのまま受信バイト数
+//
+// fib >= 0x10   (f1b & 0xf0) >> 4が連続バイト数
+//
+// f1b & 0x0fが上位部分になり、連続バイト数を受信して足す          
+//
+// writeLengthも見よ
 function readLength( client, callback ) {
-    setReadCallback( client, 1, function(err) {
+    // 1バイト受信を保証する
+    ensureReadByte( client, 1, function(err) {
         if ( err ) { callback(err); }
         else {
             var ch1 = readByte( client );
@@ -373,7 +400,7 @@ function readLength( client, callback ) {
                 return;
             }
             var req_byte = (ch1 & 0xf0) >> 4; 
-            setReadCallback( client, req_byte, function(err) {
+            ensureReadByte( client, req_byte, function(err) {
                 if ( err ) { callback(err); }
                 else {
                     var ret = (ch1 & 0x0f);
@@ -421,8 +448,10 @@ function writeLength( client, length ) {
 }
 
 // ファイルを送信する
+//
+// base_dir 基準ディレクトリ
+// filelist 送信するファイル名のリスト
 function writeFiles( client, base_dir, filelist, callback ) {
-
 
     var allcallback = callback;
     var filename;
@@ -431,33 +460,41 @@ function writeFiles( client, base_dir, filelist, callback ) {
         function(callback) {
             filename = filelist.shift();
             if ( !filename ) {
+                // 終了を明示するバイトを送信する
                 writeByte( client, 0 );
+                // 終了
                 allcallback();
                 return;
             }
+            // 継続を表すバイトを送信する
             writeByte( client, 1 );
+            // ファイル名を送信する
             writeString( client, filename );
             callback();
         },
         function(callback) {
+            // ファイルを開く
             var filepath = path.join( base_dir, filename );
             console.log("send file : " + filepath );
             fs.open( filepath, "r", callback );
         },
         function(callback) {
+            // ファイルを圧縮する
             zlib.gzip( buf, callback );
         },
         function(data, callback) {
+            // 圧縮したバイナリを送信する
             writeBinary( client, data );
         }
     ], function(err) {
+        // 自身を再帰呼び出しする
         writeFiles( client, base_dir, filelist, callback );
     });
 }
 
 
 // データ読み込みのCallbackを設定する
-function setReadCallback( client, length, callback ) {
+function ensureReadByte( client, length, callback ) {
 
     if ( client.read_buffer.length >= length ) {
         callback();
@@ -466,16 +503,19 @@ function setReadCallback( client, length, callback ) {
 
     function callback_receive(chunk) {
         if ( client.read_buffer.length >= length ) {
+            // 長さを越えたらもうイベントの受信をしない
             client.removeListener('data', callback_receive );
             callback();
         }
+        // なお、受信時の処理自体は、client作成時に登録してある
     }
+    // データ受信したときの処理
     client.on('data', callback_receive );
 }
 
 // コマンドの実行結果を受け取る
 function readCommandResult( client, callback ) {
-    setReadCallback( client, 4, callback );
+    ensureReadByte( client, 4, callback );
 }
 
 // 接続を切る
@@ -488,9 +528,11 @@ function closeGodaiQuestServer(client) {
 
 // クライアントを得る
 // 接続時に自動登録される
-function getClient(client_number) {
+function getClient(client_number, email) {
     if ( !client_number ) return null;
     var client = global.connect_gqs[client_number];
+    client.number = client_number;
+    client.email = email;
     return client;  // クローズ時に自動削除されるはずなので
 }
 
@@ -653,7 +695,7 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
         },
         function( _list_length, callback ) {
             list_length = _list_length;
-            setReadCallback( client, 4 * list_length, callback );
+            ensureReadByte( client, 4 * list_length, callback );
         },
         function( callback ) {
             listItemId = [];
@@ -951,7 +993,7 @@ function getDungeonDepth(clinet, dungeon_id, callback) {
         },
         function(callback) {
             // 深さを得る
-            setReadCallback(client, 4, function(err) {
+            ensureReadByte(client, 4, function(err) {
                 if ( err ) {callback(err); }
                 else {
                     var depth = readDword( client );
@@ -1701,6 +1743,7 @@ function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
 module.exports = {
     writeDword: writeDword,
     writeDwordRev: writeDwordRev,
+    ensureReadByte:ensureReadByte,
     getClient : getClient,
     connectGodaiQuestServer:connectGodaiQuestServer,
     closeGodaiQuestServer: closeGodaiQuestServer,
