@@ -16,6 +16,11 @@ var dungeon = require('./dungeon');
 // 通信のクライアントとしてのバージョン番号 
 var CLIENT_VERSION = 2014021819;
 
+// GQSのホスト名
+var HOST = "localhost";
+// GQSのポート
+var PORT = 21014;
+
 // dungeonよりコピーした
 // ここに置きたくないのだけれども
 var COMMAND_Nothing = 0; 
@@ -513,8 +518,8 @@ function ensureReadByte( client, length, callback ) {
     client.on('data', callback_receive );
 }
 
-// コマンドの実行結果を受け取る
-function readCommandResult( client, callback ) {
+// コマンドの実行結果を受け取り保証をする
+function ensureCommandResult( client, callback ) {
     ensureReadByte( client, 4, callback );
 }
 
@@ -528,11 +533,9 @@ function closeGodaiQuestServer(client) {
 
 // クライアントを得る
 // 接続時に自動登録される
-function getClient(client_number, email) {
+function getClient(client_number) {
     if ( !client_number ) return null;
     var client = global.connect_gqs[client_number];
-    client.number = client_number;
-    client.email = email;
     return client;  // クローズ時に自動削除されるはずなので
 }
 
@@ -541,23 +544,30 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
 
     var client = new net.Socket();
     client.read_buffer = new Buffer(0);
+    // 接続番号を記録する
     client.number = global.connect_num++;
+    // メールアドレスを記録する
+    client.email = mailaddress;
 
+    // データ受信用
     client.on('data', function(chunk) {
+        // データの結合
         client.read_buffer = Buffer.concat( [client.read_buffer, chunk] );
      });
 
     async.waterfall([
         function(callback) {
+            // ロック取得
             lockConn(callback);
         },
         function(callback) {
-            client.connect('21014', 'localhost', callback );
+            // サーバに接続する
+            client.connect(PORT, HOST, callback );
         },
         function(callback) {
              // connected
             global.connect_gqs[client.number] = client;
-            readCommandResult(client, callback);
+            ensureCommandResult(client, callback);
             writeDword( client, 0 ); // Version
         },
         function(callback) {
@@ -568,17 +578,19 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
             }
             else {
 
-                // senc logon command
+                // ログインコマンドを送信
                 writeDword( client, COM_TryLogon );
                 writeDword( client, 0 ); // version
                 var login = new LoginMessage();
                 login.mail_address = mailaddress;
+                // パスワードはハッシュをかけて送信する
                 var passwordhash = crypto.createHash('sha512').update( password ).digest('hex');
                 login.password = passwordhash;
+                // 自身のバージョン番号を設定する
                 login.client_version = CLIENT_VERSION;
                 writeProtoMes( client, login );
 
-                readCommandResult(client, callback );
+                ensureCommandResult(client, callback );
             }
         },
         function(callback) {
@@ -588,10 +600,11 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
                 callback("ログインに失敗しました")
             }
             else {
-                readCommandResult( client, callback );
+                ensureCommandResult( client, callback );
             }
         },
         function(callback) {
+            // ユーザIDを受け取る
             var userId = readDword( client );
             callback( null, userId, client );
         }
@@ -599,8 +612,9 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
         unlockConn();
         callback(err, userId, client);
     });
+    // クローズ時の処理
     client.on('close', function() {
-
+        // 削除する
         closeGodaiQuestServer(client);
     });
     client.on('error', function(err) {
@@ -638,12 +652,14 @@ function getAllUserInfo(client, callback) {
 
     async.waterfall([
         function(callback) {
+            // ロックする
             lockConn(callback);
         },
         function(callback) {
+            // ユーザ情報取得コマンドを送る
             writeDword( client, COM_GetUserInfo );
             writeDword( client, 0 ); // Version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -656,6 +672,7 @@ function getAllUserInfo(client, callback) {
         function(data, callback) {
             var userinfo = UserInfoMessage.decode(data);
 
+            // イメージ群をURIに変換したものをセットする
             for( var it in userinfo.uesr_dic ) {
                 var auser = userinfo.uesr_dic[it].auser;
                 auser.uri_image = convURIImage( auser.user_image );
@@ -664,6 +681,7 @@ function getAllUserInfo(client, callback) {
             callback( null, userinfo );
         }
     ], function(err, userinfo) {
+        // ロックを解除する
         unlockConn();
         callback( err, userinfo );
     });
@@ -675,14 +693,18 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
     var list_length = 0;
     async.waterfall( [
         function(callback) {
+            // ロックをかける
             lockConn(callback);
         },
         function(callback) {
+            // コマンドを送る
             writeDword( client, COM_GetUnpickedupItemInfo );
             writeDword( client, 0 ); // Version
+            // 対象ユーザ
             writeDword( client, userId );
+            // 対象ダンジョン
             writeDword( client, dungeonId );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -698,6 +720,7 @@ function getUnpickedupItemInfo(client, userId, dungeonId, callback) {
             ensureReadByte( client, 4 * list_length, callback );
         },
         function( callback ) {
+            // ItemIdを受け取る
             listItemId = [];
             for( var it=0; it<list_length; ++it ) {
                 var Id = readDword( client );
@@ -740,7 +763,7 @@ function getItemInfo( client, callback) {
         function(callback) {
             writeDword( client, COM_GetItemInfo );
             writeDword( client, 0 );  // version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -760,6 +783,8 @@ function getItemInfo( client, callback) {
         callback(err, iteminfo );
     });
 }
+
+// ユーザIdに対応するアイテム情報を得る
 function getItemInfoByUserId( client, user_id, callback) {
 
     async.waterfall([
@@ -770,7 +795,7 @@ function getItemInfoByUserId( client, user_id, callback) {
             writeDword( client, COM_GetItemInfoByUserId );
             writeDword( client, 0 );  // version
             writeDword( client, user_id );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -803,7 +828,7 @@ function readMarkArticle( client, user_id, item_id, callback ) {
             writeDword( client, 0 ); // version
             writeDword( client, item_id );
             writeDword( client, user_id );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -875,7 +900,7 @@ function getArticleString( client, item_id, callback ) {
             writeDword( client, COM_GetArticleString );
             writeDword( client, 0 ); // version
             writeDword( client, item_id );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -924,7 +949,7 @@ function setItemArticle( client, item_id, article_id, user_id, contents, callbac
             item_article.create_time = new Int64(0);
             writeProtoMes( client, item_article );
 
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function( callback ) {
             var okcode = readDword( client );
@@ -952,7 +977,7 @@ function deleteLastItemArticle(client, item_id, callback) {
             writeDword( client, COM_DeleteLastItemArticle );
             writeDword( client, 0 ); // version
             writeDword( client, item_id );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -980,7 +1005,7 @@ function getDungeonDepth(clinet, dungeon_id, callback) {
             writeDword( client, COM_GetDungeonDepth );
             writeDword( client, 0 ); // version
             writeDword( client, dungeon_id );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1041,7 +1066,7 @@ function getDungeon( client, dungeon_id, level, callback ) {
             get_dungeon.dungeon_number = level;
             writeProtoMes( client, get_dungeon );
 
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1099,7 +1124,7 @@ function getDungeonImageBlock(client, callback) {
         function(callback) {
             writeDword( client, COM_GetDungeonBlockImage );
             writeDword( client, 0 ); //version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1156,7 +1181,7 @@ function getObjectAttrInfo( client, callback ) {
         function(callback) {
             writeDword( client, COM_GetObjectAttrInfo );
             writeDword( client, 0 ); // version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword(client);
@@ -1216,7 +1241,7 @@ function getTileList( client, callback ) {
         function(callback) {
             writeDword( client, COM_GetTileList );
             writeDword( client, 0 ); // version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword(client);
@@ -1340,7 +1365,7 @@ function setDungeon( client, set_dungeon, callback ) {
             writeDword( client, COM_SetDungeon );
             writeDword( client, 0 ); // version
             writeProtoMes( client, set_dungeon );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1388,7 +1413,7 @@ function getIslandGroundInfo(client, callback) {
         function(callback) {
             writeDword( client, COM_GetIslandGroundInfo );
             writeDword( client, 0 ); // version
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword(client);
@@ -1496,7 +1521,7 @@ function setAItem( client, aitem_mes, imagepair_mes, basedir, filelist, callback
             writeDword( client, 0 ); // version
             writeProtoMes( client, aitem_mes );
             writeProtoMes( client, imagepair_mes );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1537,7 +1562,7 @@ function setMonster( client, item_id, bMonster, callback ) {
             writeDword( client, 0 ); // nVersion
             writeDword( client, item_id );
             writeDword( client, bMonster );
-            readCommandResult( client, callback );
+            ensureCommandResult( client, callback );
         },
         function(callback) {
             var okcode = readDword( client );
@@ -1768,5 +1793,6 @@ module.exports = {
     setAItem: setAItem,
     setMonster: setMonster,
     createNewItem: createNewItem,
-    placeNewItem:placeNewItem
+    placeNewItem:placeNewItem,
+    convURIImage: convURIImage
 }
