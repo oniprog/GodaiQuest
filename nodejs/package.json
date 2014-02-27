@@ -21,6 +21,7 @@
     "long":"*",
     "connect":"*",
     "body-parser":"*",
-    "raw-body":"*"
+    "raw-body":"*",
+    "docco":"*"
   }
 }

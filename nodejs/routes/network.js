@@ -1,4 +1,6 @@
+//
 // ネットワーク、サーバとの接続関連
+//
 var Long = require('long');
 var async = require('async');
 var net = require('net');
@@ -11,17 +13,18 @@ var fs = require('fs');
 var Int64 = require('node-int64');
 var dungeon = require('./dungeon');
 
-//
+// 通信のクライアントとしてのバージョン番号 
 var CLIENT_VERSION = 2014021819;
 
 // dungeonよりコピーした
-var COMMAND_Nothing = 0;
+// ここに置きたくないのだけれども
+var COMMAND_Nothing = 0; 
 var COMMAND_GoUp = 1;
 var COMMAND_GoDown = 2;
 var COMMAND_IntoDungeon = 3;
 var COMMAND_GoOutDungeon = 4;
 
-// コマンド
+// GQS(Godai Quest Server)の通信コマンド
 var COM_AddUser = 1;
 var COM_TryLogon = 2;
 var COM_GetDungeon = 3;
@@ -87,11 +90,15 @@ var ImagePairMessage = builder.build("godaiquest.ImagePair");
 var AItemMessage = builder.build("godaiquest.AItem");
 
 
-// ロック処理のコールバックリスト 
+/** ロック処理のコールバックリスト */
 var listLockCallback = [];
 var lockedConn = false;
 
-// ロック処理（同時にアクセスしないように)
+/**
+ ロック処理
+ 複数のプロセスが同時にネットワークにアクセスしないように制限する。
+ 再入には対応していない
+**/
 function lockConn(callback) {
 
     if ( !lockedConn ) {
@@ -104,7 +111,9 @@ function lockConn(callback) {
         listLockCallback.push( callback );
     }
 }
-// ロック解除処理
+/**
+* ロック解除処理
+*/
 function unlockConn() {
 
     if ( !lockedConn ) return;
@@ -117,7 +126,11 @@ function unlockConn() {
     }
 }
 
-// Dword送信
+/**
+* Dword送信
+ @param(DWORD) dword 送信するデータ
+ @static
+*/
 function writeDword(client, dword, callback) {
 
     var buf = new Buffer(4);
@@ -132,7 +145,11 @@ function writeDword(client, dword, callback) {
         client.write(buf);
 }
 
-// Dword送信
+/**
+ Dword送信(逆向きにして)
+ @param(DWORD) dword 送信するデータ
+ @static
+*/
 function writeDwordRev(client, dword, callback) {
 
     var buf = new Buffer(4);
@@ -147,7 +164,9 @@ function writeDwordRev(client, dword, callback) {
         client.write(buf);
 }
 
-// プロトコルバッファのオブジェクトの受信用
+/**
+ プロトコルバッファのオブジェクトの受信用
+*/
 function readProtoMes( client, callback ) {
 
     setReadCallback( client, 4,function(err) {
@@ -166,6 +185,11 @@ function readProtoMes( client, callback ) {
         }
     });
 }
+/**
+ readProtoMesのコールバック
+ @callback network.readProtoMes
+ @param(Buffer) 受信したデータ
+*/
 // Byte受信
 function readByte( client ) {
     var ret = client.read_buffer.readUInt8(0);
@@ -1676,6 +1700,7 @@ function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
 
 module.exports = {
     writeDword: writeDword,
+    writeDwordRev: writeDwordRev,
     getClient : getClient,
     connectGodaiQuestServer:connectGodaiQuestServer,
     closeGodaiQuestServer: closeGodaiQuestServer,
