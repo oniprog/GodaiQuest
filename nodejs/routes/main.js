@@ -147,7 +147,6 @@ exports.info_list = function(req, res) {
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
     var index = req.query.index;
-    if ( !index ) index = 0;
     
     if ( !view_id )
         view_id = user_id;
@@ -172,6 +171,9 @@ exports.info_list = function(req, res) {
             network.getUnpickedupItemInfo( client, user_id, dungeon_id, callback );
         },
         function(_listItemId, callback) {
+            if ( index === undefined ) {
+                index = 0;
+            }
             for(var it in _listItemId ) {
                 var itemid = _listItemId[it];
                 for(var it2 in iteminfoall.aitem_dic ) {
@@ -218,7 +220,6 @@ exports.info_list_all = function(req, res) {
         return;
     }
     var index = req.query.index;
-    if ( !index ) index = 0;
 
     // ページめくりの表示
     var flag_before = false, flag_next = false;
@@ -234,6 +235,9 @@ exports.info_list_all = function(req, res) {
             network.getItemInfoByUserId(client, view_id, callback);
         }, 
         function(_iteminfo, callback) {
+            if ( index === undefined ) {
+                index = Math.max(0, _iteminfo.aitem_dic.length - LIST_COUNT);
+            }
             for(var it2 in _iteminfo.aitem_dic ) {
                 var dic = _iteminfo.aitem_dic[it2];
                 var itemid = dic.aitem.item_id;
