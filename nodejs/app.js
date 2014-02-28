@@ -2,6 +2,7 @@
  * Module dependencies.
  */
 
+//agent = require('webkit-devtools-agent')
 var express = require('express');
 var routes = require('./routes');
 //var user = require('./routes/user');
@@ -71,6 +72,8 @@ app.get('/delete_file', main.info);
 app.post('/delete_file', main.delete_file_post);
 app.get('/register_user', main.register_user );
 app.post('/register_user', main.register_user_post );
+app.get('/modify_info', main.modify_info );
+app.post('/modify_info', main.modify_info_post );
 
 var mount = st({ path: __dirname + '/public', url: '/public' });
 
@@ -79,3 +82,5 @@ var server = http.createServer(app);
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+console.log('[%s] server pid', process.pid );

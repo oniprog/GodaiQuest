@@ -5,6 +5,8 @@ extends ./layout.jade
 block content
 
     h2 情報 &nbsp; &nbsp;
+      if user_id == view_id
+        a.small(href="modify_info?info_id="+info_id) 記事を変更する &nbsp; &nbsp;
       a.small(href="info_list?view_id="+view_id) 戻る
 
     if article_content !== undefined

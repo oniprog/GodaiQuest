@@ -45,7 +45,7 @@ function getUserInfo( client, req, callback) {
 }
 
 // トップページに移動する
-function gotoTopPage() {
+function gotoTopPage(res) {
     res.render('index', {error_messsage: "ログインしてください"});
 }
 
@@ -231,7 +231,7 @@ exports.info_list_all = function(req, res) {
     var user_id = req.session.user_id;
     var view_id = req.query.view_id;
     if ( !view_id ) {
-        gotoTopPage();
+        gotoTopPage(res);
         return;
     }
     var index = req.query.index;
@@ -289,7 +289,7 @@ exports.info = function(req, res) {
     var view_id = req.query.view_id;
     var info_id = req.query.info_id;
     if ( !view_id || !info_id ) {
-        gotoTopPage();
+        gotoTopPage(res);
         return;
     }
 
@@ -326,7 +326,7 @@ exports.info = function(req, res) {
             network.getArticleString(client, info_id, callback );
         }
     ], function(err, article_content) {
-        res.render('info', {error_message:err, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content, pagesize:LIST_COUNT});
+        res.render('info', {error_message:err, user_id:user_id, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content, pagesize:LIST_COUNT});
     });
 
 }
@@ -344,7 +344,7 @@ exports.info_post = function(req, res) {
     var info_id = req.query.info_id;
     var contents = req.body.inputtext;
     if ( !view_id || !info_id ) {
-        gotoTopPage();
+        gotoTopPage(res);
         return;
     }
 
@@ -374,7 +374,7 @@ exports.info_del_article = function(req, res) {
     var view_id = req.query.view_id;
     var info_id = req.query.info_id;
     if ( !view_id || !info_id ) {
-        gotoTopPage();
+        gotoTopPage(res);
         return;
     }
 
@@ -388,6 +388,7 @@ exports.info_del_article = function(req, res) {
         res.redirect("info?view_id="+view_id+"&info_id="+info_id);
     });
 }
+
 
 // 記事の書き込み
 exports.write_info = function(req, res) {
@@ -588,7 +589,92 @@ exports.write_info_post = function(req, res) {
     });
 }
 
-// ファイルアップロード処理のテスト
+// 記事の変更処理
+exports.modify_info = function(req,res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var user_id = req.session.user_id;
+    var info_id = req.query.info_id;
+    var view_id = user_id; // 同義として扱う
+
+    if ( !info_id || !view_id ) {
+        gotoTopPage(res);
+        return;
+    }
+
+    var aitem;
+    async.waterfall([
+        function(callback) {
+            network.getItemInfoByUserId(client, view_id, callback);
+        }, 
+        function(_iteminfo, callback) {
+            for(var it2 in _iteminfo.aitem_dic ) {
+                var dic = _iteminfo.aitem_dic[it2];
+                var itemid = dic.aitem.item_id;
+                if ( itemid == info_id ) {
+                    aitem = dic.aitem; // AItemの情報が入る
+                    break;
+                }
+                // 一個しか読まないけれども
+            }
+            //download_folder = path.join( global.DOWNLOAD_FOLDER, ""+itemid );
+            callback();
+        }
+    ], function(err, article_content) {
+        res.render('modify_info', {error_message:err, aitem:aitem, info_id:info_id, view_id:view_id});
+    });
+}
+
+// 記事の変更処理のポスト処理
+exports.modify_info_post = function(req,res) {
+
+    var client = checkLogin(req,res);
+    if ( !client )
+        return;
+
+    var user_id = req.session.user_id;
+    var info_id = req.body.info_id;
+    var view_id = user_id; // 同義として扱う
+    var new_text = req.body.inputtext;
+
+    if ( !info_id || !view_id || new_text === undefined) {
+        gotoTopPage(res);
+        return;
+    }
+
+    var aitem;
+    async.waterfall([
+        function(callback) {
+            // まずはアイテム情報を得る
+            network.getItemInfoByUserId(client, view_id, callback);
+        }, 
+        function(_iteminfo, callback) {
+            for(var it2 in _iteminfo.aitem_dic ) {
+                var dic = _iteminfo.aitem_dic[it2];
+                var itemid = dic.aitem.item_id;
+                if ( itemid == info_id ) {
+                    aitem = dic.aitem; // AItemの情報が入る
+                    // 一個しか読まないけれども
+                    break;
+                }
+            }
+            //download_folder = path.join( global.DOWNLOAD_FOLDER, ""+itemid );
+            callback();
+        },
+        function(callback) {
+            // アイテム情報を変更する
+            aitem.header_string = new_text; // HTML更新用
+            network.changeAItem( client, aitem.item_id, aitem.item_image_id, new_text, callback );
+        }
+    ], function(err) {
+        res.render('modify_info', {error_message:err, aitem:aitem, info_id:info_id, view_id:view_id});
+    });
+}
+
+// ファイルアップロード
 exports.upload_file = function(req, res) {
 
     var client = checkLogin(req,res);
@@ -710,7 +796,7 @@ exports.register_user_post = function(req, res)  {
         if ( key == "email" ) email = value;
         if ( key == "password" ) password = value;
         if ( key == "name" ) name = value;
-        console.log("fileld " + key + ":"+ value );
+//        console.log("fileld " + key + ":"+ value );
     });
     req.busboy.on('finish', function() {
         if ( !receive_flag ) { callback("画像ファイルを指定してください"); return; }
@@ -750,3 +836,4 @@ exports.register_user_post = function(req, res)  {
     req.pipe(req.busboy);
     
 }
+

@@ -1863,6 +1863,52 @@ function addUser( email, password, name, imagepath, userfolder, client_address, 
     });
 }
 
+// アイテムの変更処理を行う
+/*
+message AItem {
+
+	optional int32 item_id  = 1;
+	optional int32 item_image_id = 2;
+	optional string header_string = 3;
+	optional bytes header_image = 4;
+	optional bool bNew = 5;
+}
+*/
+function changeAItem( client, item_id, image_id, text, callback ) {
+
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+
+            writeDword( client, COM_ChangeAItem );
+            writeDword( client, 1 ); // version
+
+            var aitem = new AItemMessage();
+            aitem.item_id = item_id;
+            aitem.item_image_id = image_id;
+            aitem.header_string = text;
+            aitem.bNew = false;
+            writeProtoMes( client, aitem );
+
+            ensureCommandResult( client, callback );
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if (okcode != 1 ) {
+                callback("アイテム情報の変更に失敗しました");
+            }
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
 module.exports = {
     lockConn:lockConn,
     unlockConn:unlockConn,
@@ -1896,5 +1942,6 @@ module.exports = {
     createNewItem: createNewItem,
     placeNewItem:placeNewItem,
     convURIImage: convURIImage,
-    addUser: addUser
+    addUser: addUser,
+    changeAItem: changeAItem
 }

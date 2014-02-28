@@ -1,14 +1,16 @@
 extends ./layout.jade
 
--var title = "Godai Quest Info List";
+-var title = "Godai Quest Write Info";
 
 block content
   h2 投稿する記事を書いてください
-    span#small &nbsp; &nbsp; 記事をかける数:#{rest_item_cnt}
+    span.small &nbsp; &nbsp; 記事をかける数:#{rest_item_cnt} &nbsp; &nbsp;
+    a.small(href="info_list?view_id="+view_id) 戻る
+
   form(action="write_info", method="post")
-    div#box
+    div.box
       textarea(rows="40", cols="90", name="inputtext")
-    div#box2
+    div.box2
       | ファイルのアップロードは、記事のページからあとで行ってください
     input(type="reset")
     input(type="submit", value="投稿する", style="width:400px")

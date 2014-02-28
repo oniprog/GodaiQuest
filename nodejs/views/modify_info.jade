@@ -1,0 +1,16 @@
+extends ./layout.jade
+
+-var title = "Godai Quest Modify Info";
+
+block content
+  h2 記事を変更してコミットしてください &nbsp; &nbsp;
+    a.small(href="info?view_id="+view_id+"&info_id="+info_id) 戻る
+    //span#small &nbsp; &nbsp; 記事をかける数:#{rest_item_cnt}
+  form(action="modify_info", method="post")
+    div.box
+      textarea(rows="40", cols="90", name="inputtext") #{aitem.header_string}
+      input(type="hidden", name="info_id", value=info_id)
+    div.box2
+      | ファイルのアップロードは、記事のページからあとで行ってください
+    input(type="reset")
+    input(type="submit", value="変更する", style="width:400px")
