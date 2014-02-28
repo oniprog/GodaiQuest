@@ -6,6 +6,7 @@ var network =require('../routes/network');
 
 function DummyClient() {
     this._buffer = new Buffer(0);
+    this.read_buffer = new Buffer(0);
 }
 
 DummyClient.prototype = {
@@ -14,6 +15,7 @@ DummyClient.prototype = {
         if ( callback )
             callback();
     },
+    // for test interface
     get: function(index) {
         return this._buffer.readUInt8(index);
     },
@@ -22,6 +24,24 @@ DummyClient.prototype = {
     },
     getDwordRev: function(index) {
         return this._buffer.readUInt32LE(index);
+    }
+};
+
+// DummyClient準備用のクラス
+function DummyClientBuilder = function(dc) {
+    this._dc = dc;
+}
+
+DummyClientBuilder.prototype = {
+    prepareDword: function(dword) {
+        var buf = new Buffer(dword);
+        buf.writeUInt32BE( dword, 0 );
+        this._dc.read_buffer = Buffer.concat( this._dc.read_buffer, [buf] );
+    },
+    prepareDwordRev: function(dword) {
+        var buf = new Buffer(dword);
+        buf.writeUInt32LE( dword, 0 );
+        this._dc.read_buffer = Buffer.concat( this._dc.read_buffer, [buf] );
     }
 };
 

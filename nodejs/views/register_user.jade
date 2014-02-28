@@ -1,0 +1,21 @@
+extends ./layout.jade
+
+-var title = "Godai Quest Register User";
+
+block content
+  h2 ユーザ登録 &nbsp; &nbsp;
+    A.small(href="index") 戻る
+
+  form(action="register_user", method="post", enctype="multipart/form-data")
+    p キャラクタ名: 
+      input(type="text", name="name", size="20")
+    p email: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      input(type="text", name="email", size="80")
+    p password: &nbsp;
+      input(type="text", name="password", size="80")
+    p 登録画像:
+      input(type="file", name="image")
+    input(type="reset", value="リセット")
+    input(type="submit", value="登録をする")
+
+    

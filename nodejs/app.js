@@ -69,6 +69,8 @@ app.get('/upload_file', main.info);
 app.post('/upload_file', main.upload_file_post);
 app.get('/delete_file', main.info);
 app.post('/delete_file', main.delete_file_post);
+app.get('/register_user', main.register_user );
+app.post('/register_user', main.register_user_post );
 
 var mount = st({ path: __dirname + '/public', url: '/public' });
 

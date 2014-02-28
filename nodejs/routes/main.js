@@ -1,12 +1,14 @@
 // メイン（現時点では全部を詰め込んである)
-var network = require("./network");
 var async = require("async"); 
-var filegqs = require("./filegqs");
 var path = require('path');
-var dungeon = require('./dungeon');
 var Busboy = require('busboy');
 var os = require('os');
 var fs = require('fs');
+var im = require('imagemagick');
+
+var network = require("./network");
+var filegqs = require("./filegqs");
+var dungeon = require('./dungeon');
 //var devnull = require('dev-null');
 //var html_encoder = require("node-html-encoder").Encoder();
 
@@ -668,4 +670,83 @@ exports.logout = function(req, res) {
     // ログアウト処理
     network.closeGodaiQuestServer(client);
     res.render('index', { error_message: "ログアウトしました"});
+}
+
+// ユーザ登録
+exports.register_user = function(req, res) {
+
+    res.render('register_user');
+}
+
+// クライアントアドレスを得る
+function getClientAddress (req) {
+        return (req.headers['x-forwarded-for'] || '').split(',')[0] 
+        || req.connection.remoteAddress;
+};
+
+// ユーザ登録実行
+exports.register_user_post = function(req, res)  {
+
+    var email;
+    var password;
+    var name;
+
+    var str = "abcdefghijklmnopqrstuvwxyz";
+    function randCh() {
+       return str[ Math.floor(Math.random()*str.length) ];
+    }
+    var tmpfile = randCh() + randCh() + randCh() + randCh();
+    var tmpfile2 = randCh() + randCh() + randCh() + randCh();
+    var tmpfilepath = path.join( os.tmpdir(), tmpfile );
+    var tmpfilepath2 = path.join( os.tmpdir(), tmpfile2 );
+    var receive_flag = false;
+
+    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype ) {
+        console.log("temp file: " + tmpfilepath);
+        receive_flag = true;
+        file.pipe(fs.createWriteStream(tmpfilepath));
+    });
+    req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
+        if ( key == "email" ) email = value;
+        if ( key == "password" ) password = value;
+        if ( key == "name" ) name = value;
+        console.log("fileld " + key + ":"+ value );
+    });
+    req.busboy.on('finish', function() {
+        if ( !receive_flag ) { callback("画像ファイルを指定してください"); return; }
+        async.waterfall([
+            // イメージ画像をリサイズする
+            function(callback) {
+                im.resize({ 
+                    srcPath: tmpfilepath,
+                    dstPath: tmpfilepath2,
+                    width: 64,
+                    height: 64
+                }, callback );
+            },
+            function(stdout, stderr, callback) {
+                network.addUser( email, password, name, tmpfilepath2, "c:\\tmp\\godaiquest", getClientAddress(req), callback );
+            },
+            function(callback) {
+                // ファイル削除
+                fs.unlink( tmpfilepath, callback );
+            },
+            function(callback) {
+                // ファイル削除
+                fs.unlink( tmpfilepath2, callback );
+            }
+        ], function(err) {
+            if ( err && !err.length ) {
+                err = "イメージファイルではありません";
+            }
+            if ( err ) {
+                res.render('register_user', {error_message:err} );
+            }
+            else {
+                res.render('index', {error_message:"ユーザ登録に成功しました"});
+            }
+        });
+    });
+    req.pipe(req.busboy);
+    
 }

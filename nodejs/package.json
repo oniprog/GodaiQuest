@@ -23,7 +23,9 @@
     "body-parser":"*",
     "raw-body":"*",
     "docco":"*",
+    "jsdoc":"*",
     "mocha": "*",
-    "chai":"*"
+    "chai":"*",
+    "imagemagick":"*"
   }
 }

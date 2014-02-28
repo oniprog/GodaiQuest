@@ -1,6 +1,7 @@
-//
-// ネットワーク、サーバとの接続関連
-//
+/**
+ ネットワーク、サーバとの接続関連
+ @module network
+*/
 var Long = require('long');
 var async = require('async');
 var net = require('net');
@@ -13,16 +14,30 @@ var fs = require('fs');
 var Int64 = require('node-int64');
 var dungeon = require('./dungeon');
 
-// 通信のクライアントとしてのバージョン番号 
+/**
+ 通信のクライアントとしてのバージョン番号 
+ @constant
+ @static
+*/
 var CLIENT_VERSION = 2014021819;
 
-// GQSのホスト名
+/**
+ GQSのホスト名
+ @constant
+ @static
+*/
 var HOST = "localhost";
-// GQSのポート
+/**
+ GQSのポート
+ @constant
+ @static
+*/
 var PORT = 21014;
 
-// dungeonよりコピーした
-// ここに置きたくないのだけれども
+/**
+ dungeonよりコピーした
+ ここに置きたくないのだけれども
+*/
 var COMMAND_Nothing = 0; 
 var COMMAND_GoUp = 1;
 var COMMAND_GoDown = 2;
@@ -94,6 +109,7 @@ var TileInfoMessage = builder.build("godaiquest.TileInfo");
 var IslandGroundInfoMessage = builder.build("godaiquest.IslandGroundInfo");
 var ImagePairMessage = builder.build("godaiquest.ImagePair");
 var AItemMessage = builder.build("godaiquest.AItem");
+var AddUserMessage = builder.build("godaiquest.AddUser");
 
 
 // ロック時のコールバック格納用
@@ -539,10 +555,11 @@ function getClient(client_number) {
     return client;  // クローズ時に自動削除されるはずなので
 }
 
-// Godai Questサーバへのログイン処理を行う
-function connectGodaiQuestServer(mailaddress, password, callback) {
+// clientの作成
+function createClient(mailaddress) {
 
     var client = new net.Socket();
+
     client.read_buffer = new Buffer(0);
     // 接続番号を記録する
     client.number = global.connect_num++;
@@ -554,6 +571,14 @@ function connectGodaiQuestServer(mailaddress, password, callback) {
         // データの結合
         client.read_buffer = Buffer.concat( [client.read_buffer, chunk] );
      });
+
+    return client;
+}
+
+// Godai Questサーバへのログイン処理を行う
+function connectGodaiQuestServer(mailaddress, password, callback) {
+
+    var client = createClient(mailaddress);
 
     async.waterfall([
         function(callback) {
@@ -1765,6 +1790,79 @@ function placeNewItem( client, user_id, ix, iy, new_item, callback ) {
     });
 }
 
+
+// ユーザの追加
+function addUser( email, password, name, imagepath, userfolder, client_address, callback ) {
+
+    var client;
+    var image;
+    async.waterfall([
+        function(callback) {
+            lockConn(callback);
+        },
+        function(callback) {
+            // イメージファイルを読み込む
+            fs.readFile( imagepath, callback );
+        },
+        function(_data, callback) {
+            image = _data;
+            callback();
+        },
+        function(callback) {
+            // 
+            client = createClient( email );
+
+            // サーバに接続する
+            client.connect(PORT, HOST, callback );
+        },
+        function(callback) {
+             // connected
+            global.connect_gqs[client.number] = client;
+            writeDword( client, 0 ); // Version
+            ensureCommandResult(client, callback);
+        },
+        function(callback) {
+            // read dword
+            var okcode = readDword( client );
+            if (okcode != 1 ) {
+                callback("Godai Quest Server接続失敗 ");
+            }
+            else {
+                // ユーザ登録コマンドを送る
+                writeDword( client, COM_AddUser );
+                writeDword( client, 1 ); //version
+
+                var user = new AddUserMessage();
+                user.mail_address = email;
+                user.user_name = name;
+                var passwordhash = crypto.createHash('sha512').update( password ).digest('hex');
+                user.password = passwordhash;
+                user.user_folder = userfolder;
+                user.computer_name = client_address;
+                user.user_image = image;
+                writeProtoMes( client, user );
+
+                ensureCommandResult( client, callback );
+            }
+        },
+        function(callback) {
+            var okcode = readDword( client );
+            if ( okcode == 2 ) {
+                callback("すでに同じメールアドレスのユーザが存在します");
+            }
+            else if ( okcode != 1 ) {
+                callback("ユーザ登録エラーです");
+            }                   
+            else {
+                callback();
+            }
+        }
+    ], function(err) {
+        unlockConn();
+        callback(err);
+    });
+}
+
 module.exports = {
     lockConn:lockConn,
     unlockConn:unlockConn,
@@ -1797,5 +1895,6 @@ module.exports = {
     setMonster: setMonster,
     createNewItem: createNewItem,
     placeNewItem:placeNewItem,
-    convURIImage: convURIImage
+    convURIImage: convURIImage,
+    addUser: addUser
 }
