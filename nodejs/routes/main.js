@@ -769,12 +769,40 @@ exports.delete_file_post = function(req, res) {
         return;
     }
 
-    var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
-    filename = path.normalize(filename).replace("..", "");
-    var delete_path = path.join( dir_base, filename );
-    fs.unlink( delete_path, function() {
-        console.log( "delete file "+ delete_path);
-        res.redirect('info?info_id='+info_id+'&view_id='+view_id );
+    async.waterfall([
+        // アイテムの親をチェックする
+        function(callback) {
+            network.getItemInfoByUserId(client, view_id, callback);
+        }, 
+        function(_iteminfo, callback) {
+            for(var it2 in _iteminfo.aitem_dic ) {
+                var dic = _iteminfo.aitem_dic[it2];
+                var itemid = dic.aitem.item_id;
+                if ( itemid == info_id ) {
+                    aitem = dic.aitem; // AItemの情報が入る
+                    break;
+                }
+            }
+            if ( aitem === undefined )
+                callback("他人のファイルを削除できません");
+            else
+                callback();
+        },
+        function(callback) {
+            var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
+            filename = path.normalize(filename).replace("..", "");
+            var delete_path = path.join( dir_base, filename );
+            fs.unlink( delete_path, function() {
+                console.log( "delete file "+ delete_path);
+                callback();
+            });
+        }
+
+    ], function(err) {
+        if ( err ) 
+            res.redirect('info?info_id='+info_id+'&view_id='+view_id+'&message='+err );
+        else
+            res.redirect('info?info_id='+info_id+'&view_id='+view_id );
     });
 }
 
