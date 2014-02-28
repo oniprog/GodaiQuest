@@ -9,7 +9,7 @@ block content
 
   form(action="write_info", method="post")
     div.box
-      textarea(rows="40", cols="90", name="inputtext")
+      textarea(rows="40", cols="90", name="inputtext") #{content}
     div.box2
       | ファイルのアップロードは、記事のページからあとで行ってください
     input(type="reset")

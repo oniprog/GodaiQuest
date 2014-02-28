@@ -18,7 +18,7 @@ block content
         div.box
           - var lines = aitem.header_string.split("\n");
           - var cnt = 0; for( var it in lines ) { if (lines[it].length>0 ) ++cnt; if ( cnt > 5 ) break; 
-            div #{lines[it]}
+            div.text #{lines[it]}
           - }
           br
           br

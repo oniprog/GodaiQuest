@@ -216,6 +216,7 @@ exports.info_list = function(req, res) {
             getAUser( req, view_id, callback );
         }
     ], function(err, auser) {
+        if ( !auser ) auser = {}
         res.render('info_list', {error_message:err, name:auser.user_name, iteminfo:iteminfo, view_id:view_id, index:index, before:flag_before, next:flag_next});
     });
 }
@@ -448,7 +449,7 @@ exports.write_info = function(req, res) {
             }
         }
     ], function(err) {
-        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
+        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt, content:""});
     });
 }
 
@@ -585,7 +586,7 @@ exports.write_info_post = function(req, res) {
         } 
     ], function(err) {
         if ( !err ) err = "記事を書き込みました";
-        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt});
+        res.render('write_info', {error_message:err, rest_item_cnt:rest_item_cnt, content:text});
     });
 }
 
