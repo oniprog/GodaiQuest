@@ -31,23 +31,28 @@ block content
             span
               img(src="public/download/"+info_id+"/"+afile.path, style="width:64px;height:64px")
           - }
-              form.dinline(action="delete_file?filename="+afile.path+"&view_id="+view_id+"&info_id="+info_id, method="post")
-                input(type="submit", value="×")
+              if user_id == view_id
+                form.dinline(action="delete_file?filename="+afile.path+"&view_id="+view_id+"&info_id="+info_id, method="post")
+                  input(type="submit", value="×")
+                  A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
+              else
                 A(href="public/download/"+info_id+"/"+afile.path) #{afile.path}
+              
           span &nbsp; &nbsp;
     div &nbsp;
           
     div.box
-      form(action="upload_file?view_id="+view_id+"&info_id="+info_id, method="post", enctype="multipart/form-data")
-        div(id="filepoint")
-          input(type="hidden", name="info_id", value=view_id)
-          input(type="hidden", name="view_id", value=info_id)
-        div
-          input(type="submit", value="アップロードする")
-          button(type="button", id="add_file") 追加
+      if user_id == view_id
+        form(action="upload_file?view_id="+view_id+"&info_id="+info_id, method="post", enctype="multipart/form-data")
+          div(id="filepoint")
+            input(type="hidden", name="info_id", value=view_id)
+            input(type="hidden", name="view_id", value=info_id)
+          div
+            input(type="submit", value="アップロードする")
+            button(type="button", id="add_file") 追加
 
-      script().
-        $( function() {
+        script().
+          $( function() {
           g_cnt = 0;
           function deleteUploadFile() {var name=$(this).data("id"); $("#"+name).remove(); $("#b"+name).remove();}
           function addUploadFile(){
@@ -59,13 +64,14 @@ block content
           }; 
           $("#add_file").click(function(){ addUploadFile(); });
           addUploadFile();// 初回無条件に追加
-        });
+          });
     if iteminfo
       - var aitem = iteminfo[info_id];
       div.box
-        - var lines = aitem.header_string.split("\n");
-        each line in lines
-          div.text #{line} &nbsp;
+        if aitem
+          - var lines = aitem.header_string.split("\n");
+          each line in lines
+            div.text #{line} &nbsp;
         br
         br
       br

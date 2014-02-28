@@ -26,6 +26,7 @@
     "jsdoc":"*",
     "mocha": "*",
     "chai":"*",
-    "imagemagick":"*"
+    "imagemagick":"*",
+    "config":"*"
   }
 }

@@ -7,12 +7,13 @@ var async = require('async');
 var net = require('net');
 var ProtoBuf = require('protobufjs');
 var crypto = require('crypto');
-var filegqs = require('./filegqs');
 var path = require('path');
 var zlib = require('zlib');
 var fs = require('fs');
 var Int64 = require('node-int64');
+var config = require('config');
 var dungeon = require('./dungeon');
+var filegqs = require('./filegqs');
 
 /**
  通信のクライアントとしてのバージョン番号 
@@ -21,18 +22,8 @@ var dungeon = require('./dungeon');
 */
 var CLIENT_VERSION = 2014021819;
 
-/**
- GQSのホスト名
- @constant
- @static
-*/
-var HOST = "localhost";
-/**
- GQSのポート
- @constant
- @static
-*/
-var PORT = 21014;
+var HOST = config.HOST;
+var PORT = config.PORT;
 
 /**
  dungeonよりコピーした

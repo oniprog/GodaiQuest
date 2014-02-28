@@ -294,6 +294,7 @@ exports.info = function(req, res) {
         return;
     }
 
+    var message = req.query.message;
     var iteminfo = {};
     var download_folder;
     var listFiles;
@@ -327,6 +328,7 @@ exports.info = function(req, res) {
             network.getArticleString(client, info_id, callback );
         }
     ], function(err, article_content) {
+        if ( !err && message ) err = message;
         res.render('info', {error_message:err, user_id:user_id, iteminfo:iteminfo, info_id:info_id, view_id:view_id, listFiles:listFiles, article_content: article_content, pagesize:LIST_COUNT});
     });
 
@@ -675,7 +677,7 @@ exports.modify_info_post = function(req,res) {
     });
 }
 
-// ファイルアップロード
+// 転送
 exports.upload_file = function(req, res) {
 
     var client = checkLogin(req,res);
@@ -686,37 +688,69 @@ exports.upload_file = function(req, res) {
     res.redirect('info');
 }
 
-// ファイルアップロード処理のテスト
+// ファイルアップロード処理
 exports.upload_file_post = function(req, res) {
 
     var client = checkLogin(req,res);
     if ( !client )
         return;
 
+    var user_id = req.session.user_id;
     var info_id = req.query.info_id;
-    var view_id = req.query.view_id;
+    var view_id_moto = req.query.view_id;
+    var view_id = user_id;
     if ( !info_id || !view_id ) {
 
-        res.redirect("index");
+        gotoTopPage(res);
         return;
     }
-    var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
-    
-    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype ) {
-        var saveTo = path.join(dir_base, path.basename(filename) );
-        if ( filename === undefined ) {
-            saveTo = path.join( os.tmpDir(), "nothing" );
+
+    var aitem;
+    async.waterfall([
+        // アイテムの親をチェックする
+        function(callback) {
+            network.getItemInfoByUserId(client, view_id, callback);
+        }, 
+        function(_iteminfo, callback) {
+            for(var it2 in _iteminfo.aitem_dic ) {
+                var dic = _iteminfo.aitem_dic[it2];
+                var itemid = dic.aitem.item_id;
+                if ( itemid == info_id ) {
+                    aitem = dic.aitem; // AItemの情報が入る
+                    break;
+                }
+            }
+            if ( aitem === undefined )
+                callback("他人のフォルダにアップロードできません");
+            else
+                callback();
+        },
+        function(callback) {
+
+            var dir_base = path.join( global.DOWNLOAD_FOLDER, ""+info_id );
+
+            req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype ) {
+                var saveTo = path.join(dir_base, path.basename(filename) );
+                if ( filename === undefined ) {
+                    saveTo = path.join( os.tmpDir(), "nothing" );
+                }
+                console.log(saveTo);
+                file.pipe(fs.createWriteStream(saveTo));
+            });
+            req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
+        //        console.log("fileld " + key + ":"+ value );
+            });
+            req.busboy.on('finish', function() {
+                callback();
+            });
+            req.pipe(req.busboy);
         }
-        console.log(saveTo);
-        file.pipe(fs.createWriteStream(saveTo));
+    ], function(err) {
+        if ( err )
+            res.redirect('info?info_id='+info_id+'&view_id='+view_id_moto+"&message="+err );
+        else
+            res.redirect('info?info_id='+info_id+'&view_id='+view_id_moto);
     });
-    req.busboy.on('field', function(key, value, keyTruncated, valueTruncated) {
-//        console.log("fileld " + key + ":"+ value );
-    });
-    req.busboy.on('finish', function() {
-        res.redirect('info?info_id='+info_id+'&view_id='+view_id );
-    });
-    req.pipe(req.busboy);
 }
 
 // ファイルを削除する
