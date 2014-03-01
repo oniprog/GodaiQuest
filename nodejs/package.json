@@ -27,6 +27,8 @@
     "mocha": "*",
     "chai":"*",
     "imagemagick":"*",
+    "busboy":"*",
+    "connect-busboy":"*",
     "config":"*"
   }
 }
