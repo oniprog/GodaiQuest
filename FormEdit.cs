@@ -217,7 +217,7 @@ namespace GodaiQuest
             }
         }
 
-        //
+        // 指定範囲を指定タイルで塗りつぶす
         private void paintMapData(Point selBegin, Point selEnd, int nSelect)
         {
             Tile tile = this.mImageTileList[nSelect];
