@@ -413,12 +413,13 @@ namespace GodaiQuestServer
         // ブロックイメージパレットを設定する
         public EServerResult setBlockImagePalette(TilePalette palette, int nUserID)
         {
-            var palettedb = this.mBlockImagePaletteCollection.FindOne(Query.EQ("UserID", palette.getUesrID()));
+            var palettedb = this.mBlockImagePaletteCollection.FindOne(Query.EQ("UserID", nUserID));
             if (palettedb == null)
             {
                 palettedb = new DBTilePalette();
             }
             palettedb.setInit(palette);
+			palettedb.UserID = nUserID;
 
             this.mBlockImagePaletteCollection.Save(palettedb);
 

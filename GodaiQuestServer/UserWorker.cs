@@ -449,6 +449,7 @@ namespace GodaiQuestServer
             int nUserID = set_dungeon.user_id;
             int nDungeonNumber = set_dungeon.dungeon_number;
 
+            addLog("UserId : " + ("" + nUserID));
             addLog("DunNum : " + ("" + nDungeonNumber));
 
             DungeonInfo dungeon = new DungeonInfo(set_dungeon.dungeon_info);
@@ -563,6 +564,7 @@ namespace GodaiQuestServer
 #if true
             var set_block_image_palette = this.mNetwork.Deserialize<godaiquest.SetBlockImagePalette>();
             int nUserID = set_block_image_palette.user_id;
+			set_block_image_palette.tile_palette.user_id = set_block_image_palette.user_id;
             var palette = new TilePalette(set_block_image_palette.tile_palette);
 #else
             int nUserID = this.mNetwork.receiveDWORD();
