@@ -83,8 +83,10 @@ namespace GodaiQuestServer
 
         private void btnChangePassword_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("まだ実装していません");
-            /*
+            int nIndex = this.cmbUserName.SelectedIndex;
+            if (nIndex < 0)
+                return;
+
             FormInputLine formInput = new FormInputLine("新パスワード", "");
             if ( formInput.ShowDialog() != DialogResult.OK )
                 return;
@@ -95,9 +97,10 @@ namespace GodaiQuestServer
                 return;
             }
 
-            String strPasswordHash = GodaiLibrary.Crypto.calcPasswordHash(formInput.getResult());
-            this.mServerWorker.changePassword();
-             */
+            var user = this.mUserList[nIndex];
+            String strPasswordHash = GodaiLibrary.Crypto.CalcPasswordHash(formInput.getResult());
+            this.mServerWorker.changePassword( user.getUserID(), strPasswordHash);
+            MessageBox.Show("パスワードを変更しました");
         }
 
         private void btnChangeEMail_Click(object sender, EventArgs e)

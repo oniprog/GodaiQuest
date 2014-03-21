@@ -25,7 +25,7 @@ namespace GodaiQuest
         {
             TcpClient client = new TcpClient();
 #if DEBUG
-            client.Connect("localhost", SERVER_PORT);
+            client.Connect("192.168.1.106", SERVER_PORT);
 #else
 
 //            client.Connect("192.168.48.111", SERVER_PORT);
