@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Drawing;
 using MongoDB.Bson;
@@ -45,7 +46,8 @@ namespace GodaiQuestServer
         private MongoCollection<DBRDReadItem> mRDReadItemCollection;
         private MongoCollection<DBRSSLastUpdateTime> mRSSLastUpdateTimeCollection;
         private MongoCollection<DBUserFolder> mUserFolderCollection;
-
+        private MongoCollection<DBKeyword> mKeywordCollection;
+        private MongoCollection<DBKeywordItem> mKeywordItemCollection;
 
         public MongoMaster()
         {
@@ -74,6 +76,8 @@ namespace GodaiQuestServer
             this.mRDReadItemCollection = this.mDB.GetCollection<DBRDReadItem>("rd_readitem");
             this.mRSSLastUpdateTimeCollection = this.mDB.GetCollection<DBRSSLastUpdateTime>("rss_lastupate");
             this.mUserFolderCollection = this.mDB.GetCollection<DBUserFolder>("user_fodler");
+            this.mKeywordCollection= this.mDB.GetCollection<DBKeyword>("keyword");
+            this.mKeywordItemCollection= this.mDB.GetCollection<DBKeywordItem>("keyword_item");
         }
 
 		// データベースが有効かを判定する
@@ -1314,6 +1318,30 @@ namespace GodaiQuestServer
             }
         }
 
+        // KeywordIDを得る 
+        private int newKeywordID()
+        {
+            while (true)
+            {
+                var findone = this.mGodaiSystemCollection.FindOne();
+                if (findone == null)
+                {
+                    this.mGodaiSystemCollection.Save(new DBGodaiSystem());
+                }
+                else
+                {
+                    int nMaxID = findone.MaxKeywordID;
+                    var query = Query.EQ("MaxKeywordID", nMaxID);
+                    var sortBy = SortBy.Null;
+                    var update = Update.Inc("MaxKeywordID", 1);
+                    if (this.mGodaiSystemCollection.FindAndModify(query, sortBy, update, false) != null)
+                    {
+						return nMaxID;
+                    }
+                }
+            }
+        }
+
 
 
 #if false
@@ -1365,6 +1393,132 @@ namespace GodaiQuestServer
             }
         }
 
+		// キーワードを登録する(同一キーワードがあったら弾く)
+        public EServerResult registerKeyword(out int nKeywordID, int nUserId, string keyword, int nPriority)
+        {
+            nKeywordID = 0;
+            DBKeyword keywordDB;
+			var findone = this.mKeywordCollection.FindOne(Query.And(Query.EQ("UserID", nUserId), Query.EQ("Keyword", keyword) ) );
+            if (findone != null)
+                return EServerResult.SameKeyword;
+
+            keywordDB = new DBKeyword();
+            keywordDB.UserID = nUserId;
+            keywordDB.Keyword = keyword;
+            keywordDB.KeywordID = nKeywordID = newKeywordID();
+            keywordDB.KeywordPriority = nPriority;
+            mKeywordCollection.Save(keywordDB);
+            return EServerResult.SUCCESS;
+        }
+
+		// キーワードを変更する
+        public EServerResult modifyKeyword(int nUserId, int nKeywordId, string newKeyword)
+        {
+			var findone = this.mKeywordCollection.FindOne(Query.And(Query.EQ("UserID", nUserId), Query.EQ("Keyword", newKeyword)) );
+            if (findone != null)
+                return EServerResult.SameKeyword;
+			
+			findone = this.mKeywordCollection.FindOne(Query.And(Query.EQ("UserID", nUserId), Query.EQ("KeywordID", nKeywordId)) );
+            if (findone == null)
+                return EServerResult.MissingKeyword;
+
+            var update = Update.Rename(findone.Keyword, newKeyword);
+            mKeywordCollection.Update(Query.And(Query.EQ("UserID", nUserId), Query.EQ("KeywordID", nKeywordId)), update);
+            return EServerResult.SUCCESS;
+        }
+
+		// キーワードの優先順位を変更する
+        public EServerResult modifyKeywordPriority(int nUserId, int nKeywordId, int newPriority)  
+        {
+			var findone = this.mKeywordCollection.FindOne(Query.And(Query.EQ("UserID", nUserId), Query.EQ("KeywordID", nKeywordId)) );
+            if (findone == null)
+                return EServerResult.MissingKeyword;
+
+            var update = Update.Set("KeywordPriority", BsonValue.Create(newPriority));
+            mKeywordCollection.Update(Query.And(Query.EQ("UserID", nUserId), Query.EQ("KeywordID", nKeywordId)), update);
+            return EServerResult.SUCCESS;
+        }
+
+		// キーワードをアイテムに関連付ける
+        public EServerResult attachKeyword(int keywordId, int nItemID, int nItemPriority) 
+        {
+            var findone =
+                this.mKeywordItemCollection.FindOne(Query.And( Query.EQ("KeywordID", keywordId), Query.EQ("ItemID", nItemID)));
+            if (findone != null)
+                return EServerResult.SUCCESS;
+
+            var keywordItemDB = new DBKeywordItem();
+            keywordItemDB.ItemPriority = nItemPriority;
+            keywordItemDB.KeywordID = keywordId;
+            keywordItemDB.ItemID = nItemID;
+			mKeywordItemCollection.Save(keywordItemDB);
+            return EServerResult.SUCCESS;
+        }
+
+		// キーワードに関連づけたアイテムを除く
+        public void detachKeyword(int nKeywordId, int nItemID)
+        {
+            this.mKeywordItemCollection.Remove(Query.And(Query.EQ("KeywordID", nKeywordId), Query.EQ("ItemID", nItemID)));
+        }
+
+		// キーワード一覧を得る
+        public KeywordUserInfo listKeyword(int nUserID)
+        {
+            var ret = new KeywordUserInfo();
+            var find = mKeywordCollection.Find(Query.And(Query.EQ("UserID", nUserID)));
+            if (find == null)
+            {
+                return ret;
+            }
+
+            foreach (var akeywordDB in find)
+            {
+                var akeyword = new AKeyword(akeywordDB.KeywordID, akeywordDB.Keyword, akeywordDB.KeywordPriority);
+                ret.addKeyword(akeyword);
+            }
+            return ret;
+        }
+
+		// キーワードに関連付けたアイテム一覧を得る
+        public AKeyword getKeywordDetail(int nKeywordId)
+        {
+            var ret = new AKeyword(nKeywordId, "", 0);
+            var find = mKeywordItemCollection.Find(Query.And(Query.EQ("KeywordID", nKeywordId)));
+            if (find == null)
+            {
+                return ret;
+            }
+
+            foreach (var keywordUserDB in find) 
+            {
+                ret.addKeywordItem(new AKeywordItem(keywordUserDB.ItemID, keywordUserDB.ItemPriority));
+            }
+			return ret;
+		}
+
+		// アイテムの優先順位を変える
+        public EServerResult modifyKeywordItemPriority(int nKeywordID, int nItemID, int nNewPriority)
+        {
+            var update = Update.Set("ItemPriority", BsonValue.Create(nNewPriority));
+            mKeywordItemCollection.Update(Query.And(Query.EQ("KeywordID", nKeywordID), Query.EQ("ItemID", nItemID)),
+                update);
+            return EServerResult.SUCCESS;
+        }
+
+		// キーワードを削除する
+        public EServerResult deleteKeyword(int nUserID, int nKeywordID)
+        {
+            var findone =
+                mKeywordCollection.FindOne(Query.And(Query.EQ("UserID", nUserID), Query.EQ("KeywordID", nKeywordID)));
+            if (findone == null)
+            {
+                return EServerResult.MissingKeyword;
+            }
+
+            mKeywordCollection.Remove(Query.EQ("KeywordID", nKeywordID));
+            mKeywordItemCollection.Remove(Query.EQ("KeywordID", nKeywordID));
+            return EServerResult.SUCCESS;
+        }
     }
 
     public class DBGodaiSystem
@@ -1375,6 +1529,7 @@ namespace GodaiQuestServer
         public int MaxObjectID { get; set; }
         public int MaxItemID { get; set; }
         public int MaxItemImageID { get; set; }
+		public int MaxKeywordID { get; set; }
 
         public DBGodaiSystem()
         {
@@ -1383,6 +1538,7 @@ namespace GodaiQuestServer
             this.MaxObjectID = 0;
             this.MaxItemID = 1; // 0 はアイテム無し
             this.MaxItemImageID = 1; // 0はアイテム無し
+            this.MaxKeywordID = 1;
         }
     }
 
@@ -1667,6 +1823,24 @@ namespace GodaiQuestServer
         public String ComputerName { get; set; }
         public String Folder { get; set; }
     }
+
+    public class DBKeywordItem
+    {
+        public MongoDB.Bson.ObjectId _id { get; set; }
+		public int KeywordID { get; set; }
+		public int ItemPriority { get; set; }
+		public int ItemID { get; set; }
+    }
+
+    public class DBKeyword
+    {
+        public MongoDB.Bson.ObjectId _id { get; set; }
+		public int UserID { get; set; }
+		public int KeywordID { get; set; }
+		public string Keyword { get; set; }
+		public int KeywordPriority { get; set; }
+    }
+
 
 #if false
     public class DBItemImage

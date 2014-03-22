@@ -50,7 +50,16 @@ namespace GodaiLibrary.GodaiQuest
         SetUserFolder,
         GetUserFolder,
 		GetRealMonsterSrcInfo, // モンスターの元情報を得る
-		GetItemInfoByUserId
+		GetItemInfoByUserId,
+        RegisterKeyword,
+        ModifyKeyword,
+        ModifyKeywordPriority,
+        AttachKeyword,
+        DetachKeyword,
+        ListKeyword,
+        GetKeywordDetail,
+        ModifyKeywordItemPriority,
+        DeleteKeyword
     }
 
     public enum EServerResult
@@ -72,6 +81,8 @@ namespace GodaiLibrary.GodaiQuest
         NotEnoughExp,                   // 経験値が足りません
         NotExistDungeon,                // ダンジョンが存在しません
         ClientNewer,                    // クライアントが新しすぎます
+		SameKeyword,					// 同じキーワードがすでにあります
+		MissingKeyword					// キーワードが存在しない
     }
 
     public enum EUseExp

@@ -256,10 +256,46 @@ namespace GodaiQuestServer
                         {
 							ComGetItemInfoByUserId();
                         }
+						else if (eCommand == EServerCommand.RegisterKeyword)
+						{
+						    ComRegisterKeyword();
+						}
+                        else if (eCommand == EServerCommand.ModifyKeyword)
+						{
+                            ComModifyKeyword();
+						}
+                        else if (eCommand == EServerCommand.ModifyKeywordPriority)
+						{
+                            ComModifyKeywordPriority();
+						}
+                        else if (eCommand == EServerCommand.AttachKeyword)
+						{
+                            ComAttachKeyword();
+						}
+                        else if (eCommand == EServerCommand.DetachKeyword)
+						{
+                            ComDetachKeyword();
+						}
+                        else if (eCommand == EServerCommand.ListKeyword)
+						{
+                            ComListKeyword();
+						}
+                        else if (eCommand == EServerCommand.GetKeywordDetail)
+						{
+                            ComGetKeywordDetail();
+						}
+                        else if (eCommand == EServerCommand.ModifyKeywordItemPriority)
+						{
+                            ComModifyKeywordItemPriority();
+						}
+                        else if (eCommand == EServerCommand.DeleteKeyword)
+						{
+                            ComDeleteKeyword();
+						}
 						else
-                        {
-                            throw new Exception("Invalid Command : " + this.mMail);
-                        }
+						{
+						    throw new Exception("Invalid Command : " + this.mMail);
+						}
                     }
                     this.mNetwork.flush();
                 }
@@ -1404,6 +1440,133 @@ namespace GodaiQuestServer
 			mNetwork.sendDWORD((int)EServerResult.SUCCESS);
 			mNetwork.Serialize(_monster.GetRealMonsterSrcInfo().getSerialize());
         }
-    }
 
+		// コマンド：キーワードを登録する
+        public void ComRegisterKeyword()
+        {
+            addLog("Command : Register Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nUserID = mUserID;
+            string keyword = mNetwork.receiveString();
+            int nKeywordPriority = mNetwork.receiveDWORD();
+            int nKeywordID = 0;
+            var result = mParent.registerKeyword(out nKeywordID, nUserID, keyword, nKeywordPriority);
+			mNetwork.sendDWORD((int)result);
+            if (result != EServerResult.SUCCESS)
+                return;
+            mNetwork.sendDWORD(nKeywordID);
+        }
+
+		// コマンド：キーワードを変更する
+        public void ComModifyKeyword()
+        {
+            addLog("Command : Modify Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nUserID = mUserID;
+            int nKeywordID = mNetwork.receiveDWORD();
+            string newKeyword = mNetwork.receiveString();
+		
+            var result = mParent.modifyKeyword(nUserID, nKeywordID, newKeyword);
+			mNetwork.sendDWORD((int)result);
+            
+        }
+
+		// コマンド：キーワードの優先順位を変更する
+        public void ComModifyKeywordPriority()
+        {
+            addLog("Command : Modify Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nUserID = mUserID;
+            int nKeywordID = mNetwork.receiveDWORD();
+            int nNewPriority = mNetwork.receiveDWORD();
+		
+            var result = mParent.modifyKeywordPriority(nUserID, nKeywordID, nNewPriority);
+			mNetwork.sendDWORD((int)result);
+        }
+
+		// コマンド：キーワードにアイテムを割り当てる
+        public void ComAttachKeyword()
+        {
+            addLog("Command : Attach Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nKeywordID = mNetwork.receiveDWORD();
+            int nItemID = mNetwork.receiveDWORD();
+            int nItemPriority = mNetwork.receiveDWORD();
+		
+            var result = mParent.attachKeyword( nKeywordID, nItemID, nItemPriority);
+			mNetwork.sendDWORD((int)result);
+        }
+
+		// コマンド：キーワードに割り当てたアイテムを外す
+        public void ComDetachKeyword()
+        {
+            addLog("Command : Detach Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nKeywordID = mNetwork.receiveDWORD();
+            int nItemID = mNetwork.receiveDWORD();
+		
+            mParent.detachKeyword(nKeywordID, nItemID);
+			mNetwork.sendDWORD((int)EServerResult.SUCCESS);
+        }
+
+		// コマンド：キーワード一覧を得る
+        public void ComListKeyword()
+        {
+            addLog("Command : List Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nUserID = mNetwork.receiveDWORD(); //自分以外も見たいので 
+		
+            var result = mParent.listKeyword(nUserID);
+			mNetwork.sendDWORD((int)EServerResult.SUCCESS);
+
+            var keywordInfo = new KeywordUserInfo();
+            foreach (var akeyworddb in result)
+            {
+                keywordInfo.addKeyword(new AKeyword(akeyworddb.getKewordID(), akeyworddb.getKeyword(), akeyworddb.getKeywordPriority()));
+            }
+            mNetwork.Serialize(keywordInfo.getSerialize());
+        }
+
+		// コマンド：キーワードの詳細を得る
+        public void ComGetKeywordDetail()
+        {
+            addLog("Command : Get Keyword Detail");
+            int nVersion = mNetwork.receiveDWORD();
+            int nKeywordID = mNetwork.receiveDWORD();
+
+            var result = mParent.getKeywordDetail(nKeywordID);
+			mNetwork.sendDWORD((int)EServerResult.SUCCESS);
+
+            var keyword = new AKeyword();
+            foreach (var akeyworddb in result) 
+            {
+                keyword.addKeywordItem(new AKeywordItem(akeyworddb.getItemID(), akeyworddb.getItemPriority()));
+            }
+			mNetwork.Serialize(keyword.getSerialize());
+        }
+
+		// コマンド：キーワードのアイテムの優先順位を変える
+        public void ComModifyKeywordItemPriority()
+        {
+            addLog("Command : Modify Keyword Item Priority");
+            int nVersion = mNetwork.receiveDWORD();
+            int nKeywordID = mNetwork.receiveDWORD();
+            int nItemID = mNetwork.receiveDWORD();
+            int nNewPriority = mNetwork.receiveDWORD();
+
+            var result = mParent.modifyKeywordItemPriority(nKeywordID, nItemID, nNewPriority);
+			mNetwork.sendDWORD((int)result);
+        }
+
+		// コマンド：キーワードを削除する
+        public void ComDeleteKeyword()
+        {
+            addLog("Command : Delete Keyword");
+            int nVersion = mNetwork.receiveDWORD();
+            int nKeywordID = mNetwork.receiveDWORD();
+
+            var result = mParent.deleteKeyword(mUserID, nKeywordID);
+			mNetwork.sendDWORD((int)result);
+        }
+    }
 }

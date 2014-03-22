@@ -848,7 +848,89 @@ namespace GodaiQuestServer
             }
         }
 
+		// キーワードを登録する
+        public EServerResult registerKeyword(out int nKeywordID, int nUesrID, string keyword, int nKeywordPriority)
+        {
+            lock (mSync)
+            {
+                return mMongo.registerKeyword(out nKeywordID, nUesrID, keyword, nKeywordPriority);
+            }
+        }
+
+		// キーワードを変更する
+        public EServerResult modifyKeyword(int nUserID, int nKeywordID, string newKeyword)
+        {
+            lock (mSync)
+            {
+                return mMongo.modifyKeyword(nUserID, nKeywordID, newKeyword);
+            }
+        }
+
+		// キーワードの優先順位を変える
+        public EServerResult modifyKeywordPriority(int nUserID, int nKeywordID, int nNewPriority)
+        {
+            lock (mSync)
+            {
+                return mMongo.modifyKeywordPriority(nUserID, nKeywordID, nNewPriority);
+            }
+        }
+
+		// キーワードをアイテムに関連づける
+        public EServerResult attachKeyword( int nKeywordId, int nItemID, int nItemPriority)
+        {
+            lock (mSync)
+            {
+                return mMongo.attachKeyword( nKeywordId, nItemID, nItemPriority);
+            }
+        }
+
+		// キーワードに関連づけたアイテムを除く
+        public void detachKeyword(int nKeywordId, int nItemID)
+        {
+            lock (mSync)
+            {
+                mMongo.detachKeyword(nKeywordId, nItemID);
+            }
+        }
+
+		// キーワード一覧を得る
+        public KeywordUserInfo listKeyword(int nUserID)
+        {
+            lock (mSync)
+            {
+                return mMongo.listKeyword(nUserID);
+            }
+        }
+
+		// キーワードに関連付けたアイテム一覧を得る
+        public AKeyword getKeywordDetail(int nKeywordId)
+        {
+            lock (mSync)
+            {
+                return mMongo.getKeywordDetail(nKeywordId);
+            }
+        }
+
+		// アイテムの優先順位を変える
+        public EServerResult modifyKeywordItemPriority(int nKeywordID, int nItemID, int nNewPriority)
+        {
+            lock (mSync)
+            {
+                return mMongo.modifyKeywordItemPriority(nKeywordID, nItemID, nNewPriority);
+            }
+        }
+
+		// キーワードを削除する
+        public EServerResult deleteKeyword(int nUserID, int nKeywordID)
+        {
+            lock (mSync)
+            {
+                return mMongo.deleteKeyword(nUserID, nKeywordID);
+            }
+        }
+
 #if false 
+
         // アイテム情報を得る
         public EServerResult getItemImageInfo(out ItemImageInfo itemimageinfo)
         {

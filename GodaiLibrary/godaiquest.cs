@@ -1455,4 +1455,96 @@ namespace godaiquest
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AKeywordItem")]
+  public partial class AKeywordItem : global::ProtoBuf.IExtensible
+  {
+    public AKeywordItem() {}
+    
+    private int _item_priority = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"item_priority", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int item_priority
+    {
+      get { return _item_priority; }
+      set { _item_priority = value; }
+    }
+    private int _item_id = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"item_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int item_id
+    {
+      get { return _item_id; }
+      set { _item_id = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AKeyword")]
+  public partial class AKeyword : global::ProtoBuf.IExtensible
+  {
+    public AKeyword() {}
+    
+    private int _keyword_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"keyword_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int keyword_id
+    {
+      get { return _keyword_id; }
+      set { _keyword_id = value; }
+    }
+    private string _keyword = "";
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"keyword", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string keyword
+    {
+      get { return _keyword; }
+      set { _keyword = value; }
+    }
+    private int _keyword_priority = default(int);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"keyword_priority", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int keyword_priority
+    {
+      get { return _keyword_priority; }
+      set { _keyword_priority = value; }
+    }
+    private readonly global::System.Collections.Generic.List<godaiquest.AKeywordItem> _keyword_item_set = new global::System.Collections.Generic.List<godaiquest.AKeywordItem>();
+    [global::ProtoBuf.ProtoMember(4, Name=@"keyword_item_set", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.AKeywordItem> keyword_item_set
+    {
+      get { return _keyword_item_set; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"KeywordUserInfo")]
+  public partial class KeywordUserInfo : global::ProtoBuf.IExtensible
+  {
+    public KeywordUserInfo() {}
+    
+    private int _user_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"user_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int user_id
+    {
+      get { return _user_id; }
+      set { _user_id = value; }
+    }
+    private readonly global::System.Collections.Generic.List<godaiquest.AKeyword> _keyword_set = new global::System.Collections.Generic.List<godaiquest.AKeyword>();
+    [global::ProtoBuf.ProtoMember(2, Name=@"keyword_set", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.AKeyword> keyword_set
+    {
+      get { return _keyword_set; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
 }
