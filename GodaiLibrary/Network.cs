@@ -229,12 +229,17 @@ namespace GodaiLibrary
         /// ローカルのファイル一覧を送信する
         public static void sendLocalFilesInfo(Network network, String strDirectory)
         {
-            string strBaseDir = new DirectoryInfo(strDirectory).FullName;
-			sendLocalFilesInfo(network, strBaseDir, strBaseDir);
-			network.sendDWORD(-1);
+            if (Directory.Exists(strDirectory))
+            {
+                string strBaseDir = new DirectoryInfo(strDirectory).FullName;
+                sendLocalFilesInfo(network, strBaseDir, strBaseDir);
+            }
+            network.sendDWORD(-1);
         }
-        private static void sendLocalFilesInfo(Network network, String strDirectory, string strBaseDir) {
-
+        private static void sendLocalFilesInfo(Network network, String strDirectory, string strBaseDir)
+        {
+            if (!Directory.Exists(strDirectory))
+                return;
 			DirectoryInfo info = new DirectoryInfo(strDirectory);
             foreach (var file in info.GetFiles())
             {
