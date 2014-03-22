@@ -65,6 +65,7 @@
     <Compile Include="GodaiLibrary\UserInfo.cs" />
     <Compile Include="GodaiLibrary\godaiquest.cs" />
     <Compile Include="GodaiLibrary\MessageBoxMono.cs" />
+    <Compile Include="GodaiLibrary\KeywordInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

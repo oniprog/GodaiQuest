@@ -1330,6 +1330,9 @@ namespace GodaiQuestServer
                 }
                 else
                 {
+					if (findone.MaxKeywordID <= 1 ) {
+						mGodaiSystemCollection.Save(findone);
+					}
                     int nMaxID = findone.MaxKeywordID;
                     var query = Query.EQ("MaxKeywordID", nMaxID);
                     var sortBy = SortBy.Null;
