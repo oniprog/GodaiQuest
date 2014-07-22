@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -53,6 +54,8 @@ namespace GodaiQuest
         private List<BombAnim> _listBombAnim = new List<BombAnim>();
 
         private bool _bEnableCopyRichTextBox = true;	// コピー＆ペーストの禁止（モンスターの呪文のコピーを防ぐため）
+
+        private bool _movingOhter = false;  // 移動中のとき
 
         private void FormScreen_Load(object sender, EventArgs e)
         {
@@ -402,6 +405,7 @@ namespace GodaiQuest
                         {
                             var user = this.mUserInfo.getAUser(this.mGQCom.getUserID());
                             gra.DrawImage(user.getCharacterImage(), idrawx, idrawy, BLOCK_SIZE, BLOCK_SIZE);
+
                         }
 
                         foreach (var loc in listLocation)
@@ -558,6 +562,11 @@ namespace GodaiQuest
                         }
                     }
                 }
+
+                if (_movingOhter)
+                {
+                    gra.FillRectangle(new HatchBrush(HatchStyle.DarkDownwardDiagonal, Color.Blue, Color.FromArgb(0,0,0,0)), rect);
+                }
             }
         }
 
@@ -690,155 +699,177 @@ namespace GodaiQuest
         // 出現する
         private void goOtherGround(int nDungeonUesrID, int nDungeonNumber, int nBeforeDungeonUserID, int nBeforeDungeonNumber)
         {
-			// 爆発情報をクリアする
-            lock (_listBombAnim)
+            try
             {
-                _listBombAnim.Clear();
-            }
+                _movingOhter = true;
+                this.drawScreen();
+                this.Refresh();
 
-            // ダンジョンデータロード
-            this.mLocation = new ALocation(this.mGQCom.getUserID(), 0, 0, nDungeonUesrID, nDungeonNumber);
-            this.loadDungeon(this.mLocation, false);
-
-            int nNewX = 0;
-            int nNewY = 0;
-            if (nDungeonUesrID == 0)
-            {
-                if (nBeforeDungeonUserID == 0 ) {
-                    //　謎
+                // 爆発情報をクリアする
+                lock (_listBombAnim)
+                {
+                    _listBombAnim.Clear();
                 }
-                else {
 
-                    // 外に出た
-                    bool bBefIsland = nBeforeDungeonUserID == 0;
+                // ダンジョンデータロード
+                this.mLocation = new ALocation(this.mGQCom.getUserID(), 0, 0, nDungeonUesrID, nDungeonNumber);
+                this.loadDungeon(this.mLocation, false);
 
-                    IslandGroundInfo groundinfo;
-                    if ( !this.mGQCom.getIslandGroundInfo(out groundinfo) ) {
-                        MessageBox.Show(this.mGQCom.getErrorReasonString());
-                        return;
+                int nNewX = 0;
+                int nNewY = 0;
+                if (nDungeonUesrID == 0)
+                {
+                    if (nBeforeDungeonUserID == 0)
+                    {
+                        //　謎
                     }
-                    var listGround = groundinfo.getIslandGroundByUserID(nBeforeDungeonUserID);
+                    else
+                    {
+
+                        // 外に出た
+                        bool bBefIsland = nBeforeDungeonUserID == 0;
+
+                        IslandGroundInfo groundinfo;
+                        if (!this.mGQCom.getIslandGroundInfo(out groundinfo))
+                        {
+                            MessageBox.Show(this.mGQCom.getErrorReasonString());
+                            return;
+                        }
+                        var listGround = groundinfo.getIslandGroundByUserID(nBeforeDungeonUserID);
+
+                        int ix1 = 0, iy1 = 0;
+                        int ix2 = this.mDungeon.getSizeX() - 1, iy2 = this.mDungeon.getSizeY() - 1;
+                        for (int iy = iy1; iy <= iy2; ++iy)
+                        {
+                            bool bFind = false;
+                            for (int ix = ix1; ix <= ix2; ++ix)
+                            {
+                                bool bIn = false;
+                                foreach (var ground in listGround)
+                                {
+                                    if (ground.contains(ix, iy))
+                                    {
+                                        bIn = true;
+                                        break;
+                                    }
+                                }
+                                if (!bIn)
+                                    continue;
+
+                                nNewX = ix;
+                                nNewY = iy; //とりあえず更新
+
+                                var nObjectID = this.mDungeon.getDungeonContentAt(ix, iy);
+                                var obj = this.mObjectAttrInfo.getObject((int) nObjectID);
+                                {
+                                    if (obj.getObjectCommand() == EObjectCommand.GoDown ||
+                                        obj.getObjectCommand() == EObjectCommand.IntoDungeon)
+                                    {
+                                        nNewX = ix;
+                                        nNewY = iy;
+                                        bFind = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (bFind)
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    bool bBefIsland = nBeforeDungeonUserID == 0;
+                    bool bGoDown = nBeforeDungeonNumber <= nDungeonNumber;
+
+                    // ダンジョン内
+                    int nBefX = 0, nBefY = 0;
+
+                    int nDistMin = int.MaxValue;
+                    if (!bBefIsland)
+                    {
+                        nBefX = this.mLocation.getIX();
+                        nBefY = this.mLocation.getIY();
+                    }
 
                     int ix1 = 0, iy1 = 0;
                     int ix2 = this.mDungeon.getSizeX() - 1, iy2 = this.mDungeon.getSizeY() - 1;
                     for (int iy = iy1; iy <= iy2; ++iy)
                     {
-                        bool bFind = false;
                         for (int ix = ix1; ix <= ix2; ++ix)
                         {
-                            bool bIn = false;
-                            foreach (var ground in listGround)
-                            {
-                                if (ground.contains(ix, iy))
-                                {
-                                    bIn = true;
-                                    break;
-                                }
-                            }
-                            if (!bIn)
+                            int nDist = Math.Abs(nBefX - ix) + Math.Abs(nBefY - iy);
+                            if (nDist >= nDistMin)
                                 continue;
 
-                            nNewX = ix; nNewY = iy; //とりあえず更新
-
                             var nObjectID = this.mDungeon.getDungeonContentAt(ix, iy);
-                            var obj = this.mObjectAttrInfo.getObject((int)nObjectID);
+                            var obj = this.mObjectAttrInfo.getObject((int) nObjectID);
+                            bool bFind = false;
+                            if (bBefIsland)
                             {
-                                if (obj.getObjectCommand() == EObjectCommand.GoDown || obj.getObjectCommand() == EObjectCommand.IntoDungeon)
+                                if (bGoDown)
                                 {
-                                    nNewX = ix; nNewY = iy; bFind = true;
-                                    break;
+                                    if (nDungeonNumber == 0)
+                                    {
+
+                                        if (obj.getObjectCommand() == EObjectCommand.GoUp ||
+                                            obj.getObjectCommand() == EObjectCommand.GoOutDungeon)
+                                        {
+                                            bFind = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (obj.getObjectCommand() == EObjectCommand.GoUp)
+                                        {
+                                            bFind = true;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (obj.getObjectCommand() == EObjectCommand.GoDown)
+                                    {
+                                        bFind = true;
+                                    }
                                 }
                             }
+                            else
+                            {
+                                if (bGoDown)
+                                {
+                                    if (obj.getObjectCommand() == EObjectCommand.GoUp)
+                                    {
+                                        bFind = true;
+                                    }
+                                }
+                                else
+                                {
+                                    if (obj.getObjectCommand() == EObjectCommand.GoDown)
+                                    {
+                                        bFind = true;
+                                    }
+                                }
+                            }
+                            if (bFind)
+                            {
+                                nNewX = ix;
+                                nNewY = iy;
+                                nDistMin = nDist;
+                            }
                         }
-                        if ( bFind )
-                            break;
                     }
                 }
+
+                this.mLocation.setXY(nNewX, nNewY);
+                this.loadUnpickedupInfo();
+                this.drawScreen();
+                this.picScreen.Refresh();
             }
-            else 
+            finally
             {
-                bool bBefIsland = nBeforeDungeonUserID == 0;
-                bool bGoDown = nBeforeDungeonNumber <= nDungeonNumber;
-
-                // ダンジョン内
-                int nBefX = 0, nBefY  = 0;
-
-                int nDistMin = int.MaxValue;
-                if (!bBefIsland)
-                {
-                    nBefX = this.mLocation.getIX();
-                    nBefY = this.mLocation.getIY();
-                }
-
-                int ix1 = 0, iy1 = 0;
-                int ix2 = this.mDungeon.getSizeX() - 1, iy2 = this.mDungeon.getSizeY() - 1;
-                for (int iy = iy1; iy <= iy2; ++iy)
-                {
-                    for (int ix = ix1; ix <= ix2; ++ix)
-                    {
-                        int nDist = Math.Abs(nBefX - ix) + Math.Abs(nBefY - iy);
-                        if ( nDist >= nDistMin )
-                            continue;
-
-                        var nObjectID = this.mDungeon.getDungeonContentAt(ix, iy);
-                        var obj = this.mObjectAttrInfo.getObject((int)nObjectID);
-                        bool bFind = false;
-                        if (bBefIsland)
-                        {
-                            if (bGoDown)
-                            {
-                                if ( nDungeonNumber == 0 ) {
-
-                                    if (obj.getObjectCommand() == EObjectCommand.GoUp || obj.getObjectCommand() == EObjectCommand.GoOutDungeon)
-                                    {
-                                        bFind = true;
-                                    }
-                                }
-                                else {
-                                    if (obj.getObjectCommand() == EObjectCommand.GoUp )
-                                    {
-                                        bFind = true;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (obj.getObjectCommand() == EObjectCommand.GoDown)
-                                {
-                                    bFind = true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (bGoDown)
-                            {
-                                if (obj.getObjectCommand() == EObjectCommand.GoUp) 
-                                {
-                                    bFind = true;
-                                }
-                            }
-                            else
-                            {
-                                if (obj.getObjectCommand() == EObjectCommand.GoDown)
-                                {
-                                    bFind = true;
-                                }
-                            }
-                        }
-                        if (bFind)
-                        {
-                            nNewX = ix; nNewY = iy;
-                            nDistMin = nDist;
-                        }
-                    }
-                }
+                _movingOhter = false;
             }
-
-            this.mLocation.setXY(nNewX, nNewY);
-            this.loadUnpickedupInfo();
-            this.drawScreen();
-            this.picScreen.Refresh();
         }
 
         // コマンド実行
