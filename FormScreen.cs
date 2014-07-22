@@ -688,7 +688,7 @@ namespace GodaiQuest
         }
 
         // 出現する
-        private void goOtherGround(int nDungeonUesrID, int nDungeonNumber, int nBeforeDungeonUserID)
+        private void goOtherGround(int nDungeonUesrID, int nDungeonNumber, int nBeforeDungeonUserID, int nBeforeDungeonNumber)
         {
 			// 爆発情報をクリアする
             lock (_listBombAnim)
@@ -758,7 +758,7 @@ namespace GodaiQuest
             else 
             {
                 bool bBefIsland = nBeforeDungeonUserID == 0;
-                bool bGoDown = nBeforeDungeonUserID <= nDungeonUesrID;
+                bool bGoDown = nBeforeDungeonNumber <= nDungeonNumber;
 
                 // ダンジョン内
                 int nBefX = 0, nBefY  = 0;
@@ -813,14 +813,14 @@ namespace GodaiQuest
                         {
                             if (bGoDown)
                             {
-                                if (obj.getObjectCommand() == EObjectCommand.GoDown) // これが正しいみたい
+                                if (obj.getObjectCommand() == EObjectCommand.GoUp) 
                                 {
                                     bFind = true;
                                 }
                             }
                             else
                             {
-                                if (obj.getObjectCommand() == EObjectCommand.GoUp)
+                                if (obj.getObjectCommand() == EObjectCommand.GoDown)
                                 {
                                     bFind = true;
                                 }
@@ -866,7 +866,7 @@ namespace GodaiQuest
                         nNewDugeonID = 0x40000000;  
                     }
 
-                    this.goOtherGround(nNewDugeonID, 0, 0);
+                    this.goOtherGround(nNewDugeonID, 0, 0, 0);
                 }
                 else
                 {
@@ -885,7 +885,7 @@ namespace GodaiQuest
                     if ( bInIsland )
                         MessageBox.Show("降りる階段に見えたが行き止まりだった");
                     else
-                        this.goOtherGround(this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber() + 1, this.mLocation.getDungeonNumber());
+                        this.goOtherGround(this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber() + 1, this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber());
                 }
             }
             else if (obj.getObjectCommand() == EObjectCommand.GoUp)
@@ -899,7 +899,7 @@ namespace GodaiQuest
                 }
                 else
                 {
-                    this.goOtherGround(this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber()-1, this.mLocation.getDungeonNumber());
+                    this.goOtherGround(this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber()-1, this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber());
                 }
             }
             else if (obj.getObjectCommand() == EObjectCommand.GoOutDungeon)
@@ -911,7 +911,7 @@ namespace GodaiQuest
                 else
                 {
                     // 外に出る
-                    this.goOtherGround(0, 0, this.mLocation.getDungeonUserID() );
+                    this.goOtherGround(0, 0, this.mLocation.getDungeonUserID(), this.mLocation.getDungeonNumber() );
                 }
             }
         }
