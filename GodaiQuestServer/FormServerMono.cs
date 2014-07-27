@@ -21,7 +21,7 @@ namespace GodaiQuestServer
 		}
 
 		public void addLog( string strLog ) {
-		   Gtk.Application.Invoke(delegate {
+			Gtk.Application.Invoke(delegate {
 				var dateTime = DateTime.Now;
 				textLog.Buffer.Text = "["+dateTime.ToShortDateString() + " " + dateTime.ToShortTimeString()+ "]:"+ strLog + "\r\n" + textLog.Buffer.Text;
 				if ( textLog.Buffer.LineCount > 1000 ) {
@@ -31,7 +31,7 @@ namespace GodaiQuestServer
 						textLog.Buffer.Text += lines[it] + "\n";
 					}
 				}
-		    });
+			});
 		}
 		protected void OnButtonTestClicked (object sender, EventArgs e)
 		{
@@ -47,14 +47,14 @@ namespace GodaiQuestServer
 			}
 
 			DungeonBlockImageInfo dungeonimages;
-            _serverWorker.getDungeonBlockImage(out dungeonimages);
-            if (dungeonimages.Count() != 0)
-            {
+			_serverWorker.getDungeonBlockImage(out dungeonimages);
+			if (dungeonimages.Count() != 0)
+			{
 				MessageBox2.Show("mongodbを停止したあと，mongodbの中身を空にしてください(/usr/lib/mongodb?)．その後，再びこのボタンを押してください");
 				return;
-            }
+			}
 
-            _serverWorker.ForceInitializeMongoDB();
+			_serverWorker.ForceInitializeMongoDB();
 		}
 	}
 }
