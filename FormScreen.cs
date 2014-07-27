@@ -55,7 +55,7 @@ namespace GodaiQuest
 
         private bool _bEnableCopyRichTextBox = true;	// コピー＆ペーストの禁止（モンスターの呪文のコピーを防ぐため）
 
-        private bool _movingOhter = false;  // 移動中のとき
+        private bool _movingOther = false;  // 移動中のとき
 
         private void FormScreen_Load(object sender, EventArgs e)
         {
@@ -563,7 +563,7 @@ namespace GodaiQuest
                     }
                 }
 
-                if (_movingOhter)
+                if (_movingOther)
                 {
                     gra.FillRectangle(new HatchBrush(HatchStyle.DarkDownwardDiagonal, Color.Blue, Color.FromArgb(0,0,0,0)), rect);
                 }
@@ -701,7 +701,7 @@ namespace GodaiQuest
         {
             try
             {
-                _movingOhter = true;
+                _movingOther = true;
                 this.drawScreen();
                 this.Refresh();
 
@@ -868,7 +868,7 @@ namespace GodaiQuest
             }
             finally
             {
-                _movingOhter = false;
+                _movingOther = false;
             }
         }
 
