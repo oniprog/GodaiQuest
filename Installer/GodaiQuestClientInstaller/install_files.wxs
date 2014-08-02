@@ -1,32 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
-        <DirectoryRef Id="ProgramFilesFolder">
-            <Directory Id="dir17DCF0D3A3036F2AFACBFF4320503E85" Name="GodaiQuestClient" />
+        <DirectoryRef Id="GodaiQuestFolder">
+            <Directory Id="dir5607254BD2CCBCF678CFB1675000CD9F" Name="GodaiQuestClient" />
         </DirectoryRef>
     </Fragment>
     <Fragment>
         <ComponentGroup Id="GroupGQC">
-            <Component Id="cmp957FBC3473A0DC8FB256F409E1DB46EE" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{EEB0546F-3198-43ED-B09E-E90A9BE39367}">
-                <File Id="filB51E8F9284680750C49A34A5F885BD6B" KeyPath="yes" Source="$(var.Install_data)\bomb1.png" />
+            <Component Id="cmp229027B030EC71E48C569DA1C63F2D93" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{55D04C13-9301-45F7-8FE8-D22E6FE13FFC}">
+                <File Id="filBE54BFBF2AE0D0FBB5E55958C4B34122" KeyPath="yes" Source="$(var.Install_data)\bomb1.png" />
             </Component>
-            <Component Id="cmpAF19474D3FFBBF2A68CC41EB98343A7F" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{6A98AA73-94C6-4BE0-A6BF-15E54343FF4B}">
-                <File Id="filEE5AE2C5822113A88D980E7894F4B961" KeyPath="yes" Source="$(var.Install_data)\bomb2.png" />
+            <Component Id="cmpBDC83D84A6623C5A375F01790A739782" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{C78F3326-A4E4-4230-A210-F21FCD550F0A}">
+                <File Id="fil7EAE1EE9498535D1F6819B0BD434C643" KeyPath="yes" Source="$(var.Install_data)\bomb2.png" />
             </Component>
-            <Component Id="cmp2155598DD70AE7EAF2EC04F15060A985" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{D4490DE3-BE46-443C-978D-6E4639C97F91}">
-                <File Id="fil834B5A20F37E7376BF065FC225AD5433" KeyPath="yes" Source="$(var.Install_data)\GodaiLibrary.dll" />
+            <Component Id="cmp59D5B4543DA380B64296DC77AA8EB4EE" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{1796C988-63D9-4CFC-ABF0-E4138A1E4AF3}">
+                <File Id="fil398E8800523B4DFD1171B4315572674E" KeyPath="yes" Source="$(var.Install_data)\GodaiLibrary.dll" />
             </Component>
-            <Component Id="cmp004E0F7941A04C266A45FA9F22215D57" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{FE792E5A-39D5-4003-A45D-6B6F8C0CDC73}">
-                <File Id="filFAC9C3D5DAB2DC1216001A314A8F2F27" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe" />
+            <Component Id="cmp27B7858B13252482C1CB4928488DE5D2" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{03FCC892-9CA8-4FE2-8ECD-8362F5CDCAC0}">
+                <File Id="fil6AF38C3D586EEF3309A21A0046A90083" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe" />
             </Component>
-            <Component Id="cmpA26ACE4FA0401DB24501012F3B8D366F" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{FB26E5ED-A7B0-4F15-8070-9CBBD3570A4D}">
-                <File Id="filB5965BC28AD223C33EED339418F4DDBB" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe.config" />
+            <Component Id="cmp52CF5227F77461F9F78E9D3BDBB7C444" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{20837D3B-0A1F-4E5F-B524-843484BFAD2D}">
+                <File Id="fil46594DECD47CAEF9D9EE85F7FFCAE848" KeyPath="yes" Source="$(var.Install_data)\GodaiQuest.exe.config" />
             </Component>
-            <Component Id="cmpE70A9C23317ED827EC50818BE4D48EC7" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{DE148C0D-59DA-4011-A909-5FC05EF396D0}">
-                <File Id="fil48D25947F8261A66D3DFCBBCB7388771" KeyPath="yes" Source="$(var.Install_data)\protobuf-net.dll" />
+            <Component Id="cmp25CFA6E6D7B19553A179A1272D602B1B" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{3BAD5CA8-7F0C-4A89-8AD9-F95C76DCAB27}">
+                <File Id="fil266889488B98962705D25BE5F1C6817B" KeyPath="yes" Source="$(var.Install_data)\protobuf-net.dll" />
             </Component>
-            <Component Id="cmp4E0AD25C740C4A6DEB75B04EBEC208FD" Directory="dir17DCF0D3A3036F2AFACBFF4320503E85" Guid="{2962EA31-A330-4B16-B58C-247479310209}">
-                <File Id="filC1685BBD931B7CF3915BF2E246FFB39F" KeyPath="yes" Source="$(var.Install_data)\readme.txt" />
+            <Component Id="cmp24E8ABD65050AEE304D94E8E1AE04952" Directory="dir5607254BD2CCBCF678CFB1675000CD9F" Guid="{C9AC2C58-3139-43C3-A2A6-2344A02B1A79}">
+                <File Id="fil39DE1469B6895FBC36364D840C9FA5EF" KeyPath="yes" Source="$(var.Install_data)\readme.txt" />
             </Component>
         </ComponentGroup>
     </Fragment>

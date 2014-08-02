@@ -13,19 +13,20 @@
     </Product>
 
     <Fragment>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
-            </Directory>
-            <Directory Id="ProgramMenuFolder">
-                <Directory Id="MyShortcutsDir" Name="GodaiQuestServer"/>
+      <Directory Id="TARGETDIR" Name="SourceDir">
+        <Directory Id="ProgramFilesFolder" SourceName="ProgramFolder">
+          <Directory Id="GodaiQuestFolder" Name="GodaiQuestClient"/>
         </Directory>
+        <Directory Id="ProgramMenuFolder">
+          <Directory Id="MyShortcutsDir" Name="GodaiQuest"/>
+        </Directory>
+      </Directory>
     </Fragment>
-            </Directory>
 
     <Fragment>
         <DirectoryRef Id="MyShortcutsDir">
             <Component Id="CMP_ShortcutsExe" Guid="5B8D01CA-C428-4541-9651-7738F0021515">
-                <Shortcut Id="SHORTCUT_Exe" Name="GodaiQuest" Description="Godai Quest" Target="[INSTALLFOLDER]GodaiQuest.exe"/>
+                <Shortcut Id="SHORTCUT_Exe" Name="GodaiQuest" Description="Godai Quest" Target="[dir5607254BD2CCBCF678CFB1675000CD9F]GodaiQuest.exe"/>
                 <RemoveFolder Id="MyShortcutsDir" On="uninstall"/>
                 <RegistryValue Root="HKCU" Key="Software\oniprog\GodaiQuest" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
             </Component>
