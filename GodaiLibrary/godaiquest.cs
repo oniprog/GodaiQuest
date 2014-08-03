@@ -1547,4 +1547,55 @@ namespace godaiquest
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AItemTime")]
+  public partial class AItemTime : global::ProtoBuf.IExtensible
+  {
+    public AItemTime() {}
+    
+    private int _item_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"item_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int item_id
+    {
+      get { return _item_id; }
+      set { _item_id = value; }
+    }
+    private long _created = default(long);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"created", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long created
+    {
+      get { return _created; }
+      set { _created = value; }
+    }
+    private long _last_modified = default(long);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"last_modified", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long last_modified
+    {
+      get { return _last_modified; }
+      set { _last_modified = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ItemTimeInfo")]
+  public partial class ItemTimeInfo : global::ProtoBuf.IExtensible
+  {
+    public ItemTimeInfo() {}
+    
+    private readonly global::System.Collections.Generic.List<godaiquest.AItemTime> _item_time_list = new global::System.Collections.Generic.List<godaiquest.AItemTime>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"item_time_list", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.AItemTime> item_time_list
+    {
+      get { return _item_time_list; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
 }

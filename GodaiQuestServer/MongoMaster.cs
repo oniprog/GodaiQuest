@@ -48,6 +48,7 @@ namespace GodaiQuestServer
         private MongoCollection<DBUserFolder> mUserFolderCollection;
         private MongoCollection<DBKeyword> mKeywordCollection;
         private MongoCollection<DBKeywordItem> mKeywordItemCollection;
+        private MongoCollection<DBItemTime> mItemTime;
 
         public MongoMaster()
         {
@@ -78,6 +79,7 @@ namespace GodaiQuestServer
             this.mUserFolderCollection = this.mDB.GetCollection<DBUserFolder>("user_fodler");
             this.mKeywordCollection= this.mDB.GetCollection<DBKeyword>("keyword");
             this.mKeywordItemCollection= this.mDB.GetCollection<DBKeywordItem>("keyword_item");
+            this.mItemTime = this.mDB.GetCollection<DBItemTime>("item_time");
         }
 
 		// データベースが有効かを判定する
@@ -1522,6 +1524,44 @@ namespace GodaiQuestServer
             mKeywordItemCollection.Remove(Query.EQ("KeywordID", nKeywordID));
             return EServerResult.SUCCESS;
         }
+
+		// 時間を設定する
+        public EServerResult setItemTimeCreated(int nItemID, DateTime created)
+        {
+            var findone =
+                mItemTime.FindOne(Query.EQ("ItemID", nItemID));
+            if (findone == null)
+            {
+                var itemtime = new DBItemTime();
+                itemtime.setInit(nItemID, created, created);
+                mItemTime.Save(itemtime);
+            }
+            return EServerResult.SUCCESS;
+        }
+		// 時間を設定する
+        public EServerResult setItemTimeModified(int nItemID, DateTime modified)
+        {
+            var findone =
+                mItemTime.FindOne(Query.EQ("ItemID", nItemID));
+            if (findone == null)
+            {
+                var itemtime = new DBItemTime();
+                itemtime.setInit(nItemID, modified, modified);
+                mItemTime.Save(itemtime);
+            }
+			else {
+				var update = Update.Set("LastModified", BsonValue.Create(modified));
+				mItemTime.Update(Query.EQ("ItemID", nItemID), update);
+            }
+            return EServerResult.SUCCESS;
+        }
+		// 時間を得る
+        public AItemTime getItemTime(int nItemID)
+        {
+            var findone = mItemTime.FindOne(Query.EQ("ItemID", nItemID));
+            var ret = new AItemTime(findone.ItemID, findone.Created, findone.LastModified);
+            return ret;
+        }
     }
 
     public class DBGodaiSystem
@@ -1674,6 +1714,22 @@ namespace GodaiQuestServer
                 ? aitem.getHeaderImage() as Bitmap
                 : new Bitmap(aitem.getHeaderImage());
             this.ItemImageID = nItemImageID;
+        }
+    }
+
+	// アイテムの日付関連を記録する
+    public class DBItemTime
+    {
+        public MongoDB.Bson.ObjectId _id { get; set; }
+        public int ItemID { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime LastModified { get; set; }
+
+        public void setInit(int nItemID, DateTime created, DateTime lastModified)
+        {
+            ItemID = nItemID;
+            Created = created;
+            LastModified = lastModified;
         }
     }
 

@@ -587,6 +587,9 @@ namespace GodaiQuestServer
                 var writer = userinfo.getAUser(article.getUserID());
                 foreach (var userdb in userinfo ) {
 
+                    if (userdb.getUserID() == 0)
+                        continue;   // システムの書き込みはくわえない
+
                     var reader = userinfo.getAUser(userdb.getUserID());
                     if (writer.getUserID() == article.getUserID())
                     {
@@ -926,6 +929,33 @@ namespace GodaiQuestServer
             lock (mSync)
             {
                 return mMongo.deleteKeyword(nUserID, nKeywordID);
+            }
+        }
+
+        // アイテム作成時刻を書き込む
+        public EServerResult setItemTimeCreated(int nItemId, DateTime created)
+        {
+            lock (mSync)
+            {
+                return mMongo.setItemTimeCreated(nItemId, created);
+            }
+        }
+
+        // アイテム作成時刻を書き込む
+        public EServerResult setItemTimeModified(int nItemID, DateTime lastModified)
+        {
+            lock (mSync)
+            {
+                return mMongo.setItemTimeModified(nItemID, lastModified);
+            }
+        }
+
+        // アイテム作成時刻を得る
+        public AItemTime getItemTime(int nItemID)
+        {
+            lock (mSync)
+            {
+                return mMongo.getItemTime(nItemID);
             }
         }
 

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="CSVLoader.cs" />
     <Compile Include="godaiquest.cs" />
+    <Compile Include="ItemTime.cs" />
     <Compile Include="KeywordInfo.cs" />
     <Compile Include="MessageBoxWin.cs" />
     <Compile Include="RandaomDungeonInfo.cs" />
