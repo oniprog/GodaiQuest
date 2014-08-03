@@ -690,6 +690,8 @@ namespace GodaiQuest
                         _bEnableCopyRichTextBox = true;
                     }
                 }
+                // 無条件で移動する
+                findAndGoPath(poiClick.X, poiClick.Y);
             }
             this.mSelectedCell = poiClick;
             this.drawScreen();
@@ -950,6 +952,7 @@ namespace GodaiQuest
         // マウス二回クリック
         private void picScreen_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+
             Point poiClick = getDungeonCoordInPicture(e.X, e.Y);
             if (poiClick.X < 0 || poiClick.X >= this.mDungeon.getSizeX() || poiClick.Y < 0 || poiClick.Y >= this.mDungeon.getSizeY())
                 return;
