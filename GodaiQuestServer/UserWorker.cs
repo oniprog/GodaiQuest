@@ -292,6 +292,10 @@ namespace GodaiQuestServer
 						{
                             ComDeleteKeyword();
 						}
+                        else if (eCommand == EServerCommand.GetItemInfo2ByUserId)
+                        {
+							ComGetItemInfo2ByUserId();
+                        }
 						else
 						{
 						    throw new Exception("Invalid Command : " + this.mMail);
@@ -663,6 +667,27 @@ namespace GodaiQuestServer
             this.mNetwork.Serialize(iteminfo.getSerialize());
 		}
 
+        // コマンド：アイテム一覧(特定ユーザの），更新日付付き
+        private void ComGetItemInfo2ByUserId()
+        {
+			addLog ("Command : get item info2 "+ mMail );
+			int nVersion = mNetwork.receiveDWORD();
+			int nUserId = mNetwork.receiveDWORD();
+
+            ItemInfo iteminfo;
+            var result = this.mParent.getItemInfoByUserId(out iteminfo, nUserId);
+            this.mNetwork.sendDWORD((int)result);
+            if (result != EServerResult.SUCCESS)
+            {
+                return;
+            }
+            ItemInfo2 iteminfo2;
+            this.mParent.convToItemInfo2(out iteminfo2, iteminfo);
+
+            this.mNetwork.Serialize(iteminfo2.getSerialize());
+
+        }
+
         /// コマンド：アイテム一覧を得る
         private void ComGetItemInfo()
         {
@@ -755,6 +780,9 @@ namespace GodaiQuestServer
             // 中でアイテムの拾い上げログをけしている。これで経験値が再び入るようになる。
             var result = this.mParent.changeAItem(item);
             this.mNetwork.sendDWORD((int)result);
+
+            // 更新日付を記録する
+            this.mParent.setItemTimeModified(item.getItemID(), DateTime.Now);
 
             // ログを作る
             UserInfo userinfo;

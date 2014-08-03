@@ -59,7 +59,8 @@ namespace GodaiLibrary.GodaiQuest
         ListKeyword,
         GetKeywordDetail,
         ModifyKeywordItemPriority,
-        DeleteKeyword
+        DeleteKeyword,
+        GetItemInfo2ByUserId
     }
 
     public enum EServerResult

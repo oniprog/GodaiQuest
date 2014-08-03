@@ -1053,5 +1053,29 @@ namespace GodaiQuestServer
             GodaiLibrary.MessageBox2.Show("ディフォルトの設定で初期化しました");
             return true;
         }
+
+
+        // ItemInfoを2に変換する
+        public void convToItemInfo2(out ItemInfo2 iteminfo2, ItemInfo iteminfo)
+        {
+            iteminfo2 = new ItemInfo2();
+            foreach (var aitem in iteminfo)
+            {
+                var itemTime = getItemTime(aitem.getItemID());
+                DateTime created, lastModified;
+                if (itemTime == null)
+                {
+                    created = new DateTime(2000, 1, 1);
+                    lastModified = new DateTime(2000, 1, 1);
+                }
+                else
+                {
+                    created = itemTime.getCreatedTime();
+                    lastModified = itemTime.getLastModifiedTime();
+                }
+                var aitem2 = new AItem2( aitem.getItemID(), aitem.getItemImageID(), aitem.getHeaderString(), aitem.getHeaderImage(), aitem.isNew(), created, lastModified );
+                iteminfo2.addItem(aitem2);
+            }
+        } 
     }
 }

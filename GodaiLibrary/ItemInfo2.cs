@@ -7,9 +7,9 @@ using System.Drawing;
 namespace GodaiLibrary.GodaiQuest
 {
 
-    /// 1つのアイテム
+    /// 1つのアイテム 日付情報付き
     [Serializable()]
-    public class AItem
+    public class AItem2
     {
         private int mItemID; // フォルダ場所はItemIDより求まるだろう。
         
@@ -20,22 +20,29 @@ namespace GodaiLibrary.GodaiQuest
 
         private bool mNew;
 
-        public AItem() { }
-        public AItem(godaiquest.AItem aitem)
+        private DateTime mCreated;
+        private DateTime mLastModified;
+
+        public AItem2() { }
+        public AItem2(godaiquest.AItem2 aitem)
         {
             mItemID = aitem.item_id;
             mItemImageID = aitem.item_image_id;
             mHeaderString = aitem.header_string;
             mHeaderImage = Network.ByteArrayToImage(aitem.header_image);
             mNew = aitem.bNew;
+            mCreated = new DateTime(aitem.created);
+            mLastModified = new DateTime(aitem.last_modified);
         }
-        public godaiquest.AItem getSerialize()
+        public godaiquest.AItem2 getSerialize()
         {
-			var ret = new godaiquest.AItem();
+			var ret = new godaiquest.AItem2();
             ret.item_id = mItemID;
             ret.item_image_id = mItemImageID;
             ret.header_string = mHeaderString;
             ret.header_image = Network.ImageToByteArray(mHeaderImage);
+            ret.created = mCreated.Ticks;
+            ret.last_modified = mLastModified.Ticks;
             return ret;
         }
 
@@ -70,39 +77,38 @@ namespace GodaiLibrary.GodaiQuest
         {
             this.mNew = false;
         }
-        public AItem(int nItemID, int nItemImageID, String strHeader, Image imageHeader, bool bNew)
+        public AItem2(int nItemID, int nItemImageID, String strHeader, Image imageHeader, bool bNew, DateTime created, DateTime lastModified)
         {
             this.mItemID = nItemID;
             this.mItemImageID = nItemImageID;
             this.mHeaderString = strHeader;
             this.mHeaderImage = imageHeader;
+            this.mCreated = created;
+            this.mLastModified = lastModified;
         }
     }
 
     /// アイテム集合の情報
     [Serializable()]
-    public class ItemInfo: IEnumerable<AItem>
+    public class ItemInfo2: IEnumerable<AItem2>
     {
-        private Dictionary<int, AItem> mDicItems = new Dictionary<int, AItem>();
+        private Dictionary<int, AItem2> mDicItems = new Dictionary<int, AItem2>();
 
-        public ItemInfo() { }
-        public ItemInfo(godaiquest.ItemInfo iteminfo)
+        public ItemInfo2() { }
+        public ItemInfo2(godaiquest.ItemInfo2 iteminfo)
         {
-			foreach (var tmp in iteminfo.aitem_dic)
+			foreach (var tmp in iteminfo.item_list)
 			{
-                mDicItems.Add(tmp.index, new AItem(tmp.aitem));
+                mDicItems.Add(tmp.item_id, new AItem2(tmp));
 			}
         }
 
-        public godaiquest.ItemInfo getSerialize()
+        public godaiquest.ItemInfo2 getSerialize()
         {
-            var ret = new godaiquest.ItemInfo();
+            var ret = new godaiquest.ItemInfo2();
 			foreach (var tmp in mDicItems)
 			{
-                var aitemdic = new godaiquest.AItemDic();
-                aitemdic.index = tmp.Key;
-                aitemdic.aitem = tmp.Value.getSerialize();
-                ret.aitem_dic.Add(aitemdic);
+                ret.item_list.Add(tmp.Value.getSerialize());
 			}
             return ret;
         }
@@ -111,19 +117,19 @@ namespace GodaiLibrary.GodaiQuest
         {
             return GetEnumerator();
         }
-        public IEnumerator<AItem> GetEnumerator()
+        public IEnumerator<AItem2> GetEnumerator()
         {
             return mDicItems.Values.GetEnumerator();
         }
 
-        public void addItem(AItem item_)
+        public void addItem(AItem2 item_)
         {
             this.mDicItems.Add(item_.getItemID(), item_);
         }
 
-        public AItem getAItem(int nItemID)
+        public AItem2 getAItem(int nItemID)
         {
-            AItem ret = null;
+            AItem2 ret = null;
             this.mDicItems.TryGetValue(nItemID, out ret );
             return ret;
         }

@@ -1559,8 +1559,11 @@ namespace GodaiQuestServer
         public AItemTime getItemTime(int nItemID)
         {
             var findone = mItemTime.FindOne(Query.EQ("ItemID", nItemID));
-            var ret = new AItemTime(findone.ItemID, findone.Created, findone.LastModified);
-            return ret;
+            if (findone == null)
+            {
+                return new AItemTime(nItemID, new DateTime(2000, 1, 1), new DateTime(2000, 1, 1));
+            }
+            return new AItemTime(findone.ItemID, findone.Created, findone.LastModified);
         }
     }
 

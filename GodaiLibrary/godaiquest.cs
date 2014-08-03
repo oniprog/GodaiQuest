@@ -762,6 +762,89 @@ namespace godaiquest
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"AItem2")]
+  public partial class AItem2 : global::ProtoBuf.IExtensible
+  {
+    public AItem2() {}
+    
+    private int _item_id = default(int);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"item_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int item_id
+    {
+      get { return _item_id; }
+      set { _item_id = value; }
+    }
+    private int _item_image_id = default(int);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"item_image_id", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(int))]
+    public int item_image_id
+    {
+      get { return _item_image_id; }
+      set { _item_image_id = value; }
+    }
+    private string _header_string = "";
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"header_string", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string header_string
+    {
+      get { return _header_string; }
+      set { _header_string = value; }
+    }
+    private byte[] _header_image = null;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"header_image", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] header_image
+    {
+      get { return _header_image; }
+      set { _header_image = value; }
+    }
+    private bool _bNew = default(bool);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"bNew", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool bNew
+    {
+      get { return _bNew; }
+      set { _bNew = value; }
+    }
+    private long _created = default(long);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"created", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long created
+    {
+      get { return _created; }
+      set { _created = value; }
+    }
+    private long _last_modified = default(long);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"last_modified", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long last_modified
+    {
+      get { return _last_modified; }
+      set { _last_modified = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ItemInfo2")]
+  public partial class ItemInfo2 : global::ProtoBuf.IExtensible
+  {
+    public ItemInfo2() {}
+    
+    private readonly global::System.Collections.Generic.List<godaiquest.AItem2> _item_list = new global::System.Collections.Generic.List<godaiquest.AItem2>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"item_list", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<godaiquest.AItem2> item_list
+    {
+      get { return _item_list; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"ALocation")]
   public partial class ALocation : global::ProtoBuf.IExtensible
   {
