@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="Godai Quest" Language="1041" Version="1.0.0.0" Manufacturer="oniprog" UpgradeCode="DD185F85-3908-4066-B433-FAF01F3997E0" Codepage="utf-8">
+    <Product Id="*" Name="Godai Quest" Language="1041" Version="1.0.0.1" Manufacturer="oniprog" UpgradeCode="DD185F85-3908-4066-B433-FAF01F3997E0" Codepage="utf-8">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
 
         <MajorUpgrade DowngradeErrorMessage="新しいバージョンの [ProductName] がすでにインストールされています" />
