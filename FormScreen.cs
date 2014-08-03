@@ -999,15 +999,23 @@ namespace GodaiQuest
                     }
 
                     // アイテムの処理
-                    FormOpenItem form = new FormOpenItem(false, strFolder, this.mGQCom, nItemID, this.mLocation.getDungeonUserID());
+                    //FormOpenItem form = new FormOpenItem(false, strFolder, this.mGQCom, nItemID, this.mLocation.getDungeonUserID(), this.mLocation, this.mDungeon);
+                    FormOpenItem form = new FormOpenItem(this.mLocation.getDungeonUserID()==this.mGQCom.getUserID(), true, strFolder, this.mGQCom, nItemID, this.mLocation.getDungeonUserID(), this.mLocation, this.mDungeon);
                     form.ShowDialog();
 
-                    // ピックアップ情報を再読み込み
-                    this.loadUnpickedupInfo();
+                    if (form.isChangeDungeon())
+                    {
+                        this.loadDungeon(this.mLocation, true);
+                    }
+                    else
+                    {
+                        // ピックアップ情報を再読み込み
+                        this.loadUnpickedupInfo();
 
-                    // モンスタ情報を再読み込み
-                    this.loadMonsterInfo();
-                    this.initMonsterPosition();
+                        // モンスタ情報を再読み込み
+                        this.loadMonsterInfo();
+                        this.initMonsterPosition();
+                    }
                 }
             }
             else if (poiClick.X == this.mLocation.getIX() && poiClick.Y == this.mLocation.getIY())

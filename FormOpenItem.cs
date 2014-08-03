@@ -19,15 +19,25 @@ namespace GodaiQuest
         private bool mOwner;
         private MonsterInfo mMonsterInfo;
         private int mDungeonID;
+        private AItem mItem;
+        private ALocation mLocation;
+        private DungeonInfo mDungeonInfo;
+        private bool mChangeDungeon;
 
-        public FormOpenItem(bool bOwner_, String strFolder, GQCommandMaster gqcom_, int nItemID_, int nDungeonID_)
+        public FormOpenItem(bool bOwner_, bool bShowChangeItemBtn, String strFolder, GQCommandMaster gqcom_, int nItemID_, int nDungeonID_, ALocation location_, DungeonInfo dungeonInfo_)
         {
             InitializeComponent();
+            if (!bOwner_ || !bShowChangeItemBtn)
+                btnChangeAItem.Visible = false;
+
+            mChangeDungeon = false;
             this.mFolder = strFolder;
             this.mGQCom = gqcom_;
             this.mItemID = nItemID_;
             this.mOwner = bOwner_;
             this.mDungeonID = nDungeonID_;
+            this.mLocation = location_;
+            this.mDungeonInfo = dungeonInfo_;
         }
 
         private void FormOpenItem_Load(object sender, EventArgs e)
@@ -51,7 +61,8 @@ namespace GodaiQuest
             ItemInfo itemInfo = new ItemInfo();
             this.mGQCom.getItemInfo(out itemInfo);
             var item = itemInfo.getAItem(this.mItemID);
-            this.richTextBox3.Text = item.getHeaderString();            
+            this.richTextBox3.Text = item.getHeaderString();
+            this.mItem = item;
             
             // アーティクルをセットする
             richTextBox1.Text = this.mGQCom.getAritcleString(this.mItemID);
@@ -197,6 +208,20 @@ namespace GodaiQuest
         private void richTextBox3_LinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
+        }
+
+        private void btnChangeAItem_Click(object sender, EventArgs e)
+        {
+            var form = new FormShowHeader(this.mItem, this.mGQCom, this.mLocation, this.mDungeonInfo, this.mDungeonID,
+                this.mFolder);
+            form.ShowDialog();
+            this.loadArticle();
+            mChangeDungeon = true;
+        }
+
+        public bool isChangeDungeon()
+        {
+            return mChangeDungeon;
         }
     }
 }

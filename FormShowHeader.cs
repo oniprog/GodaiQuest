@@ -25,11 +25,38 @@ namespace GodaiQuest
         private DungeonInfo mDungeon;
         private int mDungeonID;
 
-        public FormShowHeader(FormEdit parent, AItem item_, GQCommandMaster gqcom_, ALocation location_, DungeonInfo dungeon_, int nDugeonID_, String strUserFolder_ ) 
+        public FormShowHeader(AItem item_, GQCommandMaster gqcom_, ALocation location_, DungeonInfo dungeon_, int nDungeonID_, String strUserFolder_)
         {
             InitializeComponent();
 
-            this.mDungeonID = nDugeonID_;
+            btnChangeItemImage.Visible = false;
+            btnOpen.Visible = false;
+                
+            this.mDungeonID = nDungeonID_;
+
+            this.mItem = item_;
+            this.mItemHeader = item_.getHeaderString();
+            this.mItemHeaderImage = item_.getHeaderImage();
+            this.mItemID = item_.getItemID();
+            this.mGQCom = gqcom_;
+            this.mItemImageID = this.mItem.getItemImageID();
+
+            // イメージを得る
+            DungeonBlockImageInfo images;
+            this.mGQCom.getDungeonBlockImage(out images);
+            this.picItemImage.Image = images.getImageAt((uint)this.mItemImageID);
+            this.mLocation = location_;
+
+            this.mUserFolder = strUserFolder_;
+            this.mDungeon = dungeon_;
+            
+        } 
+
+        public FormShowHeader(FormEdit parent, AItem item_, GQCommandMaster gqcom_, ALocation location_, DungeonInfo dungeon_, int nDungeonID_, String strUserFolder_ ) 
+        {
+            InitializeComponent();
+
+            this.mDungeonID = nDungeonID_;
 
             this.mParent = parent;
             this.mItem = item_;
@@ -112,7 +139,7 @@ namespace GodaiQuest
             String strFolder = Path.Combine(this.mUserFolder, "" + this.mItemID);
             Hide();
             this.mGQCom.getAItem(this.mItemID, strFolder);
-            FormOpenItem dlg = new FormOpenItem(true, strFolder, this.mGQCom, this.mItemID, this.mDungeonID);
+            FormOpenItem dlg = new FormOpenItem(true, false, strFolder, this.mGQCom, this.mItemID, this.mDungeonID, this.mLocation, this.mDungeon);
             dlg.ShowDialog();
             Show();
             DialogResult = DialogResult.OK;
@@ -139,11 +166,16 @@ namespace GodaiQuest
             else
             {
                 // ダンジョンの可視化情報も変える
-                this.mDungeon.setDungeonImageAt(this.mLocation.getIX(), this.mLocation.getIY(), (uint)this.mItemImageID);
+                this.mDungeon.setDungeonImageAt(this.mLocation.getIX(), this.mLocation.getIY(),
+                    (uint) this.mItemImageID);
 
-                //
-                this.mParent.loadItemInfo();
+                if (this.mParent != null)
+                {
+                    //
+                    this.mParent.loadItemInfo();
+                }
                 MessageBox.Show("変更を保存しました");
+                Close();
             }
         }
 
