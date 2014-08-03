@@ -587,7 +587,7 @@ namespace GodaiQuestServer
                 var writer = userinfo.getAUser(article.getUserID());
                 foreach (var userdb in userinfo ) {
 
-                    if (userdb.getUserID() == 0)
+                    if (writer.getUserID() == 0)
                         continue;   // システムの書き込みはくわえない
 
                     var reader = userinfo.getAUser(userdb.getUserID());
