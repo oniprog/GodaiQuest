@@ -51,7 +51,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(12, 171);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(484, 191);
+            this.richTextBox1.Size = new System.Drawing.Size(737, 336);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -79,7 +79,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(422, 386);
+            this.btnCancel.Location = new System.Drawing.Point(675, 531);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 38);
             this.btnCancel.TabIndex = 3;
@@ -101,7 +101,7 @@
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(282, 386);
+            this.btnSave.Location = new System.Drawing.Point(535, 531);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(126, 38);
             this.btnSave.TabIndex = 5;
@@ -119,7 +119,7 @@
             this.txtAshiato.Multiline = true;
             this.txtAshiato.Name = "txtAshiato";
             this.txtAshiato.ReadOnly = true;
-            this.txtAshiato.Size = new System.Drawing.Size(303, 134);
+            this.txtAshiato.Size = new System.Drawing.Size(556, 134);
             this.txtAshiato.TabIndex = 6;
             // 
             // label1
@@ -154,7 +154,7 @@
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(10, 371);
+            this.label7.Location = new System.Drawing.Point(10, 516);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(276, 12);
             this.label7.TabIndex = 25;
@@ -164,7 +164,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(508, 431);
+            this.ClientSize = new System.Drawing.Size(761, 576);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.btnChangeItemImage);
             this.Controls.Add(this.picItemImage);
